@@ -1,0 +1,583 @@
+<HTML>
+<HEAD>
+<TITLE>MICO</TITLE>
+<!-- Changed by: Arno Puder, 26-Aug-1998 -->
+</HEAD>
+<BODY BGCOLOR="#CCCCCC"-->
+
+<TABLE BGCOLOR="#CCCCCC">
+
+
+<TR><TD BGCOLOR="#bbbbbb">
+<A NAME=version></A>
+<H1>Current Version</H1>
+<P>
+<P>
+
+Version @VERSION@ was released on @DATE@.
+
+<P><img src="dot1.gif" height="25">
+<p>&nbsp;
+
+
+<TR><TD BGCOLOR="#cccccc">
+<A NAME=intro></A>
+
+<H1>What is MICO?</H1>
+<P>
+<P>
+
+The acronym MICO expands to <EM><B>M</B></EM>ICO <EM><B>I</B></EM>s
+<EM><B>CO</B></EM>RBA. The intention of this project is to provide a
+<EM>freely available</EM> and <EM>fully compliant</EM> implementation
+of the <A HREF="http://www.omg.org/">CORBA</A> standard. MICO has
+become quite popular as an <A
+HREF="http://www.opensource.org/">OpenSource</A> project and is widely
+used for different purposes (see our <a href="#stories">success
+stories</A>). As a major milestone, MICO has been branded as <a
+href="http://www.opengroup.org/press/7jun99_a.htm">CORBA compliant</A>
+by the OpenGroup, thus demonstrating that OpenSource can indeed
+produce industrial strength software.
+
+<a href="http://www.opengroup.org/press/7jun99_a.htm">
+<IMG SRC="corba-brand-trans.gif" BORDER=0 VSPACE=10 HSPACE=10 ALIGN=right>
+</A>
+
+Our goal is to keep MICO compliant to the latest CORBA standard. The
+sources of MICO are placed under the <A
+HREF="http://www.gnu.org/copyleft/">GNU-copyright notice</A>. The
+following design principles guided the implementation of MICO:
+
+<UL>
+  <LI> start from scratch: only use what standard APIs (POSIX/Win32)
+       have to offer;
+       don't rely on propietary or specialized libraries.
+  <LI> use standard C++ for the implementation.
+  <LI> only make use of widely available, free, non-proprietary tools.
+  <LI> omit bells and whistles: only implement what is required for a
+       CORBA compliant implementation.
+  <LI> clear design even for implementation internals to ensure extensibility.
+</UL>
+
+<P> We decided to implement MICO in C++. If you are interested in a
+Java implementation, you should take a look at
+<A HREF="http://jacorb.inf.fu-berlin.de/">JacORB</A>. The
+current version of MICO is @VERSION@ including the following features:
+
+<UL>
+  <LI> IDL to C++ mapping
+  <LI> Dynamic Invocation Interface (DII)
+  <LI> Dynamic Skeleton Interface (DSI)
+  <LI> graphical Interface Repository browser that allows you to
+       invoke arbitrary methods on arbitrary interfaces
+  <LI> Interface Repository (IR)
+  <LI> IIOP as native protocol (ORB prepared for multiprotocol support)
+  <LI> Portable Object Adapter (POA)
+  <LI> Objects by Value (OBV)
+  <LI> CORBA Components (CCM)
+  <LI> Support for using MICO from within X11 applications (Xt, Qt, and Gtk)
+       and Tcl/Tk
+  <LI> Dynamic Any
+  <LI> Interceptors <i>(deprecated feature)</i>
+  <LI> Portable Interceptors (PI)
+  <LI> Support for secure communication and authentication using SSL
+  <LI> Support for nested method invocations
+  <LI> <TT>Any</TT> offers an interface for inserting and extracting
+       constructed types that were not known at compile time
+  <LI> Full BOA implementation <i>(deprecated feature)</i>, including all activation modes,
+       support for object migration and the implementation repository
+  <LI> BOA can load object implementations into clients at runtime using
+       loadable modules
+  <LI> Multi-threading (MT): support for thread-pool and
+       thread-per-connection concurrency models
+  <LI> CORBA Services:
+    <UL>
+      <LI> Interoperable Naming service
+      <LI> Trading service
+      <LI> Event service
+      <LI> Relationship service
+      <LI> Property service
+      <LI> Time service
+      <LI> Security service
+    </UL>
+</UL>
+
+<P><i>(deprecated feature - the feature will be removed in some of future MICO
+versions)</i><P>&nbsp;
+
+
+<TR><TD BGCOLOR="#bbbbbb">
+<A NAME=projects> </A>
+<H1>Projects</H1>
+<P>
+
+While in the past we have been able to maintain MICO, it becomes increasingly difficult for us to add new features due to our time constraints. On several occasions companies have stepped forward to fund the development of new code in MICO:
+
+<UL>
+  <LI> MICO/MT (funded by AT&amp;T Broadband) - done and merged into MICO 2.3.9
+  <LI> CORBASec L2 (funded by Deutsche Telekom) - done and merged into MICO
+    2.3.9
+  <LI> <a href="http://www.fpx.de/MicoCCM/" TARGET="_top">CORBA Components</a> (funded by
+    Alcatel) - done and merged into MICO 2.3.7
+  <LI> Policy Management Framework (PMF) and Security Level 3 (SL3) (partly funded by <a href="http://www.ist-coach.org">EU-IST
+    COACH</a> and by <a href="http://www.objectsecurity.com">ObjectSecurity Ltd.</a>)
+  <LI> <a href="http://nova.ls.fi.upm.es/hpda/Projects/CORBA_concurrency_transactions.html" TARGET="_top">Transaction and Concurrency Control for MICO</a> (Facultad de Informatica Universidad Politecnica de Madrid)
+</UL>
+
+We hope that the MICO homepage can serve as a meeting point between companies and the open source community. If you are interested in providing some funds to implement parts of the CORBA specification missing in MICO, please let <A HREF="mailto:arno@mico.org">me</A> know and I'll add a project description to this page. Your proposal should include timeline, milestones, deliverables and, of course, the compensation. There is only one requirement from us, namely that the resulting source code will be published under the GNU-GPL/LGPL license.
+
+<P>You can also purchase commercial support and order new MICO features
+development under a commercial support contract. Click <a href="#commsup">here</a>
+for more information about MICO commercial support.<P>
+
+
+<tr>
+  <TD BGCOLOR="#cccccc">
+<A NAME=sponsors></A>
+
+<H1> Sponsors</H1>
+<P>
+<img src="sfsu.gif" align="left">
+The <a href="http://www.sfsu.edu/">San Francisco State University</a> is hosting the www.mico.org homepage as well as our mailing lists.
+<p>
+&nbsp;
+
+<P align="left">The MICO development is currently funded as part of the European
+Union&nbsp; project <a href="http://www.ist-coach.org"> COACH (Component Based
+Open Source Architecture for Distributed Telecom
+Applications)</a> under the Information Society Technologies (IST) Programme
+(Project IST-2001-34445, Duration: 1 April 2002 to 31 March 2004)<P align="center"><a href="http://www.ist-coach.org">&nbsp;<img border="0" src="COACHLogoSmallOnBlue.gif" align="center" width="263" height="85"><img border="0" src="istlogo-trans.gif" align="center" width="98" height="79" hspace="20">
+
+</a>
+
+<P><img src="dot1.gif" height="25"><P>
+
+
+&nbsp;
+
+
+</tr>
+
+
+<TR><TD BGCOLOR="#BBBBBB">
+<A NAME=source></A>
+<H1>Source</H1>
+<P>
+
+The current version @VERSION@ runs on Sun Solaris, IBM AIX,
+HP-UX, Linux, Digital Unix, Ultrix, Windows NT and PocketPC and it shouldn't be too
+difficult to port it to other platforms. Click 
+<A HREF="CHANGES">here</A> for a list of changes. Please send bug reports
+or comments to the <A HREF="#maillist">MICO mailing list</A>. <P>
+
+The following packages are available:
+
+<UL>
+  <LI>Complete sources for MICO in <A HREF="mico-@VERSION@.tar.gz">.tar.gz</A>
+      and <A HREF="mico-@VERSION@.zip">.zip</A> format.
+  <LI>Development snapshots are available <A HREF="http://mico.org/snapshots">here</A>.
+  <LI>Anonymous <a href="http://gnuarch.org">Arch</a> acccess:&nbsp;<br>
+    <CODE>larch register-archive mico-devel@mico.org--archive http://mico.org/mico-archive&nbsp;<br>
+    larch get mico-devel@mico.org--archive/mico--main--2.3 mico</CODE>
+  <LI>Anonymous <a href="http://gnuarch.org">Arch</a> acccess to the
+      latest development branch
+      (kgardas@objectsecurity.com--local/mico--devel):<br>
+      <CODE>
+      larch register-archive kgardas@objectsecurity.com--local http://mico.org/~karel/local-mirror
+      larch get kgardas@objectsecurity.com--local/mico--devel--2.3
+      mico</CODE><br>
+
+    Note: instead of larch you can use either tla or arx
+  
+</UL>
+
+The following tools are necessary to compile MICO:
+
+<UL>
+  <LI> Any decent C++ compiler (we recommend the GNU compiler,
+       <a href="http://gcc.gnu.org/">gcc 2.95.x</a> or <a href="http://gcc.gnu.org/">gcc
+    3.2.x</a> for multi-threaded build)
+  <LI> <a href="ftp://prep.ai.mit.edu/pub/gnu/flex-2.5.3.tar.gz">flex 2.5.3</a> (optional)
+  <LI> <a href="ftp://prep.ai.mit.edu/pub/gnu/bison-1.25.tar.gz">bison 1.25</a> (optional)
+  <LI> <a href="http://java.sun.com">JDK 1.1.5</a> (or later versions) (optional)
+  <LI> <a href="http://www.cs.princeton.edu/~appel/modern/java/CUP/">Java CUP 0.10g</a> (optional)
+  <LI> <a href="http://www.openssl.org">OpenSSL</A> either 0.9.6i or 0.9.7a (optional)
+</UL>
+
+MICO has been reported to work on the following platforms. Let us know if
+you succeed in running MICO on other platforms
+
+<ul>
+  <li> Solaris 2.5, 2.6, 7, 8 and 9 on Sun SPARC (gcc 2.95, native C++
+  compiler)
+  <li> Solaris 8 and 9 on x86 (gcc 3.3)
+  <li> AIX 4.2 on IBM RS/6000 (gcc 2.95, native C++ compiler)
+  <li> Linux 2.x on Intel x86 (gcc 2.95, como4.3.x.y, icc8.0)
+  <li> Linux 2.x on Sun UltraSparc (gcc 2.95)
+  <li> Linux 2.x on DEC Alpha (gcc 2.95)
+  <li> Linux 2.x on ARM (gcc 3.2)
+  <li> Digital Unix 4.x and 5.x on DEC Alpha (gcc 2.95)
+  <li> Digital Ultrix 4.3 on DEC Mips (gcc 2.95)
+  <li> HP-UX 10.20 on PA-RISC (gcc 2.95, native C++ compiler)
+  <li> SGI-IRIX on DEC Mips (gcc 2.95, native C++ compiler)
+  <li> PowerMax OS (native C++ compiler)
+  <li> Windows 9x/NT/2000/XP (Visual-C++ 7 (aka .Net), Cygwin or MinGW)
+  <li> FreeBSD 3.x, 4.x and 5.x on Intel x86 (gcc 2.95)
+</ul>
+
+We heard rumors that MICO somehow works on the following platforms:
+
+<ul>
+  <li> OS/2 on Intel x86 (emx 0.9)
+  <li> DG/UX on Intel x86 (egcs 1.x)
+  <li> LynxOS (egcs 1.x)
+</ul>
+
+<P><b>Note:</b> if you would like to build multi-threaded enabled build, then
+instead of gcc 2.95 you have to use at least gcc 3.2. Multi-threaded MICO
+compiled by gcc 2.95 is not stable, because of some bugs in this compiler.<P>
+
+
+<TR><TD BGCOLOR="#CCCCCC">
+<A NAME=books></A>
+<H1>Books</H1>
+<P>
+
+<H4>"MICO: An Open Source CORBA Implementation"</H4>
+<P>
+
+The book includes a comprehensive documentation of MICO from an application programmer's point of view. The accompaning CD contains binaries of MICO as ready to run executables for the following architectures:
+
+<A HREF="http://www.amazon.com/exec/obidos/ASIN/1558606661/o/qid=975180718/sr=8-1/ref=aps_sr_b_1_3/105-7005626-7206337">
+<IMG SRC="mico-book.gif" BORDER=0 VSPACE=10 HSPACE=20 ALIGN=right>
+</A>
+
+<ul>
+  <li> Solaris 2.6 on Sun SPARC
+  <li> AIX 4.2 on IBM RS/6000
+  <li> Linux 2.x on Intel x86
+  <li> HP-UX 10.20 on PA-RISC
+  <li> Windows 9x/NT on Intel x86
+</ul>
+
+The book explains how to install and use MICO. A little tutorial gets
+you going with a sample CORBA application. All features of MICO are
+well documented both in the manual and in online man-pages. MICO is
+fully interoperable with other CORBA implementations, such as Orbix
+from Iona or VisiBroker from Borland. The manual contains a
+step-by-step procedure showing how to connect MICO with other CORBA
+implementations. It even includes sample programs from various CORBA
+textbooks to show you all aspects of CORBA. <P>
+
+<blockquote>
+<EM>
+Puder and R&ouml;mer have achieved a landmark proof of the value of
+open-specification, open-source systems. The existence of commercial
+products based on the MICO CORBA implementation prove their work; this
+book proves their knowledge. You will find both of immense value in
+the tough job of building scalable, distributed, heterogeneous
+systems.
+</EM>
+<P>
+
+From the Foreword by Richard Mark Soley, Ph.D.<br>
+Chairman and CEO, Object Management Group, Inc.
+</blockquote>
+<P>
+
+
+<HR>
+
+<H4>&quot;Developing Secure Distributed Systems with CORBA" (ISBN 1-58053-295-0)</H4> <p><a href="http://www.objectsecurity.com/book.html"><img border="0" src="http://www.objectsecurity.com/295lang.gif" align="right" width="165" height="240" hspace="10"></a>This
+new book is a clearly written, well structured guide to building secure
+distributed applications with CORBA. It helps securing CORBA applications,
+integrating security infrastructure with CORBA applications, and evaluating the
+security effectiveness of distributed applications. You get a comprehensive
+study of the CORBA security architecture, providing you with a better
+understanding of its goals and limitations. It serves as your complete reference
+for understanding security in distributed systems.</p> 
+<p>The book also generously illustrates the usage of the MICOSec CORBA security
+services implementation, including important information on the installation and
+configuration of MICOSec, the usage of two different kinds of application-facing
+interfaces, and the configuration of CORBA security for applications that do not
+contain any security-related modifications.</p>
+<blockquote>
+<P>
+
+
+<i>&quot;In this impressive book, well-known security experts Lang &amp;
+Schreiner manage to cover all of the CORBAsec specification in a structured and
+technical fashion. It is well suited to security professionals who need a
+comprehensive reference guide with detailed descriptions of, and rationales for,
+the CORBAsec architecture and systems security architectures in general. This
+well-written hands-on guide is invaluable for developers building real-world
+applications, and belongs on the desk of every systems security engineer on the
+planet.” --- Richard Mark Soley, Chairman &amp; CEO, OMG</i>
+</blockquote>
+<P>
+
+
+Click <a href="http://www.objectsecurity.com/book.html"  target="_blank">here</a> for more
+information.
+<P>
+
+
+&nbsp;
+
+
+<HR>
+
+<H4>"Middleware f&uuml;r verteilte Systeme"</H4> (in German)
+<P>
+
+The book explains the internal structure of a middleware platform based on CORBA. Throughout the book the design and architecture of a middleware platform is described from two different perspectives: the view of an application programmer (using the middleware) and the view of a system programmer (implementing the middleware). MICO serves as a case study to describe a specific architecture using a micro-kernel approach. The book also serves as a reference to the internals of MICO. An English translation will soon be available.
+
+        
+<A HREF="http://www.amazon.de/exec/obidos/ASIN/3932588037/o/qid=975180631/sr=8-1/028-7696581-5006955">
+<IMG SRC="mico-textbook-de.gif" WIDTH=200 BORDER=0 VSPACE=10 HSPACE=20 ALIGN=right>
+</A>
+
+<P>
+Both books can be purchased in Europe from:
+
+<blockquote>
+   dpunkt.verlag f&uuml;r digitale Technologie
+<br>
+   Ringstra&szlig;e 19
+<br>
+   69115 Heidelberg, Germany
+<br>
+   fax: +49 - 6221 - 47 29 09
+<br>
+   web: <a href="http://www.dpunkt.de/mico">http://www.dpunkt.de/mico</a>
+</blockquote>
+
+<p>
+and in North America from:
+
+<blockquote>
+   Morgan Kaufmann Publishers, Inc.
+<br>
+   340 Pine Street, Sixth Floor
+<br>
+   San Francisco, CA 94104-3205
+<br>
+   fax: (415) 982-2665
+<br>
+   web: <a href="http://www.mkp.com/mico">
+        http://www.mkp.com/mico</a>
+</blockquote>
+
+<P><img src="dot1.gif" height="25"><P>
+
+
+<TR><TD BGCOLOR="#BBBBBB">
+<A NAME=documentation> </A>
+<H1>Documentation</H1>
+<P>
+
+The free documentation is a subset of the MICO distribution, that
+contains enough information to get you going. The documentation comes
+in various different flavours, depending on your preferred reading
+habits. The content of all the different versions is identical. The
+documentation provides a short introduction on middleware platforms as
+well as a tutorial on CORBA. The documentation also describes MICO in
+great detail.
+
+<UL>
+  <LI> <A HREF="doc.ps.gz">Single PostScript file</A>
+  <LI> <A HREF="doc-book.ps.gz">PostScript file in booklet form
+       (requires two sided printing capabilities)</A>
+  <LI> <A HREF="http://www.mico.org/mailman/listinfo/mico-devel">Searchable
+       mailing list archive</A>
+  <LI> <A HREF="FAQ">Frequently Asked Questions (FAQ)</A>
+  <LI> <A HREF="doc/doc.html">Online documentation</A>
+  <LI> <A HREF="doc-html.tar.gz">Set of downloadable HTML pages</A>
+</UL>
+
+<P><img src="dot1.gif" height="25"><P>
+
+
+<TR><TD BGCOLOR="#CCCCCC">
+<A NAME=maillist> </A>
+<H1>Mailing Lists</H1>
+<P>
+
+Further development and other MICO related aspects are dicussed on the
+<code>mico-devel</code> mailing list. You can subscribe by
+clicking <a href="http://www.mico.org/mailman/listinfo/mico-devel" TARGET="_top">here</a>.
+<P>
+There is also a low-traffic, read-only, moderated mailing list,
+<code>mico-announce</code> where announcements of new MICO releases or
+related software are sent occasionally. To subscribe, click
+<a href="http://www.mico.org/mailman/listinfo/mico-announce" TARGET="_top">here</a>.
+<p>
+Before your subscription becomes effective, you will receive a
+confirmation message by email that <i>you must reply to</i>. The
+intent of this confirmation is to avoid illegal email addresses on the
+mailing list (for example by mistyping it on the Web subscription form).
+<p>
+
+Before sending a question over the mailing list, you might want to
+have a look at the <a HREF="http://www.mico.org/mailman/listinfo/mico-devel">searchable
+mailing list archive</a> or the <A HREF="FAQ">FAQ</A>, to see if your
+problem was already discussed before.
+
+<P><img src="dot1.gif" height="25"><P>
+
+
+<TR><TD BGCOLOR="#BBBBBB">
+<A NAME=authors> </A>
+<H1>Authors</H1>
+<P>
+
+The CORBA core was implemented by:
+
+<UL>
+  <LI><A HREF="http://www.inf.ethz.ch/~roemer/" TARGET="_top">
+       Kay R&ouml;mer:</A> <I>ORB, IIOP, OBV.</I>
+  <LI><A HREF="http://www.puder.org/" TARGET="_top">
+       Arno Puder:</A> <I>IDL-compiler, Interface Repository.</I>
+  <LI><A HREF="http://www.fpx.de/fp/" TARGET="_top">
+       Frank Pilhofer:</A> <I>POA, OBV, CCM.</I>
+  <LI><a href="mailto:aschultz@warp10.net">Andreas Schultz</a>, Andy Kersting,
+    and <a href="mailto:kgardas@objectsecurity.com">Karel Gardas</a>: <i>multi-threading</i>
+  <LI><a href="http://www.objectsecurity.com" target="_blank">ObjectSecurity Ltd.</a>: <i>Portable
+    Interceptors</i>
+</UL>
+
+With a little help from some friends:
+<UL>
+  <LI><A HREF="http://wwwiti.cs.uni-magdeburg.de/~sattler/">
+       Kai-Uwe Sattler:</A> <I>Naming and event service.</I>
+  <LI>Lars Doelle: <I>Qt support.</I>
+  <LI><A HREF="http://www.msc.cornell.edu/~otaylor/">
+       Owen Taylor:</A> <I>GTK support.</I>
+  <LI><A HREF="mail:sopwith@redhat.com">Elliot Lee</A>:
+      <I>C language mapping.</I> (note: removed in MICO 2.2.7)
+  <LI><A HREF="http://www.vsb.cs.uni-frankfurt.de/~becker">Christian
+      Becker</A>: <I>Stream service.</I>
+  <LI><A HREF="mailto:ben@jetpen.com">Ben Eng</A>,
+      <A HREF="mailto:am@concurrent.co.uk">Andrew Metcalfe</A>,
+      <A HREF="http://www.zib.de/best/">Christoph Best</A>, and
+      <A HREF="mailto:aschultz@icsi.berkeley.edu">Andreas Schultz</A>:
+      <I>adopted MICO to various C++ compilers.</I>
+  <LI><A HREF="http://www.martin-sander.de">Martin Sander</A>,
+      <A HREF="mailto:janz@stud.uni-frankfurt.de">Rudolf Janz</A>:
+      <I>adopted MICO to Visual-C++.</I>
+  <LI><A HREF="http://www.informatik.uni-frankfurt.de/~mueller">Marcus
+      M&uuml;ller</A>:
+      <I>Codeset converters.</I>
+  <LI><A HREF="mailto:gardask@alpha.inf.upol.cz">Karel Gardas</A>:
+      <I>Relationship service.</I>
+  <LI><A HREF="mailto:leif@informatik.uni-frankfurt.de">Leif Jakobsmeier</A>:
+      <I>Property service.</I>
+  <LI><A HREF="mailto:weis@kde.org">Torben Weis</A>:
+      <I>Trading service.</I>
+  <LI><A HREF="mailto:jackt@gel.ulaval.ca">Jacques Tremblay</A>:
+      <I>FLtk support.</I>
+  <LI><A HREF="mailto:Wil_Evers@doosys.com">Wil Evers</A>:
+      <I>CORBA compliant exception handling.</A></I>
+  <LI><A HREF="mailto:digiorgi@DI.Unipi.IT">Massimo Di Giorgio</A>:
+      <I>Microsoft IDL generator.</I>
+  <LI><A HREF="mailto:zerbst@tu-harburg.de">Carsten Zerbst</A>:
+      <I>Time Service.</I>
+  <LI><a href="http://www.objectsecurity.com"  target="_blank">ObjectSecurity Ltd.</a>: <i>CORBA
+    Security Service level 2 and Common Secure Interoperability version 2</i>
+</UL>
+
+<P><img src="dot1.gif" height="25">
+
+
+<TR><TD BGCOLOR="#CCCCCC">
+<A NAME=maintainers> </A>
+
+<H1>Current Maintainers</H1>
+<P>
+
+The MICO project is currently maintained by:
+<ul>
+  <li><a href="mailto:kgardas@objectsecurity.com">Karel Gardas</a> (current
+    maintainer)</li>
+  <li><a href="mailto:msorin@objectsecurity.com">Sorin Mustaca</a> (Win32 port
+    maintainer)</li>
+  <li><a href="mailto:sem@ciam.ru">Sergey Matveychuk</a> (FreeBSD port
+    maintainer)</li>
+  <li><a href="mailto:J.Kraaijeveld@Askesis.nl">Joost Kraaijeveld</a>
+    (Cygwin and MinGW port maintainer)
+</ul>
+
+
+<p>&nbsp;
+
+
+<TR><TD BGCOLOR="#BBBBBB">
+<A NAME=commsup> </A>
+<H1>Commercial Support</H1>
+
+<P><a href="http://www.objectsecurity.com"  target="_blank">ObjectSecurity Ltd.</a> provides
+commercial support, as well as development and consulting services for MICO.
+Click <a href="http://www.objectsecurity.com/commsup.html" target="_blank">here</a> if you would
+like to know more about the various support plans and service options.
+<p>&nbsp;
+
+
+<TR><TD BGCOLOR="#CCCCCC">
+<A NAME=stories> </A>
+<H1>Success Stories</H1>
+<P>
+
+Drop us a <A HREF="mailto:arno@mico.org">mail</A> if
+you want to see your project listed below...
+
+<UL>
+  <LI><A HREF="http://linuxtoday.com/news_story.php3?ltsn=2000-10-10-011-04-PR">
+      Weather Channel</A> uses MICO for the collection and distribution of
+      weather data.
+  <LI><A HREF="http://corbaweb.lifl.fr/CorbaScript/">CorbaScript</A>,
+      an OO scripting language with access to all the CORBA functionality
+      supports MICO.
+  <LI><A HREF="http://www.math.uni-goettingen.de/micoe/">MICO/E</A> is an
+      Eiffel version of MICO
+  <LI><A HREF="mailto:becker@vsb.cs.uni-frankfurt.de/~becker/">MAQS (Management
+      Architecture for QoS)</A> aims at adding generic QoS support to
+      CORBA. Its prototype implementation is based on MICO.
+  <LI><A HREF="http://www.vsb.cs.uni-frankfurt.de/lehre/praktikum/WS_97-98/Content.html">MICO Praktikum</A>
+      at University of Frankfurt, VSB
+  <LI><A HREF="http://www.informatik.tu-darmstadt.de/VS/Lehre/WS98-99/VertSysPrak/">MICO Praktikum</A> at TU Darmstadt
+  <LI>MICO has firewall support for the
+      <A HREF="http://www.objectsecurity.com/">TIS-plug-gw</A>, a TCP-proxy
+      firewall.
+  <LI><A HREF="http://www.fpx.de/Combat/">Combat</A> is
+      a Tcl extension that gives access to CORBA functionality from Tcl.
+  <LI>Christoph Gebauer's
+      <A HREF="http://www.vsb.cs.uni-frankfurt.de/~gebauer/">Load Monitor
+      and Interface Repository Browser</A>.
+  <LI><A HREF="http://www.fokus.gmd.de/research/cc/platin/coop/tina-internet/test/">KAM (market for small ads)</A>, a
+      project to evaluate the TINA architecture in the Internet environment,
+      is partially implemented using MICO.
+  <LI>The <A HREF="http://www.irisa.fr/caps/PROJECTS/Cobra/">PACHA</A>
+      esprit project uses MICO as middleware to manage a cluster of
+      PCs connected by an SCI network.
+  <LI>The Jaco3 esprit project uses MICO as middleware.
+  <LI>The <A HREF="http://www.linuxnet.com/">MUSCLE</A> (Movement for the
+      Use of Smart Cards in a Linux Environment) uses MICO.
+  <LI>The <a href="http://www.ist-coach.org">EU IST COACH</a> project uses MICO.
+  <LI><A HREF="http://www.starix.com.br/">Starix Informatica</A> uses
+      MICO in a variety of projects/products: ERP,
+      e-learning/e-training and telephony sensoring and control for <A
+      HREF="http://www.ati.com.br">ATI</A>/<A
+      HREF="http://www.telemar.com.br">TELEMAR</A>.
+  <LI>The <A HREF="http://qedo.berlios.de/">Qedo</A> CORBA Component
+      Model (CCM) implementation supports MICO as its underlying ORB.
+</UL>
+
+</TABLE>
+
+<HR>
+<a HREF="mailto:arno@mico.org">webmaster</a>, Mar 22nd, 2003
+<PRE>
+
+</PRE>
+</BODY>
+</HTML>
