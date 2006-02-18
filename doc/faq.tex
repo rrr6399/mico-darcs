@@ -1,0 +1,150 @@
+
+
+\chapter{Frequently Asked Questions About MICO}
+
+\begin{itemize}
+\item[Q:] \emph{During compilation my gcc dies with an
+    "internal compiler error". What is going wrong?}
+\item[A:] Some Linux distributions are coming with a broken version of
+  gcc that calls itself gcc 2.96. You will have to "downgrade" to gcc
+  2.95.x. See below for a note on gcc 3.0.
+\end{itemize}
+
+\begin{itemize}
+\item[Q:] \emph{MICO seems to compile, but then the IDL compiler crashes.
+    What is going wrong?}
+\item[A:] This is an error you are likely to experience with gcc 3.0. This
+  gcc version is buggy, resulting in wrong code. You cannot use MICO with
+  gcc 3.0. Bug reports have been filed with the gcc database. At the moment,
+  you will have to downgrade to gcc 2.95.x.
+\end{itemize}
+
+\begin{itemize}
+\item[Q:] \emph{gcc still dies with an "internal compiler error".}
+\item[A:] You are encouraged to submit a bug report to the appropriate
+  compiler's mailing list. In the meantime, disabling optimization
+  usually works.
+
+  \begin{verbatim}
+     ./configure --disable-optimize
+  \end{verbatim}
+\end{itemize}
+
+\begin{itemize}
+\item[Q:] \emph{During compilation gcc dies with a "virtual memory
+    exhausted" error.  What can I do?}
+
+\item[A:] Add more swap space. Under Linux you can simply create a
+  swap file:
+  
+  \begin{verbatim}
+     su
+     dd if=/dev/zero of=/tmp/swapfile bs=1024 count=64000
+     mkswap /tmp/swapfile
+     swapon /tmp/swapfile
+  \end{verbatim}
+
+  There are similar ways for other unix flavors. Ask your sys admin.
+  If for some reason you cannot add more swap space, try turning off
+  optimization by rerunning configure: \texttt{./configure
+    --disable-optimize}.
+
+  We recommend at least 64 Megabytes of physical memory for compiling
+  MICO or for development based on MICO. Ready-to-run MICO applications
+  have a much smaller memory footprint.
+\end{itemize}
+
+\begin{itemize}
+\item[Q:] \emph{I'm using gcc. Compliation aborts with an error message
+  from the assembler (as) such as}
+  \begin{verbatim}
+     /usr/ccs/bin/as: error: can't compute value of an expression
+     involving an external symbol
+  \end{verbatim}
+
+\item[A:] This is a bug in the assember which cannot handle long symbol
+  names. The preferred solution is to install the GNU assembler (from the
+  binutils package). In the meantime, you can try to enable debugging
+
+  \begin{verbatim}
+     ./configure --enable-debug
+  \end{verbatim}
+
+  You can also try to use MICO's lightweight MiniSTL package instead of
+  your system's STL library:
+
+  \begin{verbatim}
+     ./configure --enable-mini-stl
+  \end{verbatim}
+\end{itemize}
+
+\begin{itemize}
+\item[Q:] \emph{Why do MICO programs fail with a COMM\_FAILURE
+    exception when running on `localhost'?}
+\item[A:] Because MICO requires using your `real' host name. Never use
+    `localhost' in an address specification.
+\end{itemize}
+
+\begin{itemize}
+\item[Q:] \emph{MICO programs crash. Why?}
+  
+\item[A:] There is no easy answer (what did you expect?). But often
+  this is caused by linking in wrong library versions. For example
+  people often install egcs as a second compiler in their system and
+  set PATH such that egcs will be picked. But that is not enough: You
+  have to make sure that gcc's C++ libraries (esp. libstdc++) will be
+  linked in. One way to make MICO use a gcc installed in
+  \texttt{/usr/local/gcc} is:
+
+  \begin{verbatim}
+     export PATH=/usr/local/gcc/bin:$PATH
+     export CXXFLAGS=-L/usr/local/gcc/lib
+     export LD_LIBRARY_PATH=/usr/local/gcc/lib:$LD_LIBRARY_PATH
+     ./configure
+  \end{verbatim}
+  
+  If that is not the cause you probably found a bug in MICO. Write a
+  mail to \texttt{mico@vsb.cs.uni-frankfurt.de} containing a
+  description of the problem, along with
+
+  \begin{itemize}
+  \item the MICO version (make sure it is the latest by visiting
+       http://www.mico.org/)
+  \item the operating system you are running on
+  \item the hardware you are running on
+  \item the compiler type and version you are using
+  \item a stack trace
+  \item To get a stack trace run the offending program in the
+    debugger:
+    \begin{verbatim}
+      gdb <prog>
+      (gdb) run <args>
+      program got signal ???
+      (gdb) backtrace
+    \end{verbatim}
+    and include the output in your mail.
+  \end{itemize}
+\end{itemize}
+
+\begin{itemize}
+\item[Q:] \emph{After creating Implementation Repository entries with
+    imr create imr list does not show the newly created entries. What
+    is going wrong?}
+  
+\item[A:] You must tell \texttt{imr} where \texttt{micod} is running,
+  otherwise imr will create its own implementation repository which is
+  destroyed when imr exits. You tell \texttt{imr} the location of the
+  implementation repository by using the \texttt{-ORBImplRepoAddr}
+  option, e.g.:
+  \begin{verbatim}
+     micod -ORBIIOPAddr inet:jade:4242 &
+     imr -ORBImplRepoAddr inet:jade:4242
+  \end{verbatim}
+\end{itemize}
+
+\begin{itemize}
+\item[Q:] \emph{Why don't exceptions work on Linux?}
+\item[A:] They do. You are experiencing a bug in the
+  assembler. Upgrade to binutils-2.8.1.0.15 or newer and recompile
+  MICO.
+\end{itemize}
