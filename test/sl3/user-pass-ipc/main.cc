@@ -235,6 +235,10 @@ main (int argc, char *argv[])
 	//orb->run();
         // force marshalling and so PI upcalls
         CORBA::Object_var hello_obj = new CORBA::Object(new CORBA::IOR(str.in()));
+        // we need to setup domains to get appropriate transport preference policy
+        // from the domain manager -- this is needed for CSIv2, where we need
+        // to get correct "active" IOR profile
+        hello_obj->_setup_domains(CORBA::Object::_nil());
         HelloWorld_var hello = HelloWorld::_narrow(hello_obj);
         assert(!CORBA::is_nil(hello));
        
