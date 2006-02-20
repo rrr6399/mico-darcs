@@ -147,7 +147,11 @@ CSIv2::CSS_impl::write_sas_context
     if (MICO::Logger::IsLogged(MICO::Logger::Security))
 	MICO::Logger::Stream(MICO::Logger::Security)
 	    << "CSIv2::CSS_impl::write_sas_context" << endl;
-    assert(plist.mechanism_list.length() > 0);
+    //assert(plist.mechanism_list.length() > 0);
+    if (plist.mechanism_list.length() == 0) {
+	// non-CSIv2 enabled target
+	return;
+    }
     CSIIOP::CompoundSecMech mech = plist.mechanism_list[0];
 #ifdef USE_SL3
     // invoke trust in server decider, if available at the first
