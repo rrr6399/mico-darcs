@@ -1,6 +1,6 @@
 #
 #  MICO --- an Open Source CORBA implementation
-#  Copyright (c) 1997-2005 by The Mico Team
+#  Copyright (c) 1997-2006 by The Mico Team
 #
 #  This library is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Library General Public
@@ -679,14 +679,31 @@ if test X"$GXX" = Xyes; then
   #AC_TRY_COMPILE([],[],, CXXFLAGS=$SAVE_CXXFLAGS)
   
   GCCMT="safe"
-  gccmtversion=`$CXX --version 2>&1`
-  case $gccmtversion in
+  gccversion=`$CXX --version 2>&1`
+  case $gccversion in
     *2.95*)
       GCCMT="unsafe"
       ;;
     *)
       ;;
   esac
+
+  # kcg: GCC 4.1.x requires -fno-strict-aliasing
+  GCC_STRICT_ALIASING="no"
+  case $gccversion in
+    # we need to avoid 4.0.x
+    *4.0*)
+      ;;
+    *4.*)
+      GCC_STRICT_ALIASING="yes"
+      ;;
+    *)
+      ;;
+  esac
+  if test X"$GCC_STRICT_ALIASING" = Xyes; then
+    CXXFLAGS="$CXXFLAGS -fno-strict-aliasing"
+  fi
+
   if test X"$use_threads" = Xyes; then
     CXXFLAGS="$CXXFLAGS -D_REENTRANT"
   fi
