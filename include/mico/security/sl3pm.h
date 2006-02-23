@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2003 by The Mico Team
+ *  Copyright (c) 1997-2006 by The Mico Team
  *
  *  This file was automatically generated. DO NOT EDIT!
  */
@@ -149,10 +149,10 @@ typedef TSeqOut< SequenceTmpl< ResourceName,MICO_TID_DEF> > ResourceNameList_out
 
 extern MICO_EXPORT CORBA::TypeCodeConst _tc_ResourceNameList;
 
-const NameType NT_KerberosName = "oid:1.2.840.113554.1.2.2.1";
-const NameType NT_X509DirectoryNamePath = "SL3:X509DirectoryPathName";
-const NameType NT_Anonymous = "SL3:anonymous";
-const NameType NT_StringName = "oid:2.23.130.1.2.1";
+const char* const NT_KerberosName = "oid:1.2.840.113554.1.2.2.1";
+const char* const NT_X509DirectoryNamePath = "SL3:X509DirectoryPathName";
+const char* const NT_Anonymous = "SL3:anonymous";
+const char* const NT_StringName = "oid:2.23.130.1.2.1";
 struct ScopedPrivileges;
 typedef TVarVar< ScopedPrivileges > ScopedPrivileges_var;
 typedef TVarOut< ScopedPrivileges > ScopedPrivileges_out;
@@ -427,8 +427,8 @@ typedef CORBA::String_out EncodingType_out;
 
 extern MICO_EXPORT CORBA::TypeCodeConst _tc_EncodingType;
 
-const EncodingType ET_NoEncoding = "NoEncoding";
-const EncodingType ET_Unknown = "Unknown";
+const char* const ET_NoEncoding = "NoEncoding";
+const char* const ET_Unknown = "Unknown";
 struct BadEncoding : public CORBA::UserException {
   #ifdef HAVE_EXPLICIT_STRUCT_OPS
   BadEncoding();

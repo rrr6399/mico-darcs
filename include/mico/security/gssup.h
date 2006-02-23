@@ -29,7 +29,7 @@
 namespace GSSUP
 {
 
-const ::CSI::StringOID GSSUPMechOID = "oid:2.23.130.1.1.1";
+const char* const GSSUPMechOID = "oid:2.23.130.1.1.1";
 struct InitialContextToken;
 typedef TVarVar< InitialContextToken > InitialContextToken_var;
 typedef TVarOut< InitialContextToken > InitialContextToken_out;

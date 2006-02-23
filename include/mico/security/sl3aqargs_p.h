@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2003 by The Mico Team
+ *  Copyright (c) 1997-2006 by The Mico Team
  *
  *  This file was automatically generated. DO NOT EDIT!
  */
@@ -157,7 +157,7 @@ typedef ObjOut< IdentityProcessorArgument > IdentityProcessorArgument_out;
 namespace SL3AQArgs
 {
 
-const ::SL3CM::AcquisitionArgumentType ArgsHolderType = "ArgsHolder";
+const char* const ArgsHolderType = "ArgsHolder";
 
 /*
  * Base class and common definitions for local interface ArgsHolder
@@ -200,7 +200,7 @@ class ArgsHolder :
 };
 
 
-const ::SL3CM::AcquisitionArgumentType CSIv1SupportType = "CSIv1Support";
+const char* const CSIv1SupportType = "CSIv1Support";
 
 /*
  * Base class and common definitions for local interface CSIv1Support
@@ -242,7 +242,7 @@ class CSIv1Support :
 };
 
 
-const ::SL3CM::AcquisitionArgumentType CSIv2SupportType = "CSIv2Support";
+const char* const CSIv2SupportType = "CSIv2Support";
 
 /*
  * Base class and common definitions for local interface CSIv2Support
@@ -308,7 +308,7 @@ struct TCPIPInitiatorOptions {
 
 extern MICO_EXPORT CORBA::TypeCodeConst _tc_TCPIPInitiatorOptions;
 
-const ::SL3CM::AcquisitionArgumentType TCPIPInitiatorArgumentType = "TCPIPInitiatorArgument";
+const char* const TCPIPInitiatorArgumentType = "TCPIPInitiatorArgument";
 
 /*
  * Base class and common definitions for local interface TCPIPInitiatorArgument
@@ -376,7 +376,7 @@ struct TCPIPAcceptorOptions {
 
 extern MICO_EXPORT CORBA::TypeCodeConst _tc_TCPIPAcceptorOptions;
 
-const ::SL3CM::AcquisitionArgumentType TCPIPAcceptorArgumentType = "TCPIPAcceptorArgument";
+const char* const TCPIPAcceptorArgumentType = "TCPIPAcceptorArgument";
 
 /*
  * Base class and common definitions for local interface TCPIPAcceptorArgument
@@ -418,7 +418,7 @@ class TCPIPAcceptorArgument :
 };
 
 
-const ::SL3CM::AcquisitionArgumentType TLSX509IdentityVerifierInitiatorArgumentType = "TLSX509IdentityVerifierInitiatorArgument";
+const char* const TLSX509IdentityVerifierInitiatorArgumentType = "TLSX509IdentityVerifierInitiatorArgument";
 
 /*
  * Base class and common definitions for local interface TLSX509IdentityVerifierInitiatorArgument
@@ -460,7 +460,7 @@ class TLSX509IdentityVerifierInitiatorArgument :
 };
 
 
-const ::SL3CM::AcquisitionArgumentType TLSX509IdentityVerifierAcceptorArgumentType = "TLSX509IdentityVerifierAcceptorArgument";
+const char* const TLSX509IdentityVerifierAcceptorArgumentType = "TLSX509IdentityVerifierAcceptorArgument";
 
 /*
  * Base class and common definitions for local interface TLSX509IdentityVerifierAcceptorArgument
@@ -530,7 +530,7 @@ struct OpenSSLConfig {
 
 extern MICO_EXPORT CORBA::TypeCodeConst _tc_OpenSSLConfig;
 
-const ::SL3CM::AcquisitionArgumentType OpenSSLInitiatorArgumentType = "OpenSSLInitiatorArgument";
+const char* const OpenSSLInitiatorArgumentType = "OpenSSLInitiatorArgument";
 
 /*
  * Base class and common definitions for local interface OpenSSLInitiatorArgument
@@ -572,7 +572,7 @@ class OpenSSLInitiatorArgument :
 };
 
 
-const ::SL3CM::AcquisitionArgumentType OpenSSLAcceptorArgumentType = "OpenSSLAcceptorArgument";
+const char* const OpenSSLAcceptorArgumentType = "OpenSSLAcceptorArgument";
 
 /*
  * Base class and common definitions for local interface OpenSSLAcceptorArgument
@@ -614,7 +614,7 @@ class OpenSSLAcceptorArgument :
 };
 
 
-const ::SL3CM::AcquisitionArgumentType TransportCredentialsArgumentType = "TransportCredentialsArgument";
+const char* const TransportCredentialsArgumentType = "TransportCredentialsArgument";
 
 /*
  * Base class and common definitions for local interface TransportCredentialsArgument
@@ -656,7 +656,7 @@ class TransportCredentialsArgument :
 };
 
 
-const ::SL3CM::AcquisitionArgumentType DeciderArgumentType = "LocalTrustInServerDeciderArgument";
+const char* const DeciderArgumentType = "LocalTrustInServerDeciderArgument";
 
 /*
  * Base class and common definitions for local interface DeciderArgument
@@ -698,7 +698,7 @@ class DeciderArgument :
 };
 
 
-const ::SL3CM::AcquisitionArgumentType GeneratorArgumentType = "UserPasswordGenerator";
+const char* const GeneratorArgumentType = "UserPasswordGenerator";
 
 /*
  * Base class and common definitions for local interface GeneratorArgument
@@ -740,7 +740,7 @@ class GeneratorArgument :
 };
 
 
-const ::SL3CM::AcquisitionArgumentType ProcessorArgumentType = "UserPasswordProcessor";
+const char* const ProcessorArgumentType = "UserPasswordProcessor";
 
 /*
  * Base class and common definitions for local interface ProcessorArgument
@@ -782,7 +782,7 @@ class ProcessorArgument :
 };
 
 
-const ::SL3CM::AcquisitionArgumentType QuotingPrincipalArgumentType = "QuotingPrincipal";
+const char* const QuotingPrincipalArgumentType = "QuotingPrincipal";
 
 /*
  * Base class and common definitions for local interface QuotingPrincipalArgument
@@ -824,7 +824,7 @@ class QuotingPrincipalArgument :
 };
 
 
-const ::SL3CM::AcquisitionArgumentType ATLASArgumentType = "ATLAS";
+const char* const ATLASArgumentType = "ATLAS";
 
 /*
  * Base class and common definitions for local interface ATLASArgument
@@ -874,7 +874,7 @@ typedef TSeqOut< IfaceSequenceTmpl< ::SL3Authorization::TokenProcessor_var,::SL3
 
 extern MICO_EXPORT CORBA::TypeCodeConst _tc_TokenProcessorSeq;
 
-const ::SL3CM::AcquisitionArgumentType TokenProcessorSeqArgumentType = "TokenProcessorSeq";
+const char* const TokenProcessorSeqArgumentType = "TokenProcessorSeq";
 
 /*
  * Base class and common definitions for local interface TokenProcessorSeqArgument
@@ -916,7 +916,7 @@ class TokenProcessorSeqArgument :
 };
 
 
-const ::SL3CM::AcquisitionArgumentType IPCInitiatorArgumentType = "IPCInitiator";
+const char* const IPCInitiatorArgumentType = "IPCInitiator";
 
 /*
  * Base class and common definitions for local interface IPCInitiatorArgument
@@ -956,7 +956,7 @@ class IPCInitiatorArgument :
 };
 
 
-const ::SL3CM::AcquisitionArgumentType IPCAcceptorArgumentType = "IPCAcceptor";
+const char* const IPCAcceptorArgumentType = "IPCAcceptor";
 
 /*
  * Base class and common definitions for local interface IPCAcceptorArgument
@@ -996,7 +996,7 @@ class IPCAcceptorArgument :
 };
 
 
-const ::SL3CM::AcquisitionArgumentType ObserverSeqArgumentType = "ObserverSeq";
+const char* const ObserverSeqArgumentType = "ObserverSeq";
 
 /*
  * Base class and common definitions for local interface ObserverSeqArgument
@@ -1038,7 +1038,7 @@ class ObserverSeqArgument :
 };
 
 
-const ::SL3CM::AcquisitionArgumentType IdentityProcessorArgumentType = "TLSX509IdentityProcessor";
+const char* const IdentityProcessorArgumentType = "TLSX509IdentityProcessor";
 
 /*
  * Base class and common definitions for local interface IdentityProcessorArgument
