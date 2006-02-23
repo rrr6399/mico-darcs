@@ -40,10 +40,10 @@ LIB_OBJS = $(LIB_SRCS:.cc=.obj)
 Test.obj: Test.cc Test.h
 
 Test.cc Test.h: Test.idl
-	$(IDL) $(IDLFLAGS) --no-boa --poa Test.idl
+	$(IDL) $(IDLFLAGS) --poa Test.idl
 
 Documents.cc Documents.h: Documents.idl
-	$(IDL) $(IDLFLAGS) --no-boa --poa Documents.idl
+	$(IDL) $(IDLFLAGS) --poa Documents.idl
 
 
 TestServer: Test.obj Test_impl.obj TestServer.obj $(DEPS)

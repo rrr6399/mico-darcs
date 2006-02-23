@@ -78,7 +78,7 @@ prg: .depend
 generate: csi-base-generate csl2-generate csiv2-generate sl3-touch sl3-generate atlas-generate
 
 csi-base-generate:
-	$(IDL) --windows-dll mico -B.. --no-poa --no-boa \
+	$(IDL) --windows-dll mico -B.. --no-poa \
 		--pseudo --any --mico-core \
 		../../include/mico/security/csi_base.idl
 	mv csi_base.h ../../include/mico/security/csi_base.h
@@ -115,20 +115,20 @@ csl2-generate:
 
 
 csiv2-generate:
-	$(IDL) --windows-dll mico -B../.. --no-poa --no-boa \
+	$(IDL) --windows-dll mico -B../.. --no-poa \
 		--pseudo --any --mico-core ../../include/mico/security/csi.idl
 	mv csi.h ../../include/mico/security/csi.h
-	$(IDL) --windows-dll mico -B../.. --no-poa --no-boa \
+	$(IDL) --windows-dll mico -B../.. --no-poa \
 		--pseudo --any --mico-core ../../include/mico/security/csiiop.idl
 	mv csiiop.h ../../include/mico/security/csiiop.h
-	$(IDL) --windows-dll mico -B../.. --no-poa --no-boa \
+	$(IDL) --windows-dll mico -B../.. --no-poa \
 		--pseudo --any --mico-core ../../include/mico/security/gssup.idl
 	mv gssup.h ../../include/mico/security/gssup.h
-	$(IDL) --windows-dll mico -B../.. --no-poa --no-boa \
+	$(IDL) --windows-dll mico -B../.. --no-poa \
 		--pseudo --any --mico-core ../../include/mico/security/csiv2.idl
 	mv csiv2.h ../../include/mico/security/csiv2.h
 
-IDLFLAGS=--windows-dll mico -B../.. -I../../include --no-poa --no-boa \
+IDLFLAGS=--windows-dll mico -B../.. -I../../include --no-poa \
 		--pseudo --any --mico-core
 
 SL3GENFILES=sl3pm.cc sl3cm.cc sl3om.cc securitylevel3.cc transportsecurity.cc \

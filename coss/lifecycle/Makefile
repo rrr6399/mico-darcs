@@ -25,7 +25,7 @@ include ../../MakeVars
 LDLIBS    = -lmicocoss$(VERSION) -lmico$(VERSION) $(CONFLIBS)
 LDFLAGS  := -L.. -L../../orb $(LDFLAGS)
 CXXFLAGS := -I. -I../../include $(CXXFLAGS) $(EHFLAGS)
-IDLFLAGS := -B../.. --poa --no-boa --any
+IDLFLAGS := -B../.. --poa --any
 
 # generated files
 

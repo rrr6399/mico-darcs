@@ -265,20 +265,20 @@ generate: orbcore-generate security-generate
 
 orbcore-generate:
 	../admin/mkcsreg $(REG_FILES) > ../include/mico/code_set_registry.h
-	$(IDL) --no-poa --no-boa --name current --windows-dll mico --pseudo \
+	$(IDL) --no-poa --name current --windows-dll mico --pseudo \
 		-B.. --mico-core ../include/mico/current.idl
 	mv current.h ../include/mico/current.h
 	$(IDL) --name policy --windows-dll mico -B.. \
-		--no-poa --no-boa --pseudo --mico-core \
+		--no-poa --pseudo --mico-core \
 		../include/mico/policy.idl
 	patch < policy.cc.diffs
 	$(RM) policy.*.orig
 	mv policy.h ../include/mico/policy.h
-	$(IDL) --name policy2 --any --windows-dll mico --no-poa --no-boa \
+	$(IDL) --name policy2 --any --windows-dll mico --no-poa \
 		-B.. --pseudo --mico-core \
 		../include/mico/policy2.idl
 	mv policy2.h ../include/mico/policy2.h
-	$(IDL) --any --name poa --windows-dll mico --no-poa --no-boa \
+	$(IDL) --any --name poa --windows-dll mico --no-poa \
 		-B.. --pseudo --mico-core \
 		../include/mico/poa.idl
 	patch < poa.h.diffs
@@ -292,7 +292,7 @@ orbcore-generate:
 		-B.. ../include/mico/orb_excepts.idl
 	mv orb_excepts.h ../include/mico/orb_excepts.h
 	$(IDL) --name dynany --windows-dll mico --pseudo --mico-core --any \
-		-B.. --no-poa --no-boa -I../include ../include/mico/dynany.idl
+		-B.. --no-poa -I../include ../include/mico/dynany.idl
 	mv dynany.h ../include/mico/dynany.h
 	$(IDL) --name ioptypes --windows-dll mico --pseudo --mico-core \
 		-B.. --any ../include/mico/ioptypes.idl
@@ -328,45 +328,45 @@ csiv2-generate:
 #	$(IDL) --name ioptypes --windows-dll mico -B.. --pseudo --mico-core \
 #		--any ../include/mico/ioptypes.idl
 #	mv ioptypes.h ../include/mico/ioptypes.h
-	$(IDL) --windows-dll mico -B.. --no-poa --no-boa \
+	$(IDL) --windows-dll mico -B.. --no-poa \
 		--pseudo --any --mico-core ../include/mico/security/csi_base.idl
 	mv csi_base.h ../include/mico/security/csi_base.h
-	$(IDL) --windows-dll mico -B.. --no-poa --no-boa \
+	$(IDL) --windows-dll mico -B.. --no-poa \
 		--pseudo --any --mico-core ../include/mico/security/csi.idl
 	mv csi.h ../include/mico/security/csi.h
-	$(IDL) --windows-dll mico -B.. --no-poa --no-boa \
+	$(IDL) --windows-dll mico -B.. --no-poa \
 		--pseudo --any --mico-core ../include/mico/security/csiiop.idl
 	mv csiiop.h ../include/mico/security/csiiop.h
-	$(IDL) --windows-dll mico -B.. --no-poa --no-boa \
+	$(IDL) --windows-dll mico -B.. --no-poa \
 		--pseudo --any --mico-core ../include/mico/security/gssup.idl
 	mv gssup.h ../include/mico/security/gssup.h
-	$(IDL) --windows-dll mico -B.. --no-poa --no-boa \
+	$(IDL) --windows-dll mico -B.. --no-poa \
 		--pseudo --any --mico-core ../include/mico/security/csiv2.idl
 	mv csiv2.h ../include/mico/security/csiv2.h
 	cd ..
 
 sl3-generate:
-	$(IDL) --windows-dll mico --relative-paths -I../include --no-poa --no-boa \
+	$(IDL) --windows-dll mico --relative-paths -I../include --no-poa \
 		--pseudo --any --mico-core ../include/mico/security/securitylevel3.idl
 	mv securitylevel3.h ../include/mico/security/securitylevel3.h
 	mv securitylevel3.cc security/securitylevel3.cc
-	$(IDL) --windows-dll mico --relative-paths -I../include --no-poa --no-boa \
+	$(IDL) --windows-dll mico --relative-paths -I../include --no-poa \
 		--pseudo --any --mico-core ../include/mico/security/transportsecurity.idl
 	mv transportsecurity.h ../include/mico/security/transportsecurity.h
 	mv transportsecurity.cc security/transportsecurity.cc
-	$(IDL) --windows-dll mico --relative-paths -I../include --no-poa --no-boa \
+	$(IDL) --windows-dll mico --relative-paths -I../include --no-poa \
 		--pseudo --any --mico-core ../include/mico/security/sl3aqargs.idl
 	mv sl3aqargs.h ../include/mico/security/sl3aqargs.h
 	mv sl3aqargs.cc security/sl3aqargs.cc
-	$(IDL) --windows-dll mico --relative-paths -I../include --no-poa --no-boa \
+	$(IDL) --windows-dll mico --relative-paths -I../include --no-poa \
 		--pseudo --any --mico-core ../include/mico/security/sl3tcpip.idl
 	mv sl3tcpip.h ../include/mico/security/sl3tcpip.h
 	mv sl3tcpip.cc security/sl3tcpip.cc
-	$(IDL) --windows-dll mico --relative-paths -I../include --no-poa --no-boa \
+	$(IDL) --windows-dll mico --relative-paths -I../include --no-poa \
 		--pseudo --any --mico-core ../include/mico/security/sl3tls.idl
 	mv sl3tls.h ../include/mico/security/sl3tls.h
 	mv sl3tls.cc security/sl3tls.cc
-	$(IDL) --windows-dll mico --relative-paths -I../include --no-poa --no-boa \
+	$(IDL) --windows-dll mico --relative-paths -I../include --no-poa \
 		--pseudo --any --mico-core ../include/mico/security/sl3aqargs_p.idl
 	mv sl3aqargs_p.h ../include/mico/security/sl3aqargs_p.h
 	mv sl3aqargs_p.cc security/sl3aqargs_p.cc
@@ -374,7 +374,7 @@ sl3-generate:
 diffs:
 	mkdir orig
 	cd orig; $(IDL) --name policy --windows-dll mico -B../.. \
-	  --no-poa --no-boa -I../../include --pseudo --mico-core \
+	  --no-poa -I../../include --pseudo --mico-core \
 	  ../../include/mico/policy.idl
 	$(RM) policy.cc.diffs
 	diff -c orig/policy.cc policy.cc > policy.cc.diffs || true
@@ -382,7 +382,7 @@ diffs:
 	  >> ../../orb/policy.cc.diffs || true
 	$(RM) -r orig
 	mkdir orig
-	cd orig; $(IDL) --any --name poa --windows-dll mico --no-poa --no-boa \
+	cd orig; $(IDL) --any --name poa --windows-dll mico --no-poa \
 	  -B../.. --pseudo --mico-core \
 	  ../../include/mico/poa.idl
 	$(RM) poa.cc.diffs

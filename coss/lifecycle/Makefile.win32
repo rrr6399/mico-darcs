@@ -24,7 +24,7 @@ RELATIVE = ..\..
 !include ..\MakeVars.win32
 LDLIBS    = micocoss$(VERSION).lib mico$(VERSION).lib $(CONFLIBS)
 LDFLAGS  = /LIBPATH:.. /LIBPATH:..\..\win32-bin\lib $(LDFLAGS)
-IDLFLAGS = --poa --no-boa  $(IDLFLAGS)
+IDLFLAGS = --poa  $(IDLFLAGS)
 
 # generated files
 OMG_SRCS =  CosLifeCycle.cc \
