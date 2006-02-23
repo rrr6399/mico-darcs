@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2001 by The Mico Team
+ *  Copyright (c) 1997-2006 by The Mico Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -112,8 +112,8 @@ int main (int argc, char *_argv[])
   }
 
   if (!implname) {
-    argv[argc++] = "-POAImplName";
-    argv[argc++] = "InterfaceRepository";
+    argv[argc++] = CORBA::string_dup("-POAImplName");
+    argv[argc++] = CORBA::string_dup("InterfaceRepository");
   }
 
   argv[argc] = 0;

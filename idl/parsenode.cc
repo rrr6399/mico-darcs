@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2003 by The Mico Team
+ *  Copyright (c) 1997-2006 by The Mico Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ using namespace std;
 
 typedef struct 
 {
-  char *str;
+  const char *str;
   int   data;     // 0 = no further information
                   // 1 = ident
 } ParseNodeDoc;
@@ -410,7 +410,7 @@ void ParseNode::setBranch( int i, ParseNode *node )
 }
 
 
-void ParseNode::printBranch( int indent, char *tag, bool detailed )
+void ParseNode::printBranch( int indent, const char *tag, bool detailed )
 {
   for( int i = 0; i < indent; i++ )
     cout << " ";

@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2001 by The Mico Team
+ *  Copyright (c) 1997-2006 by The Mico Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ private:
   ParseNode*                 _current_parse_node;
   bool                       _feed_included_defs;
   CORBA::Repository_ptr      _repo;
-  char*                      _version;
+  const char*                _version;
   std::set<std::string, std::less<std::string> > _seen_iface;
   DB*                        _db;
   IDLParam*                  _params;

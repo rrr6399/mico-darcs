@@ -1,7 +1,7 @@
 // -*- c++ -*-
 //
 //  MICO CSIv2 --- an Open Source CSIv2 implementation
-//  Copyright (C) 2002, 2003, 2004 ObjectSecurity Ltd.
+//  Copyright (C) 2002, 2003, 2004, 2006 ObjectSecurity Ltd.
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Library General Public
@@ -444,7 +444,7 @@ namespace CSIv2
 	      tss_(CSIv2::TSS::_nil())
 	{}
 	ServerRequestInterceptor_impl
-	(char* name,
+	(const char* name,
 	 SecurityManager_ptr manager,
 	 IOP::CodecFactory_ptr factory)
 	    : name_(name), sec_manager_(SecurityManager::_narrow(manager)),
@@ -494,7 +494,7 @@ namespace CSIv2
 	      css_(CSIv2::CSS::_nil())
 	{}
 	ClientRequestInterceptor_impl
-	(char* name,
+	(const char* name,
 	 SecurityManager_ptr manager,
 	 IOP::CodecFactory_ptr factory)
 	    : name_(name), sec_manager_(SecurityManager::_narrow(manager)),
@@ -561,7 +561,7 @@ namespace CSIv2
 	IORInterceptor_impl()
 	    : name_(""), sec_manager_(CSIv2::SecurityManager::_nil())
 	{}
-	IORInterceptor_impl(char* name, CSIv2::SecurityManager_ptr sm)
+	IORInterceptor_impl(const char* name, CSIv2::SecurityManager_ptr sm)
 	    : name_(name), sec_manager_(CSIv2::SecurityManager::_duplicate(sm))
 	{}
 
