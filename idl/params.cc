@@ -584,8 +584,6 @@ IDLParam::usage()
   cerr << "    --ifdef-prefix <prefix>" << endl;
   cerr << "    --poa" << endl;
   cerr << "    --no-poa" << endl;
-  cerr << "    --boa    --    (deprecated)" << endl;
-  cerr << "    --no-boa" << endl;
   cerr << "    --no-poa-ties" << endl;
   cerr << "    --no-poa-stubs" << endl;
   cerr << "    --pseudo" << endl;
