@@ -658,7 +658,7 @@ if test X"$GXX" = Xyes; then
   # GCC
   #
   # add -Wall
-  CXXFLAGS="-Wall $CXXFLAGS"
+  CXXFLAGS="-Wall -Wwrite-strings $CXXFLAGS"
   CFLAGS="-Wall $CFLAGS"
 
   if test X"$use_speed_tune" = Xyes; then
