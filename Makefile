@@ -113,6 +113,7 @@ generate:
 	make -C ccm generate
 
 bootstrap:
+ifeq ($(USE_SL3), yes)
 ifeq ($(USE_CSL2), yes)
 ifeq ($(USE_CSIV2), yes)
 	@echo
@@ -139,6 +140,11 @@ endif
 else
 	@echo
 	@echo "ERROR: you have to enable MICO CSL2 for bootstrap (--enable-csl2 configure option)"
+	@echo
+endif
+else
+	@echo
+	@echo "ERROR: you have to enable MICO SL3 for bootstrap (--enable-sl3 configure option)"
 	@echo
 endif
 
