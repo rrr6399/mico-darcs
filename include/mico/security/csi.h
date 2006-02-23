@@ -343,9 +343,9 @@ typedef CORBA::String_out StringOID_out;
 
 extern MICO_EXPORT CORBA::TypeCodeConst _tc_StringOID;
 
-const StringOID KRB5MechOID = "oid:1.2.840.113554.1.2.2";
-const StringOID GSS_NT_Export_Name_OID = "oid:1.3.6.1.5.6.4";
-const StringOID GSS_NT_Scoped_Username_OID = "oid:2.23.130.1.2.1";
+const char* const KRB5MechOID = "oid:1.2.840.113554.1.2.2";
+const char* const GSS_NT_Export_Name_OID = "oid:1.3.6.1.5.6.4";
+const char* const GSS_NT_Scoped_Username_OID = "oid:2.23.130.1.2.1";
 }
 
 
