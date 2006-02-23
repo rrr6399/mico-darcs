@@ -1,6 +1,6 @@
 /*
  *  MICO --- a free CORBA implementation
- *  Copyright (C) 1997-98 Kay Roemer & Arno Puder
+ *  Copyright (C) 1997-2006 Kay Roemer & Arno Puder
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -84,12 +84,12 @@ int main (int argc, char *_argv[])
   }
 
   if (!implname) {
-    argv[argc++] = "-POAImplName";
-    argv[argc++] = "NameService";
+    argv[argc++] = CORBA::string_dup("-POAImplName");
+    argv[argc++] = CORBA::string_dup("NameService");
   }
 
-  argv[argc++] = "-ORBNamingAddr";
-  argv[argc++] = "";
+  argv[argc++] = CORBA::string_dup("-ORBNamingAddr");
+  argv[argc++] = CORBA::string_dup("");
 
   argv[argc] = 0;
 

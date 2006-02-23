@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2001 by The Mico Team
+ *  Copyright (c) 1997-2006 by The Mico Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -172,10 +172,10 @@ main (int argc, char *argv[])
     for (int i=0; i<argc; ++i) {
 	t_argv[i] = argv[i];
     }
-    t_argv[argc++] = "-ORBThreadPool";
+    t_argv[argc++] = CORBA::string_dup("-ORBThreadPool");
 
-    t_argv[argc++] = "-ORBRequestLimit";
-    t_argv[argc++] = "1";    
+    t_argv[argc++] = CORBA::string_dup("-ORBRequestLimit");
+    t_argv[argc++] = CORBA::string_dup("1");
 
     t_argv[argc] = 0;
 

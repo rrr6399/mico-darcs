@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2001 by The Mico Team
+ *  Copyright (c) 1997-2006 by The Mico Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -1604,7 +1604,7 @@ char *CodeGenMIDL::recursive_container(CORBA::IDLType_ptr memb)
 
 void CodeGenMIDL::insert_guid()
 {
-  char* szGUID = "(XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX)";
+  const char* szGUID = "(XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX)";
 
 #if defined(_WIN32) && !defined(__MINGW32__)
   GUID g;
