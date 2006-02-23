@@ -75,7 +75,7 @@ endif
 
 prg: .depend
 
-generate: csi-base-generate csl2-generate csiv2-generate sl3-generate atlas-generate
+generate: csi-base-generate csl2-generate csiv2-generate sl3-touch sl3-generate atlas-generate
 
 csi-base-generate:
 	$(IDL) --windows-dll mico -B.. --no-poa --no-boa \
@@ -136,6 +136,23 @@ SL3GENFILES=sl3pm.cc sl3cm.cc sl3om.cc securitylevel3.cc transportsecurity.cc \
 	sl3csi.cc userpassword.cc trust.cc sl3authorization.cc sl3omext.cc
 
 sl3-generate: $(SL3GENFILES)
+
+sl3-touch:
+	touch ../../include/mico/security/sl3pm.idl
+	touch ../../include/mico/security/sl3cm.idl
+	touch ../../include/mico/security/sl3om.idl
+	touch ../../include/mico/security/securitylevel3.idl
+	touch ../../include/mico/security/transportsecurity.idl
+	touch ../../include/mico/security/transportsecurity_p.idl
+	touch ../../include/mico/security/sl3aqargs.idl
+	touch ../../include/mico/security/sl3tcpip.idl
+	touch ../../include/mico/security/sl3tls.idl
+	touch ../../include/mico/security/sl3aqargs_p.idl
+	touch ../../include/mico/security/sl3csi.idl
+	touch ../../include/mico/security/userpassword.idl
+	touch ../../include/mico/security/trust.idl
+	touch ../../include/mico/security/sl3authorization.idl
+	touch ../../include/mico/security/sl3omext.idl
 
 atlas-generate:
 	$(IDL) --windows-dll mico -B../.. -I../../include \
