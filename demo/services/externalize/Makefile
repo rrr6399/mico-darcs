@@ -40,10 +40,10 @@ INSTALL_SCRIPTS = daemons-start daemons-stop servers-start stop-servers test \
 Test.o: Test.cc Test.h
 
 Test.cc Test.h: Test.idl
-	$(IDL) $(IDLFLAGS) --no-boa --poa Test.idl
+	$(IDL) $(IDLFLAGS) --poa Test.idl
 
 Documents.cc Documents.h: Documents.idl
-	$(IDL) $(IDLFLAGS) --no-boa --poa Documents.idl
+	$(IDL) $(IDLFLAGS) --poa Documents.idl
 
 
 TestServer: Test.o Test_impl.o TestServer.o $(DEPS)

@@ -15,7 +15,7 @@ client.exe: account.h account.obj client.obj
 
 
 account.h account.cc : account.idl $(IDLGEN)
-	$(IDL) --poa --no-boa account.idl
+	$(IDL) --poa account.idl
 
 clean:
 	$(RM) /f /q 2> nul  account.cc account.h *.o core client server *~ .depend *.exe *.obj *.pdb

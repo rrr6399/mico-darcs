@@ -37,7 +37,7 @@ server: hello.o server.o $(DEPS)
 	$(LD) $(LFLAGS) $(CXXFLAGS) $(LDFLAGS) hello.o server.o $(LDLIBS) -o $@
 
 hello.h hello.cc : hello.idl $(IDL)
-	$(IDL) $(IDLFLAGS) --any --no-boa --poa hello.idl
+	$(IDL) $(IDLFLAGS) --any --poa hello.idl
 
 clean:
 	rm -f hello.cc hello.h *.o core client server *~ .depend
