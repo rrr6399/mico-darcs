@@ -455,9 +455,9 @@ void CodeGenCPPCommon::emitPrototypes( CORBA::Container_ptr in,
 {
   CORBA::ContainedSeq_var c;
 
+  bool b = use_rel_names (false);
   // Emit attributes
   c = in->contents (CORBA::dk_Attribute, 1);
-  bool b = use_rel_names (false);
   for( CORBA::ULong j = 0; j < c->length(); j++ ) {
     CORBA::AttributeDef_var attr = CORBA::AttributeDef::_narrow(c[j]);
     assert (!CORBA::is_nil(attr));
@@ -487,7 +487,6 @@ void CodeGenCPPCommon::emitPrototypes( CORBA::Container_ptr in,
       o << ";" << endl;
     }
   }
-  use_rel_names (b);
 
   if (c->length()) {
     o << endl;
@@ -575,6 +574,7 @@ void CodeGenCPPCommon::emitPrototypes( CORBA::Container_ptr in,
     o << endl;
   }
 
+  use_rel_names (b);
 }
 
 void
