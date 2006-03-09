@@ -135,7 +135,7 @@ class TLSKeyStoreArgBuilder :
 
     virtual void *_narrow_helper( const char *repoid );
 
-    virtual void addTLSX509IdentityVerifier( TLSX509IdentityVerifier_ptr verifier ) = 0;
+    virtual void addTLSX509IdentityVerifier( ::SL3TLS::TLSX509IdentityVerifier_ptr verifier ) = 0;
     virtual void addTLSKeyStoreWithStorePass( const char* keystore, const char* storetype, const char* storepass, const char* keyalias, const char* keypass, const ::CORBA::StringSeq& trusted_cert_names ) = 0;
     virtual void addTLSKeyStoreNoStorePass( const char* keystore, const char* storetype, const char* keyalias, const char* keypass, const ::CORBA::StringSeq& trusted_cert_names ) = 0;
     virtual void addTLSEncodedKeyStoreWithStorePass( const ::CORBA::OctetSeq& keystore, const char* storetype, const char* storepass, const char* keyalias, const char* keypass, const ::CORBA::StringSeq& trusted_cert_names ) = 0;
@@ -230,8 +230,8 @@ class OpenSSLConfigArgBuilder :
     virtual void add_acceptor_cipher( const char* cipher ) = 0;
     virtual void add_initiator_verify_depth( CORBA::Long depth ) = 0;
     virtual void add_acceptor_verify_depth( CORBA::Long depth ) = 0;
-    virtual void add_initiator_identity_verifier( TLSX509IdentityVerifier_ptr verifier ) = 0;
-    virtual void add_acceptor_identity_verifier( TLSX509IdentityVerifier_ptr verifier ) = 0;
+    virtual void add_initiator_identity_verifier( ::SL3TLS::TLSX509IdentityVerifier_ptr verifier ) = 0;
+    virtual void add_acceptor_identity_verifier( ::SL3TLS::TLSX509IdentityVerifier_ptr verifier ) = 0;
 
   protected:
     OpenSSLConfigArgBuilder() {};

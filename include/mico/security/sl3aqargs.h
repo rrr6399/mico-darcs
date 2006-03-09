@@ -133,9 +133,9 @@ class ArgBuilder :
 
     virtual void *_narrow_helper( const char *repoid );
 
-    virtual void add_arg( Argument_ptr arg ) = 0;
-    virtual void add_args( const ArgumentSeq& args ) = 0;
-    virtual Argument_ptr reap_args() = 0;
+    virtual void add_arg( ::SL3AQArgs::Argument_ptr arg ) = 0;
+    virtual void add_args( const ::SL3AQArgs::ArgumentSeq& args ) = 0;
+    virtual ::SL3AQArgs::Argument_ptr reap_args() = 0;
     virtual void destroy() = 0;
 
   protected:
@@ -177,7 +177,7 @@ class ArgBuilderFactory :
 
     virtual void *_narrow_helper( const char *repoid );
 
-    virtual ArgBuilder_ptr create_arg_builder( ::SL3CM::CredentialsUsage usage ) = 0;
+    virtual ::SL3AQArgs::ArgBuilder_ptr create_arg_builder( ::SL3CM::CredentialsUsage usage ) = 0;
 
   protected:
     ArgBuilderFactory() {};

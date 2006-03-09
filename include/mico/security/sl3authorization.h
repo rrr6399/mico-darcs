@@ -180,7 +180,7 @@ class TokenProcessor :
 
     virtual CORBA::Boolean supports_endorsement_by_client() = 0;
     virtual CORBA::Boolean requires_endorsement_by_client() = 0;
-    virtual AuthorizationInfo* accept_token( ::SL3PM::Principal* transport_principal, const ::SL3PM::StatementList& transport_statements, const ::SL3PM::ResourceNameList& transport_resources, ::SL3PM::SimplePrincipal* client_auth_principal, ::SL3PM::IdentityStatement* client_auth_statement, ::SL3PM::Principal* identity_assert_principal, const ::SL3PM::StatementList& identity_assert_statements, const ::CSI::AuthorizationToken& auth_token ) = 0;
+    virtual ::SL3Authorization::AuthorizationInfo* accept_token( ::SL3PM::Principal* transport_principal, const ::SL3PM::StatementList& transport_statements, const ::SL3PM::ResourceNameList& transport_resources, ::SL3PM::SimplePrincipal* client_auth_principal, ::SL3PM::IdentityStatement* client_auth_statement, ::SL3PM::Principal* identity_assert_principal, const ::SL3PM::StatementList& identity_assert_statements, const ::CSI::AuthorizationToken& auth_token ) = 0;
     virtual ::CSI::AuthorizationElementType accept_token_type() = 0;
 
   protected:

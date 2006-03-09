@@ -90,7 +90,7 @@ class PasswordGenerator :
     virtual void *_narrow_helper( const char *repoid );
 
     virtual ::SL3PM::PrincipalName* client_authentication_principal() = 0;
-    virtual ErrorCode generate_password( const ::SL3PM::PrincipalName& target, CORBA::WString_out username, CORBA::WString_out password ) = 0;
+    virtual ::UserPassword::ErrorCode generate_password( const ::SL3PM::PrincipalName& target, CORBA::WString_out username, CORBA::WString_out password ) = 0;
 
   protected:
     PasswordGenerator() {};
@@ -133,7 +133,7 @@ class PasswordProcessor :
 
     virtual CORBA::Boolean client_authen_required() = 0;
     virtual ::SL3PM::PrincipalName* password_target() = 0;
-    virtual ErrorCode verify_password( const CORBA::WChar* username, const CORBA::WChar* password, ::SL3PM::PrincipalName_out principal ) = 0;
+    virtual ::UserPassword::ErrorCode verify_password( const CORBA::WChar* username, const CORBA::WChar* password, ::SL3PM::PrincipalName_out principal ) = 0;
 
   protected:
     PasswordProcessor() {};

@@ -646,8 +646,8 @@ class Navigation :
     virtual void *_narrow_helper( const char *repoid );
 
     virtual CORBA::Object_ptr provide_facet( const char* name ) = 0;
-    virtual FacetDescriptions* get_all_facets() = 0;
-    virtual FacetDescriptions* get_named_facets( const NameList& names ) = 0;
+    virtual ::Components::FacetDescriptions* get_all_facets() = 0;
+    virtual ::Components::FacetDescriptions* get_named_facets( const ::Components::NameList& names ) = 0;
     virtual CORBA::Boolean same_component( CORBA::Object_ptr ref ) = 0;
 
   protected:
@@ -666,8 +666,8 @@ class Navigation_stub:
   public:
     virtual ~Navigation_stub();
     CORBA::Object_ptr provide_facet( const char* name );
-    FacetDescriptions* get_all_facets();
-    FacetDescriptions* get_named_facets( const NameList& names );
+    ::Components::FacetDescriptions* get_all_facets();
+    ::Components::FacetDescriptions* get_named_facets( const ::Components::NameList& names );
     CORBA::Boolean same_component( CORBA::Object_ptr ref );
 
   private:
@@ -684,8 +684,8 @@ class Navigation_stub_clp :
     Navigation_stub_clp (PortableServer::POA_ptr, CORBA::Object_ptr);
     virtual ~Navigation_stub_clp ();
     CORBA::Object_ptr provide_facet( const char* name );
-    FacetDescriptions* get_all_facets();
-    FacetDescriptions* get_named_facets( const NameList& names );
+    ::Components::FacetDescriptions* get_all_facets();
+    ::Components::FacetDescriptions* get_named_facets( const ::Components::NameList& names );
     CORBA::Boolean same_component( CORBA::Object_ptr ref );
 
   protected:
@@ -711,8 +711,8 @@ class ConnectionDescription :
     static ConnectionDescription* _downcast (CORBA::ValueBase *);
     static ConnectionDescription* _downcast (CORBA::AbstractBase *);
 
-    virtual void ck( Cookie* _p ) = 0;
-    virtual Cookie* ck() const = 0;
+    virtual void ck( ::Components::Cookie* _p ) = 0;
+    virtual ::Components::Cookie* ck() const = 0;
 
     virtual void objref( CORBA::Object_ptr _p ) = 0;
     virtual CORBA::Object_ptr objref() const = 0;
@@ -762,9 +762,9 @@ class ReceptacleDescription :
     virtual void is_multiplex( CORBA::Boolean _p ) = 0;
     virtual CORBA::Boolean is_multiplex() const = 0;
 
-    virtual void connections( const ConnectionDescriptions& _p ) = 0;
-    virtual const ConnectionDescriptions& connections() const = 0;
-    virtual ConnectionDescriptions& connections() = 0;
+    virtual void connections( const ::Components::ConnectionDescriptions& _p ) = 0;
+    virtual const ::Components::ConnectionDescriptions& connections() const = 0;
+    virtual ::Components::ConnectionDescriptions& connections() = 0;
 
 
   public:
@@ -824,11 +824,11 @@ class Receptacles :
 
     virtual void *_narrow_helper( const char *repoid );
 
-    virtual Cookie* connect( const char* name, CORBA::Object_ptr connection ) = 0;
-    virtual void disconnect( const char* name, Cookie* ck ) = 0;
-    virtual ConnectionDescriptions* get_connections( const char* name ) = 0;
-    virtual ReceptacleDescriptions* get_all_receptacles() = 0;
-    virtual ReceptacleDescriptions* get_named_receptacles( const NameList& names ) = 0;
+    virtual ::Components::Cookie* connect( const char* name, CORBA::Object_ptr connection ) = 0;
+    virtual void disconnect( const char* name, ::Components::Cookie* ck ) = 0;
+    virtual ::Components::ConnectionDescriptions* get_connections( const char* name ) = 0;
+    virtual ::Components::ReceptacleDescriptions* get_all_receptacles() = 0;
+    virtual ::Components::ReceptacleDescriptions* get_named_receptacles( const ::Components::NameList& names ) = 0;
 
   protected:
     Receptacles() {};
@@ -845,11 +845,11 @@ class Receptacles_stub:
 {
   public:
     virtual ~Receptacles_stub();
-    Cookie* connect( const char* name, CORBA::Object_ptr connection );
-    void disconnect( const char* name, Cookie* ck );
-    ConnectionDescriptions* get_connections( const char* name );
-    ReceptacleDescriptions* get_all_receptacles();
-    ReceptacleDescriptions* get_named_receptacles( const NameList& names );
+    ::Components::Cookie* connect( const char* name, CORBA::Object_ptr connection );
+    void disconnect( const char* name, ::Components::Cookie* ck );
+    ::Components::ConnectionDescriptions* get_connections( const char* name );
+    ::Components::ReceptacleDescriptions* get_all_receptacles();
+    ::Components::ReceptacleDescriptions* get_named_receptacles( const ::Components::NameList& names );
 
   private:
     void operator=( const Receptacles_stub& );
@@ -864,11 +864,11 @@ class Receptacles_stub_clp :
   public:
     Receptacles_stub_clp (PortableServer::POA_ptr, CORBA::Object_ptr);
     virtual ~Receptacles_stub_clp ();
-    Cookie* connect( const char* name, CORBA::Object_ptr connection );
-    void disconnect( const char* name, Cookie* ck );
-    ConnectionDescriptions* get_connections( const char* name );
-    ReceptacleDescriptions* get_all_receptacles();
-    ReceptacleDescriptions* get_named_receptacles( const NameList& names );
+    ::Components::Cookie* connect( const char* name, CORBA::Object_ptr connection );
+    void disconnect( const char* name, ::Components::Cookie* ck );
+    ::Components::ConnectionDescriptions* get_connections( const char* name );
+    ::Components::ReceptacleDescriptions* get_all_receptacles();
+    ::Components::ReceptacleDescriptions* get_named_receptacles( const ::Components::NameList& names );
 
   protected:
     Receptacles_stub_clp ();
@@ -948,7 +948,7 @@ class EventConsumerBase :
 
     virtual void *_narrow_helper( const char *repoid );
 
-    virtual void push_event( EventBase* evt ) = 0;
+    virtual void push_event( ::Components::EventBase* evt ) = 0;
 
   protected:
     EventConsumerBase() {};
@@ -965,7 +965,7 @@ class EventConsumerBase_stub:
 {
   public:
     virtual ~EventConsumerBase_stub();
-    void push_event( EventBase* evt );
+    void push_event( ::Components::EventBase* evt );
 
   private:
     void operator=( const EventConsumerBase_stub& );
@@ -980,7 +980,7 @@ class EventConsumerBase_stub_clp :
   public:
     EventConsumerBase_stub_clp (PortableServer::POA_ptr, CORBA::Object_ptr);
     virtual ~EventConsumerBase_stub_clp ();
-    void push_event( EventBase* evt );
+    void push_event( ::Components::EventBase* evt );
 
   protected:
     EventConsumerBase_stub_clp ();
@@ -1005,8 +1005,8 @@ class ConsumerDescription :
     static ConsumerDescription* _downcast (CORBA::ValueBase *);
     static ConsumerDescription* _downcast (CORBA::AbstractBase *);
 
-    virtual void consumer( EventConsumerBase_ptr _p ) = 0;
-    virtual EventConsumerBase_ptr consumer() const = 0;
+    virtual void consumer( ::Components::EventConsumerBase_ptr _p ) = 0;
+    virtual ::Components::EventConsumerBase_ptr consumer() const = 0;
 
 
   public:
@@ -1050,8 +1050,8 @@ class EmitterDescription :
     static EmitterDescription* _downcast (CORBA::ValueBase *);
     static EmitterDescription* _downcast (CORBA::AbstractBase *);
 
-    virtual void consumer( EventConsumerBase_ptr _p ) = 0;
-    virtual EventConsumerBase_ptr consumer() const = 0;
+    virtual void consumer( ::Components::EventConsumerBase_ptr _p ) = 0;
+    virtual ::Components::EventConsumerBase_ptr consumer() const = 0;
 
 
   public:
@@ -1095,11 +1095,11 @@ class SubscriberDescription :
     static SubscriberDescription* _downcast (CORBA::ValueBase *);
     static SubscriberDescription* _downcast (CORBA::AbstractBase *);
 
-    virtual void ck( Cookie* _p ) = 0;
-    virtual Cookie* ck() const = 0;
+    virtual void ck( ::Components::Cookie* _p ) = 0;
+    virtual ::Components::Cookie* ck() const = 0;
 
-    virtual void consumer( EventConsumerBase_ptr _p ) = 0;
-    virtual EventConsumerBase_ptr consumer() const = 0;
+    virtual void consumer( ::Components::EventConsumerBase_ptr _p ) = 0;
+    virtual ::Components::EventConsumerBase_ptr consumer() const = 0;
 
 
   public:
@@ -1143,9 +1143,9 @@ class PublisherDescription :
     static PublisherDescription* _downcast (CORBA::ValueBase *);
     static PublisherDescription* _downcast (CORBA::AbstractBase *);
 
-    virtual void consumers( const SubscriberDescriptions& _p ) = 0;
-    virtual const SubscriberDescriptions& consumers() const = 0;
-    virtual SubscriberDescriptions& consumers() = 0;
+    virtual void consumers( const ::Components::SubscriberDescriptions& _p ) = 0;
+    virtual const ::Components::SubscriberDescriptions& consumers() const = 0;
+    virtual ::Components::SubscriberDescriptions& consumers() = 0;
 
 
   public:
@@ -1205,17 +1205,17 @@ class Events :
 
     virtual void *_narrow_helper( const char *repoid );
 
-    virtual EventConsumerBase_ptr get_consumer( const char* sink_name ) = 0;
-    virtual ConsumerDescriptions* get_all_consumers() = 0;
-    virtual ConsumerDescriptions* get_named_consumers( const NameList& names ) = 0;
-    virtual Cookie* subscribe( const char* publisher_name, EventConsumerBase_ptr subscriber ) = 0;
-    virtual void unsubscribe( const char* publisher_name, Cookie* ck ) = 0;
-    virtual PublisherDescriptions* get_all_publishers() = 0;
-    virtual PublisherDescriptions* get_named_publishers( const NameList& names ) = 0;
-    virtual void connect_consumer( const char* emitter_name, EventConsumerBase_ptr consumer ) = 0;
-    virtual EventConsumerBase_ptr disconnect_consumer( const char* source_name ) = 0;
-    virtual EmitterDescriptions* get_all_emitters() = 0;
-    virtual EmitterDescriptions* get_named_emitters( const NameList& names ) = 0;
+    virtual ::Components::EventConsumerBase_ptr get_consumer( const char* sink_name ) = 0;
+    virtual ::Components::ConsumerDescriptions* get_all_consumers() = 0;
+    virtual ::Components::ConsumerDescriptions* get_named_consumers( const ::Components::NameList& names ) = 0;
+    virtual ::Components::Cookie* subscribe( const char* publisher_name, ::Components::EventConsumerBase_ptr subscriber ) = 0;
+    virtual void unsubscribe( const char* publisher_name, ::Components::Cookie* ck ) = 0;
+    virtual ::Components::PublisherDescriptions* get_all_publishers() = 0;
+    virtual ::Components::PublisherDescriptions* get_named_publishers( const ::Components::NameList& names ) = 0;
+    virtual void connect_consumer( const char* emitter_name, ::Components::EventConsumerBase_ptr consumer ) = 0;
+    virtual ::Components::EventConsumerBase_ptr disconnect_consumer( const char* source_name ) = 0;
+    virtual ::Components::EmitterDescriptions* get_all_emitters() = 0;
+    virtual ::Components::EmitterDescriptions* get_named_emitters( const ::Components::NameList& names ) = 0;
 
   protected:
     Events() {};
@@ -1232,17 +1232,17 @@ class Events_stub:
 {
   public:
     virtual ~Events_stub();
-    EventConsumerBase_ptr get_consumer( const char* sink_name );
-    ConsumerDescriptions* get_all_consumers();
-    ConsumerDescriptions* get_named_consumers( const NameList& names );
-    Cookie* subscribe( const char* publisher_name, EventConsumerBase_ptr subscriber );
-    void unsubscribe( const char* publisher_name, Cookie* ck );
-    PublisherDescriptions* get_all_publishers();
-    PublisherDescriptions* get_named_publishers( const NameList& names );
-    void connect_consumer( const char* emitter_name, EventConsumerBase_ptr consumer );
-    EventConsumerBase_ptr disconnect_consumer( const char* source_name );
-    EmitterDescriptions* get_all_emitters();
-    EmitterDescriptions* get_named_emitters( const NameList& names );
+    ::Components::EventConsumerBase_ptr get_consumer( const char* sink_name );
+    ::Components::ConsumerDescriptions* get_all_consumers();
+    ::Components::ConsumerDescriptions* get_named_consumers( const ::Components::NameList& names );
+    ::Components::Cookie* subscribe( const char* publisher_name, ::Components::EventConsumerBase_ptr subscriber );
+    void unsubscribe( const char* publisher_name, ::Components::Cookie* ck );
+    ::Components::PublisherDescriptions* get_all_publishers();
+    ::Components::PublisherDescriptions* get_named_publishers( const ::Components::NameList& names );
+    void connect_consumer( const char* emitter_name, ::Components::EventConsumerBase_ptr consumer );
+    ::Components::EventConsumerBase_ptr disconnect_consumer( const char* source_name );
+    ::Components::EmitterDescriptions* get_all_emitters();
+    ::Components::EmitterDescriptions* get_named_emitters( const ::Components::NameList& names );
 
   private:
     void operator=( const Events_stub& );
@@ -1257,17 +1257,17 @@ class Events_stub_clp :
   public:
     Events_stub_clp (PortableServer::POA_ptr, CORBA::Object_ptr);
     virtual ~Events_stub_clp ();
-    EventConsumerBase_ptr get_consumer( const char* sink_name );
-    ConsumerDescriptions* get_all_consumers();
-    ConsumerDescriptions* get_named_consumers( const NameList& names );
-    Cookie* subscribe( const char* publisher_name, EventConsumerBase_ptr subscriber );
-    void unsubscribe( const char* publisher_name, Cookie* ck );
-    PublisherDescriptions* get_all_publishers();
-    PublisherDescriptions* get_named_publishers( const NameList& names );
-    void connect_consumer( const char* emitter_name, EventConsumerBase_ptr consumer );
-    EventConsumerBase_ptr disconnect_consumer( const char* source_name );
-    EmitterDescriptions* get_all_emitters();
-    EmitterDescriptions* get_named_emitters( const NameList& names );
+    ::Components::EventConsumerBase_ptr get_consumer( const char* sink_name );
+    ::Components::ConsumerDescriptions* get_all_consumers();
+    ::Components::ConsumerDescriptions* get_named_consumers( const ::Components::NameList& names );
+    ::Components::Cookie* subscribe( const char* publisher_name, ::Components::EventConsumerBase_ptr subscriber );
+    void unsubscribe( const char* publisher_name, ::Components::Cookie* ck );
+    ::Components::PublisherDescriptions* get_all_publishers();
+    ::Components::PublisherDescriptions* get_named_publishers( const ::Components::NameList& names );
+    void connect_consumer( const char* emitter_name, ::Components::EventConsumerBase_ptr consumer );
+    ::Components::EventConsumerBase_ptr disconnect_consumer( const char* source_name );
+    ::Components::EmitterDescriptions* get_all_emitters();
+    ::Components::EmitterDescriptions* get_named_emitters( const ::Components::NameList& names );
 
   protected:
     Events_stub_clp ();
@@ -1310,7 +1310,7 @@ class CCMHome :
 
     virtual CORBA::Object_ptr get_component_def() = 0;
     virtual CORBA::Object_ptr get_home_def() = 0;
-    virtual void remove_component( CCMObject_ptr comp ) = 0;
+    virtual void remove_component( ::Components::CCMObject_ptr comp ) = 0;
 
   protected:
     CCMHome() {};
@@ -1329,7 +1329,7 @@ class CCMHome_stub:
     virtual ~CCMHome_stub();
     CORBA::Object_ptr get_component_def();
     CORBA::Object_ptr get_home_def();
-    void remove_component( CCMObject_ptr comp );
+    void remove_component( ::Components::CCMObject_ptr comp );
 
   private:
     void operator=( const CCMHome_stub& );
@@ -1346,7 +1346,7 @@ class CCMHome_stub_clp :
     virtual ~CCMHome_stub_clp ();
     CORBA::Object_ptr get_component_def();
     CORBA::Object_ptr get_home_def();
-    void remove_component( CCMObject_ptr comp );
+    void remove_component( ::Components::CCMObject_ptr comp );
 
   protected:
     CCMHome_stub_clp ();
@@ -1371,25 +1371,25 @@ class ComponentPortDescription :
     static ComponentPortDescription* _downcast (CORBA::ValueBase *);
     static ComponentPortDescription* _downcast (CORBA::AbstractBase *);
 
-    virtual void facets( const FacetDescriptions& _p ) = 0;
-    virtual const FacetDescriptions& facets() const = 0;
-    virtual FacetDescriptions& facets() = 0;
+    virtual void facets( const ::Components::FacetDescriptions& _p ) = 0;
+    virtual const ::Components::FacetDescriptions& facets() const = 0;
+    virtual ::Components::FacetDescriptions& facets() = 0;
 
-    virtual void receptacles( const ReceptacleDescriptions& _p ) = 0;
-    virtual const ReceptacleDescriptions& receptacles() const = 0;
-    virtual ReceptacleDescriptions& receptacles() = 0;
+    virtual void receptacles( const ::Components::ReceptacleDescriptions& _p ) = 0;
+    virtual const ::Components::ReceptacleDescriptions& receptacles() const = 0;
+    virtual ::Components::ReceptacleDescriptions& receptacles() = 0;
 
-    virtual void consumers( const ConsumerDescriptions& _p ) = 0;
-    virtual const ConsumerDescriptions& consumers() const = 0;
-    virtual ConsumerDescriptions& consumers() = 0;
+    virtual void consumers( const ::Components::ConsumerDescriptions& _p ) = 0;
+    virtual const ::Components::ConsumerDescriptions& consumers() const = 0;
+    virtual ::Components::ConsumerDescriptions& consumers() = 0;
 
-    virtual void emitters( const EmitterDescriptions& _p ) = 0;
-    virtual const EmitterDescriptions& emitters() const = 0;
-    virtual EmitterDescriptions& emitters() = 0;
+    virtual void emitters( const ::Components::EmitterDescriptions& _p ) = 0;
+    virtual const ::Components::EmitterDescriptions& emitters() const = 0;
+    virtual ::Components::EmitterDescriptions& emitters() = 0;
 
-    virtual void publishers( const PublisherDescriptions& _p ) = 0;
-    virtual const PublisherDescriptions& publishers() const = 0;
-    virtual PublisherDescriptions& publishers() = 0;
+    virtual void publishers( const ::Components::PublisherDescriptions& _p ) = 0;
+    virtual const ::Components::PublisherDescriptions& publishers() const = 0;
+    virtual ::Components::PublisherDescriptions& publishers() = 0;
 
 
   public:
@@ -1446,10 +1446,10 @@ class CCMObject :
     virtual void *_narrow_helper( const char *repoid );
 
     virtual CORBA::Object_ptr get_component_def() = 0;
-    virtual CCMHome_ptr get_ccm_home() = 0;
+    virtual ::Components::CCMHome_ptr get_ccm_home() = 0;
     virtual void configuration_complete() = 0;
     virtual void remove() = 0;
-    virtual ComponentPortDescription* get_all_ports() = 0;
+    virtual ::Components::ComponentPortDescription* get_all_ports() = 0;
 
   protected:
     CCMObject() {};
@@ -1470,10 +1470,10 @@ class CCMObject_stub:
   public:
     virtual ~CCMObject_stub();
     CORBA::Object_ptr get_component_def();
-    CCMHome_ptr get_ccm_home();
+    ::Components::CCMHome_ptr get_ccm_home();
     void configuration_complete();
     void remove();
-    ComponentPortDescription* get_all_ports();
+    ::Components::ComponentPortDescription* get_all_ports();
 
   private:
     void operator=( const CCMObject_stub& );
@@ -1491,10 +1491,10 @@ class CCMObject_stub_clp :
     CCMObject_stub_clp (PortableServer::POA_ptr, CORBA::Object_ptr);
     virtual ~CCMObject_stub_clp ();
     CORBA::Object_ptr get_component_def();
-    CCMHome_ptr get_ccm_home();
+    ::Components::CCMHome_ptr get_ccm_home();
     void configuration_complete();
     void remove();
-    ComponentPortDescription* get_all_ports();
+    ::Components::ComponentPortDescription* get_all_ports();
 
   protected:
     CCMObject_stub_clp ();
@@ -1643,7 +1643,7 @@ class KeylessCCMHome :
 
     virtual void *_narrow_helper( const char *repoid );
 
-    virtual CCMObject_ptr create_component() = 0;
+    virtual ::Components::CCMObject_ptr create_component() = 0;
 
   protected:
     KeylessCCMHome() {};
@@ -1660,7 +1660,7 @@ class KeylessCCMHome_stub:
 {
   public:
     virtual ~KeylessCCMHome_stub();
-    CCMObject_ptr create_component();
+    ::Components::CCMObject_ptr create_component();
 
   private:
     void operator=( const KeylessCCMHome_stub& );
@@ -1675,7 +1675,7 @@ class KeylessCCMHome_stub_clp :
   public:
     KeylessCCMHome_stub_clp (PortableServer::POA_ptr, CORBA::Object_ptr);
     virtual ~KeylessCCMHome_stub_clp ();
-    CCMObject_ptr create_component();
+    ::Components::CCMObject_ptr create_component();
 
   protected:
     KeylessCCMHome_stub_clp ();
@@ -1750,9 +1750,9 @@ class HomeFinder :
 
     virtual void *_narrow_helper( const char *repoid );
 
-    virtual CCMHome_ptr find_home_by_component_type( const char* comp_repid ) = 0;
-    virtual CCMHome_ptr find_home_by_home_type( const char* home_repid ) = 0;
-    virtual CCMHome_ptr find_home_by_name( const char* home_name ) = 0;
+    virtual ::Components::CCMHome_ptr find_home_by_component_type( const char* comp_repid ) = 0;
+    virtual ::Components::CCMHome_ptr find_home_by_home_type( const char* home_repid ) = 0;
+    virtual ::Components::CCMHome_ptr find_home_by_name( const char* home_name ) = 0;
 
   protected:
     HomeFinder() {};
@@ -1769,9 +1769,9 @@ class HomeFinder_stub:
 {
   public:
     virtual ~HomeFinder_stub();
-    CCMHome_ptr find_home_by_component_type( const char* comp_repid );
-    CCMHome_ptr find_home_by_home_type( const char* home_repid );
-    CCMHome_ptr find_home_by_name( const char* home_name );
+    ::Components::CCMHome_ptr find_home_by_component_type( const char* comp_repid );
+    ::Components::CCMHome_ptr find_home_by_home_type( const char* home_repid );
+    ::Components::CCMHome_ptr find_home_by_name( const char* home_name );
 
   private:
     void operator=( const HomeFinder_stub& );
@@ -1786,9 +1786,9 @@ class HomeFinder_stub_clp :
   public:
     HomeFinder_stub_clp (PortableServer::POA_ptr, CORBA::Object_ptr);
     virtual ~HomeFinder_stub_clp ();
-    CCMHome_ptr find_home_by_component_type( const char* comp_repid );
-    CCMHome_ptr find_home_by_home_type( const char* home_repid );
-    CCMHome_ptr find_home_by_name( const char* home_name );
+    ::Components::CCMHome_ptr find_home_by_component_type( const char* comp_repid );
+    ::Components::CCMHome_ptr find_home_by_home_type( const char* home_repid );
+    ::Components::CCMHome_ptr find_home_by_name( const char* home_name );
 
   protected:
     HomeFinder_stub_clp ();
@@ -1863,7 +1863,7 @@ class Configurator :
 
     virtual void *_narrow_helper( const char *repoid );
 
-    virtual void configure( CCMObject_ptr comp ) = 0;
+    virtual void configure( ::Components::CCMObject_ptr comp ) = 0;
 
   protected:
     Configurator() {};
@@ -1880,7 +1880,7 @@ class Configurator_stub:
 {
   public:
     virtual ~Configurator_stub();
-    void configure( CCMObject_ptr comp );
+    void configure( ::Components::CCMObject_ptr comp );
 
   private:
     void operator=( const Configurator_stub& );
@@ -1895,7 +1895,7 @@ class Configurator_stub_clp :
   public:
     Configurator_stub_clp (PortableServer::POA_ptr, CORBA::Object_ptr);
     virtual ~Configurator_stub_clp ();
-    void configure( CCMObject_ptr comp );
+    void configure( ::Components::CCMObject_ptr comp );
 
   protected:
     Configurator_stub_clp ();
@@ -1987,7 +1987,7 @@ class StandardConfigurator :
 
     virtual void *_narrow_helper( const char *repoid );
 
-    virtual void set_configuration( const ConfigValues& descr ) = 0;
+    virtual void set_configuration( const ::Components::ConfigValues& descr ) = 0;
 
   protected:
     StandardConfigurator() {};
@@ -2005,7 +2005,7 @@ class StandardConfigurator_stub:
 {
   public:
     virtual ~StandardConfigurator_stub();
-    void set_configuration( const ConfigValues& descr );
+    void set_configuration( const ::Components::ConfigValues& descr );
 
   private:
     void operator=( const StandardConfigurator_stub& );
@@ -2020,7 +2020,7 @@ class StandardConfigurator_stub_clp :
   public:
     StandardConfigurator_stub_clp (PortableServer::POA_ptr, CORBA::Object_ptr);
     virtual ~StandardConfigurator_stub_clp ();
-    void set_configuration( const ConfigValues& descr );
+    void set_configuration( const ::Components::ConfigValues& descr );
 
   protected:
     StandardConfigurator_stub_clp ();
@@ -2095,7 +2095,7 @@ class CCMContext :
 
     virtual void *_narrow_helper( const char *repoid );
 
-    virtual CCMHome_ptr get_CCM_home() = 0;
+    virtual ::Components::CCMHome_ptr get_CCM_home() = 0;
 
   protected:
     CCMContext() {};
@@ -2275,7 +2275,7 @@ class SessionComponent :
 
     virtual void *_narrow_helper( const char *repoid );
 
-    virtual void set_session_context( SessionContext_ptr ctx ) = 0;
+    virtual void set_session_context( ::Components::SessionContext_ptr ctx ) = 0;
     virtual void ccm_activate() = 0;
     virtual void ccm_passivate() = 0;
     virtual void ccm_remove() = 0;
@@ -2613,10 +2613,10 @@ class Container :
 
     virtual ::Components::ConfigValues* configuration() = 0;
 
-    virtual ComponentServer_ptr get_component_server() = 0;
-    virtual CCMHome_ptr install_home( const char* id, const char* entrypt, const ConfigValues& config ) = 0;
-    virtual void remove_home( CCMHome_ptr href ) = 0;
-    virtual CCMHomes* get_homes() = 0;
+    virtual ::Components::ComponentServer_ptr get_component_server() = 0;
+    virtual ::Components::CCMHome_ptr install_home( const char* id, const char* entrypt, const ::Components::ConfigValues& config ) = 0;
+    virtual void remove_home( ::Components::CCMHome_ptr href ) = 0;
+    virtual ::Components::CCMHomes* get_homes() = 0;
     virtual void remove() = 0;
 
   protected:
@@ -2636,10 +2636,10 @@ class Container_stub:
     virtual ~Container_stub();
     ::Components::ConfigValues* configuration();
 
-    ComponentServer_ptr get_component_server();
-    CCMHome_ptr install_home( const char* id, const char* entrypt, const ConfigValues& config );
-    void remove_home( CCMHome_ptr href );
-    CCMHomes* get_homes();
+    ::Components::ComponentServer_ptr get_component_server();
+    ::Components::CCMHome_ptr install_home( const char* id, const char* entrypt, const ::Components::ConfigValues& config );
+    void remove_home( ::Components::CCMHome_ptr href );
+    ::Components::CCMHomes* get_homes();
     void remove();
 
   private:
@@ -2657,10 +2657,10 @@ class Container_stub_clp :
     virtual ~Container_stub_clp ();
     ::Components::ConfigValues* configuration();
 
-    ComponentServer_ptr get_component_server();
-    CCMHome_ptr install_home( const char* id, const char* entrypt, const ConfigValues& config );
-    void remove_home( CCMHome_ptr href );
-    CCMHomes* get_homes();
+    ::Components::ComponentServer_ptr get_component_server();
+    ::Components::CCMHome_ptr install_home( const char* id, const char* entrypt, const ::Components::ConfigValues& config );
+    void remove_home( ::Components::CCMHome_ptr href );
+    ::Components::CCMHomes* get_homes();
     void remove();
 
   protected:
@@ -2710,10 +2710,10 @@ class ComponentServer :
 
     virtual ::Components::ConfigValues* configuration() = 0;
 
-    virtual ServerActivator_ptr get_server_activator() = 0;
-    virtual Container_ptr create_container( const ConfigValues& config ) = 0;
-    virtual void remove_container( Container_ptr cref ) = 0;
-    virtual Containers* get_containers() = 0;
+    virtual ::Components::ServerActivator_ptr get_server_activator() = 0;
+    virtual ::Components::Container_ptr create_container( const ::Components::ConfigValues& config ) = 0;
+    virtual void remove_container( ::Components::Container_ptr cref ) = 0;
+    virtual ::Components::Containers* get_containers() = 0;
     virtual void remove() = 0;
 
   protected:
@@ -2733,10 +2733,10 @@ class ComponentServer_stub:
     virtual ~ComponentServer_stub();
     ::Components::ConfigValues* configuration();
 
-    ServerActivator_ptr get_server_activator();
-    Container_ptr create_container( const ConfigValues& config );
-    void remove_container( Container_ptr cref );
-    Containers* get_containers();
+    ::Components::ServerActivator_ptr get_server_activator();
+    ::Components::Container_ptr create_container( const ::Components::ConfigValues& config );
+    void remove_container( ::Components::Container_ptr cref );
+    ::Components::Containers* get_containers();
     void remove();
 
   private:
@@ -2754,10 +2754,10 @@ class ComponentServer_stub_clp :
     virtual ~ComponentServer_stub_clp ();
     ::Components::ConfigValues* configuration();
 
-    ServerActivator_ptr get_server_activator();
-    Container_ptr create_container( const ConfigValues& config );
-    void remove_container( Container_ptr cref );
-    Containers* get_containers();
+    ::Components::ServerActivator_ptr get_server_activator();
+    ::Components::Container_ptr create_container( const ::Components::ConfigValues& config );
+    void remove_container( ::Components::Container_ptr cref );
+    ::Components::Containers* get_containers();
     void remove();
 
   protected:
@@ -2910,7 +2910,7 @@ class Assembly :
 
     virtual void build() = 0;
     virtual void tear_down() = 0;
-    virtual AssemblyState get_state() = 0;
+    virtual ::Components::AssemblyState get_state() = 0;
 
   protected:
     Assembly() {};
@@ -2929,7 +2929,7 @@ class Assembly_stub:
     virtual ~Assembly_stub();
     void build();
     void tear_down();
-    AssemblyState get_state();
+    ::Components::AssemblyState get_state();
 
   private:
     void operator=( const Assembly_stub& );
@@ -2946,7 +2946,7 @@ class Assembly_stub_clp :
     virtual ~Assembly_stub_clp ();
     void build();
     void tear_down();
-    AssemblyState get_state();
+    ::Components::AssemblyState get_state();
 
   protected:
     Assembly_stub_clp ();
@@ -2987,9 +2987,9 @@ class AssemblyFactory :
 
     virtual void *_narrow_helper( const char *repoid );
 
-    virtual Cookie* create( const char* assembly_loc ) = 0;
-    virtual Assembly_ptr lookup( Cookie* c ) = 0;
-    virtual void destroy( Cookie* c ) = 0;
+    virtual ::Components::Cookie* create( const char* assembly_loc ) = 0;
+    virtual ::Components::Assembly_ptr lookup( ::Components::Cookie* c ) = 0;
+    virtual void destroy( ::Components::Cookie* c ) = 0;
 
   protected:
     AssemblyFactory() {};
@@ -3006,9 +3006,9 @@ class AssemblyFactory_stub:
 {
   public:
     virtual ~AssemblyFactory_stub();
-    Cookie* create( const char* assembly_loc );
-    Assembly_ptr lookup( Cookie* c );
-    void destroy( Cookie* c );
+    ::Components::Cookie* create( const char* assembly_loc );
+    ::Components::Assembly_ptr lookup( ::Components::Cookie* c );
+    void destroy( ::Components::Cookie* c );
 
   private:
     void operator=( const AssemblyFactory_stub& );
@@ -3023,9 +3023,9 @@ class AssemblyFactory_stub_clp :
   public:
     AssemblyFactory_stub_clp (PortableServer::POA_ptr, CORBA::Object_ptr);
     virtual ~AssemblyFactory_stub_clp ();
-    Cookie* create( const char* assembly_loc );
-    Assembly_ptr lookup( Cookie* c );
-    void destroy( Cookie* c );
+    ::Components::Cookie* create( const char* assembly_loc );
+    ::Components::Assembly_ptr lookup( ::Components::Cookie* c );
+    void destroy( ::Components::Cookie* c );
 
   protected:
     AssemblyFactory_stub_clp ();
@@ -3066,9 +3066,9 @@ class ServerActivator :
 
     virtual void *_narrow_helper( const char *repoid );
 
-    virtual ComponentServer_ptr create_component_server( const ConfigValues& config ) = 0;
-    virtual void remove_component_server( ComponentServer_ptr server ) = 0;
-    virtual ComponentServers* get_component_servers() = 0;
+    virtual ::Components::ComponentServer_ptr create_component_server( const ::Components::ConfigValues& config ) = 0;
+    virtual void remove_component_server( ::Components::ComponentServer_ptr server ) = 0;
+    virtual ::Components::ComponentServers* get_component_servers() = 0;
 
   protected:
     ServerActivator() {};
@@ -3085,9 +3085,9 @@ class ServerActivator_stub:
 {
   public:
     virtual ~ServerActivator_stub();
-    ComponentServer_ptr create_component_server( const ConfigValues& config );
-    void remove_component_server( ComponentServer_ptr server );
-    ComponentServers* get_component_servers();
+    ::Components::ComponentServer_ptr create_component_server( const ::Components::ConfigValues& config );
+    void remove_component_server( ::Components::ComponentServer_ptr server );
+    ::Components::ComponentServers* get_component_servers();
 
   private:
     void operator=( const ServerActivator_stub& );
@@ -3102,9 +3102,9 @@ class ServerActivator_stub_clp :
   public:
     ServerActivator_stub_clp (PortableServer::POA_ptr, CORBA::Object_ptr);
     virtual ~ServerActivator_stub_clp ();
-    ComponentServer_ptr create_component_server( const ConfigValues& config );
-    void remove_component_server( ComponentServer_ptr server );
-    ComponentServers* get_component_servers();
+    ::Components::ComponentServer_ptr create_component_server( const ::Components::ConfigValues& config );
+    void remove_component_server( ::Components::ComponentServer_ptr server );
+    ::Components::ComponentServers* get_component_servers();
 
   protected:
     ServerActivator_stub_clp ();

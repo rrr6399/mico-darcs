@@ -182,7 +182,7 @@ class Credentials :
     virtual ::Security::AssociationOptions invocation_options_required() = 0;
     virtual void invocation_options_required( ::Security::AssociationOptions value ) = 0;
 
-    virtual Credentials_ptr copy() = 0;
+    virtual ::SecurityLevel2::Credentials_ptr copy() = 0;
     virtual void destroy() = 0;
     virtual CORBA::Boolean get_security_feature( ::Security::CommunicationDirection direction, ::Security::SecurityFeature feature ) = 0;
     virtual ::Security::AttributeList* get_attributes( const ::Security::AttributeTypeList& attributes ) = 0;
@@ -231,7 +231,7 @@ class Current :
 
     virtual ::SecurityLevel2::ReceivedCredentials_ptr received_credentials() = 0;
 
-    virtual TargetCredentials_ptr get_target_credentials( CORBA::Object_ptr target ) = 0;
+    virtual ::SecurityLevel2::TargetCredentials_ptr get_target_credentials( CORBA::Object_ptr target ) = 0;
 
   protected:
     Current() {};
@@ -320,7 +320,7 @@ class AccessDecision :
 
     virtual void *_narrow_helper( const char *repoid );
 
-    virtual CORBA::Boolean access_allowed( const CredentialsList& cred_list, CORBA::Object_ptr target, const char* operation_name, const char* target_interface_name ) = 0;
+    virtual CORBA::Boolean access_allowed( const ::SecurityLevel2::CredentialsList& cred_list, CORBA::Object_ptr target, const char* operation_name, const char* target_interface_name ) = 0;
 
   protected:
     AccessDecision() {};
@@ -539,9 +539,9 @@ class PrincipalAuthenticator :
 
     virtual void *_narrow_helper( const char *repoid );
 
-    virtual ::Security::AuthenticationStatus authenticate( ::Security::AuthenticationMethod method, const char* mechanism, const char* security_name, const CORBA::Any& auth_data, const ::Security::AttributeList& privileges, Credentials_out creds, CORBA::Any_out continuation_data, CORBA::Any_out auth_specific_data ) = 0;
+    virtual ::Security::AuthenticationStatus authenticate( ::Security::AuthenticationMethod method, const char* mechanism, const char* security_name, const CORBA::Any& auth_data, const ::Security::AttributeList& privileges, ::SecurityLevel2::Credentials_out creds, CORBA::Any_out continuation_data, CORBA::Any_out auth_specific_data ) = 0;
     virtual ::Security::AuthenticationMethodList* get_supported_authen_methods( const char* mechanism ) = 0;
-    virtual ::Security::AuthenticationStatus continue_authentication( const CORBA::Any& response_data, Credentials_ptr creds, CORBA::Any_out continuation_data, CORBA::Any_out auth_specific_data ) = 0;
+    virtual ::Security::AuthenticationStatus continue_authentication( const CORBA::Any& response_data, ::SecurityLevel2::Credentials_ptr creds, CORBA::Any_out continuation_data, CORBA::Any_out auth_specific_data ) = 0;
 
   protected:
     PrincipalAuthenticator() {};
@@ -836,9 +836,9 @@ class SecurityManager :
     virtual ::SecurityLevel2::AccessRights_ptr access_rights() = 0;
     virtual ::SecurityLevel2::AccessDecision_ptr access_decision() = 0;
 
-    virtual void remove_own_credentials( Credentials_ptr creds ) = 0;
-    virtual void set_own_credentials( const CredentialsList& creds ) = 0;
-    virtual TargetCredentials_ptr get_target_credentials( CORBA::Object_ptr target ) = 0;
+    virtual void remove_own_credentials( ::SecurityLevel2::Credentials_ptr creds ) = 0;
+    virtual void set_own_credentials( const ::SecurityLevel2::CredentialsList& creds ) = 0;
+    virtual ::SecurityLevel2::TargetCredentials_ptr get_target_credentials( CORBA::Object_ptr target ) = 0;
     virtual ::CORBA::Policy_ptr get_security_policy( ::CORBA::PolicyType policy_type ) = 0;
     virtual CORBA::Any* get_method_data( ::Security::AuthenticationMethod method ) = 0;
 
@@ -883,7 +883,7 @@ class AuditChannel :
 
     virtual ::Security::AuditChannelId audit_channel_id() = 0;
 
-    virtual void audit_write( const ::Security::AuditEventType& event_type, const CredentialsList& creds, const ::Security::UtcT& time, const ::Security::SelectorValueList& descriptors, const ::Security::Opaque& event_specific_data ) = 0;
+    virtual void audit_write( const ::Security::AuditEventType& event_type, const ::SecurityLevel2::CredentialsList& creds, const ::Security::UtcT& time, const ::Security::SelectorValueList& descriptors, const ::Security::Opaque& event_specific_data ) = 0;
 
   protected:
     AuditChannel() {};

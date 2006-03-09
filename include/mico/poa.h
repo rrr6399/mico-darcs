@@ -281,9 +281,9 @@ class POAManager :
     virtual void hold_requests( CORBA::Boolean wait_for_completion ) = 0;
     virtual void discard_requests( CORBA::Boolean wait_for_completion ) = 0;
     virtual void deactivate( CORBA::Boolean etherealize_objects, CORBA::Boolean wait_for_completion ) = 0;
-    virtual State get_state() = 0;
-    virtual void add_managed_poa( POA_ptr managed ) = 0;
-    virtual void del_managed_poa( POA_ptr managed ) = 0;
+    virtual ::PortableServer::POAManager::State get_state() = 0;
+    virtual void add_managed_poa( ::PortableServer::POA_ptr managed ) = 0;
+    virtual void del_managed_poa( ::PortableServer::POA_ptr managed ) = 0;
 
   protected:
     POAManager() {};
@@ -711,34 +711,34 @@ class POA :
     virtual void the_activator( ::PortableServer::AdapterActivator_ptr value ) = 0;
     virtual ::CORBA::OctetSeq* id() = 0;
 
-    virtual POA_ptr create_POA( const char* adapter_name, POAManager_ptr a_POAManager, const ::CORBA::PolicyList& policies ) = 0;
-    virtual POA_ptr find_POA( const char* adapter_name, CORBA::Boolean activate_it ) = 0;
+    virtual ::PortableServer::POA_ptr create_POA( const char* adapter_name, ::PortableServer::POAManager_ptr a_POAManager, const ::CORBA::PolicyList& policies ) = 0;
+    virtual ::PortableServer::POA_ptr find_POA( const char* adapter_name, CORBA::Boolean activate_it ) = 0;
     virtual void destroy( CORBA::Boolean etherealize_objects, CORBA::Boolean wait_for_completion ) = 0;
-    virtual ThreadPolicy_ptr create_thread_policy( ThreadPolicyValue value ) = 0;
-    virtual LifespanPolicy_ptr create_lifespan_policy( LifespanPolicyValue value ) = 0;
-    virtual IdUniquenessPolicy_ptr create_id_uniqueness_policy( IdUniquenessPolicyValue value ) = 0;
-    virtual IdAssignmentPolicy_ptr create_id_assignment_policy( IdAssignmentPolicyValue value ) = 0;
-    virtual ImplicitActivationPolicy_ptr create_implicit_activation_policy( ImplicitActivationPolicyValue value ) = 0;
-    virtual ServantRetentionPolicy_ptr create_servant_retention_policy( ServantRetentionPolicyValue value ) = 0;
-    virtual RequestProcessingPolicy_ptr create_request_processing_policy( RequestProcessingPolicyValue value ) = 0;
-    virtual ServantManager_ptr get_servant_manager() = 0;
-    virtual void set_servant_manager( ServantManager_ptr imgr ) = 0;
-    virtual Servant get_servant() = 0;
-    virtual void set_servant( Servant p_servant ) = 0;
-    virtual ObjectId* activate_object( Servant p_servant ) = 0;
-    virtual void activate_object_with_id( const ObjectId& id, Servant p_servant ) = 0;
-    virtual void deactivate_object( const ObjectId& oid ) = 0;
+    virtual ::PortableServer::ThreadPolicy_ptr create_thread_policy( ::PortableServer::ThreadPolicyValue value ) = 0;
+    virtual ::PortableServer::LifespanPolicy_ptr create_lifespan_policy( ::PortableServer::LifespanPolicyValue value ) = 0;
+    virtual ::PortableServer::IdUniquenessPolicy_ptr create_id_uniqueness_policy( ::PortableServer::IdUniquenessPolicyValue value ) = 0;
+    virtual ::PortableServer::IdAssignmentPolicy_ptr create_id_assignment_policy( ::PortableServer::IdAssignmentPolicyValue value ) = 0;
+    virtual ::PortableServer::ImplicitActivationPolicy_ptr create_implicit_activation_policy( ::PortableServer::ImplicitActivationPolicyValue value ) = 0;
+    virtual ::PortableServer::ServantRetentionPolicy_ptr create_servant_retention_policy( ::PortableServer::ServantRetentionPolicyValue value ) = 0;
+    virtual ::PortableServer::RequestProcessingPolicy_ptr create_request_processing_policy( ::PortableServer::RequestProcessingPolicyValue value ) = 0;
+    virtual ::PortableServer::ServantManager_ptr get_servant_manager() = 0;
+    virtual void set_servant_manager( ::PortableServer::ServantManager_ptr imgr ) = 0;
+    virtual ::PortableServer::Servant get_servant() = 0;
+    virtual void set_servant( ::PortableServer::Servant p_servant ) = 0;
+    virtual ::PortableServer::ObjectId* activate_object( ::PortableServer::Servant p_servant ) = 0;
+    virtual void activate_object_with_id( const ::PortableServer::ObjectId& id, ::PortableServer::Servant p_servant ) = 0;
+    virtual void deactivate_object( const ::PortableServer::ObjectId& oid ) = 0;
     virtual CORBA::Object_ptr create_reference( const char* intf ) = 0;
-    virtual CORBA::Object_ptr create_reference_with_id( const ObjectId& oid, const char* intf ) = 0;
-    virtual ObjectId* servant_to_id( Servant p_servant ) = 0;
-    virtual CORBA::Object_ptr servant_to_reference( Servant p_servant ) = 0;
-    virtual Servant reference_to_servant( CORBA::Object_ptr reference ) = 0;
-    virtual ObjectId* reference_to_id( CORBA::Object_ptr reference ) = 0;
-    virtual Servant id_to_servant( const ObjectId& oid ) = 0;
-    virtual CORBA::Object_ptr id_to_reference( const ObjectId& oid ) = 0;
-    virtual CORBA::Object_ptr activate_for_this( Servant serv ) = 0;
-    virtual void poa_manager_callback( POAManager::State newstate, CORBA::Boolean etherealize_objects, CORBA::Boolean wait_for_completion ) = 0;
-    virtual Servant preinvoke( CORBA::Object_ptr for_obj ) = 0;
+    virtual CORBA::Object_ptr create_reference_with_id( const ::PortableServer::ObjectId& oid, const char* intf ) = 0;
+    virtual ::PortableServer::ObjectId* servant_to_id( ::PortableServer::Servant p_servant ) = 0;
+    virtual CORBA::Object_ptr servant_to_reference( ::PortableServer::Servant p_servant ) = 0;
+    virtual ::PortableServer::Servant reference_to_servant( CORBA::Object_ptr reference ) = 0;
+    virtual ::PortableServer::ObjectId* reference_to_id( CORBA::Object_ptr reference ) = 0;
+    virtual ::PortableServer::Servant id_to_servant( const ::PortableServer::ObjectId& oid ) = 0;
+    virtual CORBA::Object_ptr id_to_reference( const ::PortableServer::ObjectId& oid ) = 0;
+    virtual CORBA::Object_ptr activate_for_this( ::PortableServer::Servant serv ) = 0;
+    virtual void poa_manager_callback( ::PortableServer::POAManager::State newstate, CORBA::Boolean etherealize_objects, CORBA::Boolean wait_for_completion ) = 0;
+    virtual ::PortableServer::Servant preinvoke( CORBA::Object_ptr for_obj ) = 0;
     virtual void postinvoke() = 0;
 #ifdef USE_CSL2
     virtual void register_ODM_factory( ::ObjectDomainMapping::Factory_ptr fry ) = 0;
@@ -1116,7 +1116,7 @@ class AdapterActivator :
 
     virtual void *_narrow_helper( const char *repoid );
 
-    virtual CORBA::Boolean unknown_adapter( POA_ptr parent, const char* name ) = 0;
+    virtual CORBA::Boolean unknown_adapter( ::PortableServer::POA_ptr parent, const char* name ) = 0;
 
   protected:
     AdapterActivator() {};
@@ -1196,8 +1196,8 @@ class ServantActivator :
 
     virtual void *_narrow_helper( const char *repoid );
 
-    virtual Servant incarnate( const ObjectId& oid, POA_ptr adapter ) = 0;
-    virtual void etherealize( const ObjectId& oid, POA_ptr adapter, Servant serv, CORBA::Boolean cleanup_in_progress, CORBA::Boolean remaining_activations ) = 0;
+    virtual ::PortableServer::Servant incarnate( const ::PortableServer::ObjectId& oid, ::PortableServer::POA_ptr adapter ) = 0;
+    virtual void etherealize( const ::PortableServer::ObjectId& oid, ::PortableServer::POA_ptr adapter, ::PortableServer::Servant serv, CORBA::Boolean cleanup_in_progress, CORBA::Boolean remaining_activations ) = 0;
 
   protected:
     ServantActivator() {};
@@ -1241,8 +1241,8 @@ class ServantLocator :
     typedef MICO_Native_PortableServer_ServantLocator_Cookie Cookie;
     typedef MICO_Native_PortableServer_ServantLocator_Cookie& Cookie_out;
 
-    virtual Servant preinvoke( const ObjectId& oid, POA_ptr adapter, const char* operation, Cookie_out the_cookie ) = 0;
-    virtual void postinvoke( const ObjectId& oid, POA_ptr adapter, const char* operation, Cookie the_cookie, Servant the_servant ) = 0;
+    virtual ::PortableServer::Servant preinvoke( const ::PortableServer::ObjectId& oid, ::PortableServer::POA_ptr adapter, const char* operation, ::PortableServer::ServantLocator::Cookie_out the_cookie ) = 0;
+    virtual void postinvoke( const ::PortableServer::ObjectId& oid, ::PortableServer::POA_ptr adapter, const char* operation, ::PortableServer::ServantLocator::Cookie the_cookie, ::PortableServer::Servant the_servant ) = 0;
 
   protected:
     ServantLocator() {};
@@ -1317,10 +1317,10 @@ class Current :
 
     static MICO_EXPORT CORBA::TypeCodeConst _tc_NoContext;
 
-    virtual POA_ptr get_POA() = 0;
-    virtual ObjectId* get_object_id() = 0;
+    virtual ::PortableServer::POA_ptr get_POA() = 0;
+    virtual ::PortableServer::ObjectId* get_object_id() = 0;
     virtual CORBA::Object_ptr get_reference() = 0;
-    virtual Servant get_servant() = 0;
+    virtual ::PortableServer::Servant get_servant() = 0;
     virtual CORBA::Boolean iscurrent() = 0;
 
   protected:

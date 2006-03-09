@@ -88,11 +88,11 @@ class Manager :
 
     typedef CORBA::UShort ODMGranularity;
     typedef ODMGranularity& ODMGranularity_out;
-    virtual void set_domain_name_key( ODMGranularity granularity, const ::Security::Opaque& key, const ::SecurityDomain::NameList& domainNameList ) = 0;
+    virtual void set_domain_name_key( ::ObjectDomainMapping::Manager::ODMGranularity granularity, const ::Security::Opaque& key, const ::SecurityDomain::NameList& domainNameList ) = 0;
     virtual ::SecurityDomain::NameList* get_domain_names( const ::Security::Opaque& key ) = 0;
     virtual void remove_domain_names( const ::Security::Opaque& key ) = 0;
-    virtual void set_parent_odm_key( const ::Security::Opaque& key, Manager_ptr odm ) = 0;
-    virtual void set_default_parent_odm( Manager_ptr odm ) = 0;
+    virtual void set_parent_odm_key( const ::Security::Opaque& key, ::ObjectDomainMapping::Manager_ptr odm ) = 0;
+    virtual void set_default_parent_odm( ::ObjectDomainMapping::Manager_ptr odm ) = 0;
     virtual void set_default_name_key( const ::SecurityDomain::NameList& domainNameList ) = 0;
 
   protected:
@@ -134,7 +134,7 @@ class Factory :
 
     virtual void *_narrow_helper( const char *repoid );
 
-    virtual Manager_ptr create() = 0;
+    virtual ::ObjectDomainMapping::Manager_ptr create() = 0;
     virtual CORBA::Boolean load_config_file( const char* filename ) = 0;
     virtual CORBA::Boolean save_config_file( const char* filename ) = 0;
 
@@ -177,8 +177,8 @@ class ODM :
 
     virtual void *_narrow_helper( const char *repoid );
 
-    virtual Factory_ptr create() = 0;
-    virtual Factory_ptr current() = 0;
+    virtual ::ObjectDomainMapping::Factory_ptr create() = 0;
+    virtual ::ObjectDomainMapping::Factory_ptr current() = 0;
 
   protected:
     ODM() {};

@@ -366,7 +366,7 @@ class CodecFactory :
 
     static MICO_EXPORT CORBA::TypeCodeConst _tc_UnknownEncoding;
 
-    virtual Codec_ptr create_codec( const Encoding& enc ) = 0;
+    virtual ::IOP::Codec_ptr create_codec( const ::IOP::Encoding& enc ) = 0;
 
   protected:
     CodecFactory() {};
@@ -614,8 +614,8 @@ class Current :
 
     virtual void *_narrow_helper( const char *repoid );
 
-    virtual CORBA::Any* get_slot( SlotId id ) = 0;
-    virtual void set_slot( SlotId id, const CORBA::Any& data ) = 0;
+    virtual CORBA::Any* get_slot( ::PortableInterceptor::SlotId id ) = 0;
+    virtual void set_slot( ::PortableInterceptor::SlotId id, const CORBA::Any& data ) = 0;
 
   protected:
     Current() {};
@@ -668,7 +668,7 @@ class RequestInfo :
     virtual ::PortableInterceptor::ReplyStatus reply_status() = 0;
     virtual CORBA::Object_ptr forward_reference() = 0;
 
-    virtual CORBA::Any* get_slot( SlotId id ) = 0;
+    virtual CORBA::Any* get_slot( ::PortableInterceptor::SlotId id ) = 0;
     virtual ::IOP::ServiceContext* get_request_service_context( ::IOP::ServiceID id ) = 0;
     virtual ::IOP::ServiceContext* get_reply_service_context( ::IOP::ServiceID id ) = 0;
 
@@ -767,7 +767,7 @@ class ServerRequestInfo :
     virtual char* target_most_derived_interface() = 0;
 
     virtual ::CORBA::Policy_ptr get_server_policy( ::CORBA::PolicyType type ) = 0;
-    virtual void set_slot( SlotId id, const CORBA::Any& data ) = 0;
+    virtual void set_slot( ::PortableInterceptor::SlotId id, const CORBA::Any& data ) = 0;
     virtual CORBA::Boolean target_is_a( const char* id ) = 0;
     virtual void add_reply_service_context( const ::IOP::ServiceContext& service_context, CORBA::Boolean replace ) = 0;
 
@@ -810,11 +810,11 @@ class ClientRequestInterceptor :
 
     virtual void *_narrow_helper( const char *repoid );
 
-    virtual void send_request( ClientRequestInfo_ptr ri ) = 0;
-    virtual void send_poll( ClientRequestInfo_ptr ri ) = 0;
-    virtual void receive_reply( ClientRequestInfo_ptr ri ) = 0;
-    virtual void receive_exception( ClientRequestInfo_ptr ri ) = 0;
-    virtual void receive_other( ClientRequestInfo_ptr ri ) = 0;
+    virtual void send_request( ::PortableInterceptor::ClientRequestInfo_ptr ri ) = 0;
+    virtual void send_poll( ::PortableInterceptor::ClientRequestInfo_ptr ri ) = 0;
+    virtual void receive_reply( ::PortableInterceptor::ClientRequestInfo_ptr ri ) = 0;
+    virtual void receive_exception( ::PortableInterceptor::ClientRequestInfo_ptr ri ) = 0;
+    virtual void receive_other( ::PortableInterceptor::ClientRequestInfo_ptr ri ) = 0;
 
   protected:
     ClientRequestInterceptor() {};
@@ -855,11 +855,11 @@ class ServerRequestInterceptor :
 
     virtual void *_narrow_helper( const char *repoid );
 
-    virtual void receive_request_service_contexts( ServerRequestInfo_ptr ri ) = 0;
-    virtual void receive_request( ServerRequestInfo_ptr ri ) = 0;
-    virtual void send_reply( ServerRequestInfo_ptr ri ) = 0;
-    virtual void send_exception( ServerRequestInfo_ptr ri ) = 0;
-    virtual void send_other( ServerRequestInfo_ptr ri ) = 0;
+    virtual void receive_request_service_contexts( ::PortableInterceptor::ServerRequestInfo_ptr ri ) = 0;
+    virtual void receive_request( ::PortableInterceptor::ServerRequestInfo_ptr ri ) = 0;
+    virtual void send_reply( ::PortableInterceptor::ServerRequestInfo_ptr ri ) = 0;
+    virtual void send_exception( ::PortableInterceptor::ServerRequestInfo_ptr ri ) = 0;
+    virtual void send_other( ::PortableInterceptor::ServerRequestInfo_ptr ri ) = 0;
 
   protected:
     ServerRequestInterceptor() {};
@@ -943,7 +943,7 @@ class IORInterceptor :
 
     virtual void *_narrow_helper( const char *repoid );
 
-    virtual void establish_components( IORInfo_ptr info ) = 0;
+    virtual void establish_components( ::PortableInterceptor::IORInfo_ptr info ) = 0;
 
   protected:
     IORInterceptor() {};
@@ -1110,11 +1110,11 @@ class ORBInitInfo :
 
     virtual void register_initial_reference( const char* id, CORBA::Object_ptr obj ) = 0;
     virtual CORBA::Object_ptr resolve_initial_references( const char* id ) = 0;
-    virtual void add_client_request_interceptor( ClientRequestInterceptor_ptr interceptor ) = 0;
-    virtual void add_server_request_interceptor( ServerRequestInterceptor_ptr interceptor ) = 0;
-    virtual void add_ior_interceptor( IORInterceptor_ptr interceptor ) = 0;
-    virtual SlotId allocate_slot_id() = 0;
-    virtual void register_policy_factory( ::CORBA::PolicyType type, PolicyFactory_ptr policy_factory ) = 0;
+    virtual void add_client_request_interceptor( ::PortableInterceptor::ClientRequestInterceptor_ptr interceptor ) = 0;
+    virtual void add_server_request_interceptor( ::PortableInterceptor::ServerRequestInterceptor_ptr interceptor ) = 0;
+    virtual void add_ior_interceptor( ::PortableInterceptor::IORInterceptor_ptr interceptor ) = 0;
+    virtual ::PortableInterceptor::SlotId allocate_slot_id() = 0;
+    virtual void register_policy_factory( ::CORBA::PolicyType type, ::PortableInterceptor::PolicyFactory_ptr policy_factory ) = 0;
 
   protected:
     ORBInitInfo() {};
@@ -1155,8 +1155,8 @@ class ORBInitializer :
 
     virtual void *_narrow_helper( const char *repoid );
 
-    virtual void pre_init( ORBInitInfo_ptr info ) = 0;
-    virtual void post_init( ORBInitInfo_ptr info ) = 0;
+    virtual void pre_init( ::PortableInterceptor::ORBInitInfo_ptr info ) = 0;
+    virtual void post_init( ::PortableInterceptor::ORBInitInfo_ptr info ) = 0;
 
   protected:
     ORBInitializer() {};

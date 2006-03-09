@@ -203,16 +203,16 @@ class Principal :
     static Principal* _downcast (CORBA::ValueBase *);
     static Principal* _downcast (CORBA::AbstractBase *);
 
-    virtual void the_type( PrincipalType _p ) = 0;
-    virtual PrincipalType the_type() const = 0;
+    virtual void the_type( ::SL3PM::PrincipalType _p ) = 0;
+    virtual ::SL3PM::PrincipalType the_type() const = 0;
 
-    virtual void the_name( const PrincipalName& _p ) = 0;
-    virtual const PrincipalName& the_name() const = 0;
-    virtual PrincipalName& the_name() = 0;
+    virtual void the_name( const ::SL3PM::PrincipalName& _p ) = 0;
+    virtual const ::SL3PM::PrincipalName& the_name() const = 0;
+    virtual ::SL3PM::PrincipalName& the_name() = 0;
 
-    virtual void with_privileges( const ScopedPrivilegesList& _p ) = 0;
-    virtual const ScopedPrivilegesList& with_privileges() const = 0;
-    virtual ScopedPrivilegesList& with_privileges() = 0;
+    virtual void with_privileges( const ::SL3PM::ScopedPrivilegesList& _p ) = 0;
+    virtual const ::SL3PM::ScopedPrivilegesList& with_privileges() const = 0;
+    virtual ::SL3PM::ScopedPrivilegesList& with_privileges() = 0;
 
 
   public:
@@ -259,9 +259,9 @@ class SimplePrincipal :
     virtual void authenticated( CORBA::Boolean _p ) = 0;
     virtual CORBA::Boolean authenticated() const = 0;
 
-    virtual void alternate_names( const PrincipalNameList& _p ) = 0;
-    virtual const PrincipalNameList& alternate_names() const = 0;
-    virtual PrincipalNameList& alternate_names() = 0;
+    virtual void alternate_names( const ::SL3PM::PrincipalNameList& _p ) = 0;
+    virtual const ::SL3PM::PrincipalNameList& alternate_names() const = 0;
+    virtual ::SL3PM::PrincipalNameList& alternate_names() = 0;
 
 
   public:
@@ -312,11 +312,11 @@ class ProxyPrincipal :
     static ProxyPrincipal* _downcast (CORBA::ValueBase *);
     static ProxyPrincipal* _downcast (CORBA::AbstractBase *);
 
-    virtual void speaking( Principal* _p ) = 0;
-    virtual Principal* speaking() const = 0;
+    virtual void speaking( ::SL3PM::Principal* _p ) = 0;
+    virtual ::SL3PM::Principal* speaking() const = 0;
 
-    virtual void speaks_for( Principal* _p ) = 0;
-    virtual Principal* speaks_for() const = 0;
+    virtual void speaks_for( ::SL3PM::Principal* _p ) = 0;
+    virtual ::SL3PM::Principal* speaks_for() const = 0;
 
 
   public:
@@ -368,11 +368,11 @@ class QuotingPrincipal :
     static QuotingPrincipal* _downcast (CORBA::ValueBase *);
     static QuotingPrincipal* _downcast (CORBA::AbstractBase *);
 
-    virtual void speaking( Principal* _p ) = 0;
-    virtual Principal* speaking() const = 0;
+    virtual void speaking( ::SL3PM::Principal* _p ) = 0;
+    virtual ::SL3PM::Principal* speaking() const = 0;
 
-    virtual void quotes_for( Principal* _p ) = 0;
-    virtual Principal* quotes_for() const = 0;
+    virtual void quotes_for( ::SL3PM::Principal* _p ) = 0;
+    virtual ::SL3PM::Principal* quotes_for() const = 0;
 
 
   public:
@@ -523,13 +523,13 @@ class Statement :
     static Statement* _downcast (CORBA::AbstractBase *);
 
     virtual char* get_encoding_type() = 0;
-    virtual Encoding* get_encoding( const char* encoding_type ) = 0;
+    virtual ::SL3PM::Encoding* get_encoding( const char* encoding_type ) = 0;
 
-    virtual void the_layer( StatementLayer _p ) = 0;
-    virtual StatementLayer the_layer() const = 0;
+    virtual void the_layer( ::SL3PM::StatementLayer _p ) = 0;
+    virtual ::SL3PM::StatementLayer the_layer() const = 0;
 
-    virtual void the_type( StatementType _p ) = 0;
-    virtual StatementType the_type() const = 0;
+    virtual void the_type( ::SL3PM::StatementType _p ) = 0;
+    virtual ::SL3PM::StatementType the_type() const = 0;
 
   protected:
     virtual void encoding_type( char *_p ) = 0;
@@ -537,9 +537,9 @@ class Statement :
     virtual void encoding_type( const CORBA::String_var &_p ) = 0;
     virtual const char *encoding_type() const = 0;
 
-    virtual void the_encoding( const Encoding& _p ) = 0;
-    virtual const Encoding& the_encoding() const = 0;
-    virtual Encoding& the_encoding() = 0;
+    virtual void the_encoding( const ::SL3PM::Encoding& _p ) = 0;
+    virtual const ::SL3PM::Encoding& the_encoding() const = 0;
+    virtual ::SL3PM::Encoding& the_encoding() = 0;
 
 
   public:
@@ -637,8 +637,8 @@ class PrincipalIdentityStatement :
     static PrincipalIdentityStatement* _downcast (CORBA::ValueBase *);
     static PrincipalIdentityStatement* _downcast (CORBA::AbstractBase *);
 
-    virtual void the_principal( Principal* _p ) = 0;
-    virtual Principal* the_principal() const = 0;
+    virtual void the_principal( ::SL3PM::Principal* _p ) = 0;
+    virtual ::SL3PM::Principal* the_principal() const = 0;
 
 
   public:

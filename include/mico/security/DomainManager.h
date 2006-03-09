@@ -171,7 +171,7 @@ class NameIterator :
 
     virtual void *_narrow_helper( const char *repoid );
 
-    virtual CORBA::Boolean next_one( Name_out domainName ) = 0;
+    virtual CORBA::Boolean next_one( ::SecurityDomain::Name_out domainName ) = 0;
     virtual void destroy() = 0;
 
   protected:
@@ -220,11 +220,11 @@ class DomainManagerAdmin :
     virtual void set_domain_policy( ::CORBA::Policy_ptr policy ) = 0;
     virtual ::CORBA::Policy_ptr get_domain_policy( ::CORBA::PolicyType policyType ) = 0;
     virtual void delete_domain_policy( ::CORBA::PolicyType policyType ) = 0;
-    virtual Name* get_name() = 0;
-    virtual void set_name( const Name& name ) = 0;
-    virtual DomainManagerAdminList* get_parent_domain_managers() = 0;
-    virtual void set_parent_domain_managers( const DomainManagerAdminList& managers ) = 0;
-    virtual DomainManagerAdminList* get_child_domain_managers() = 0;
+    virtual ::SecurityDomain::Name* get_name() = 0;
+    virtual void set_name( const ::SecurityDomain::Name& name ) = 0;
+    virtual ::SecurityDomain::DomainManagerAdminList* get_parent_domain_managers() = 0;
+    virtual void set_parent_domain_managers( const ::SecurityDomain::DomainManagerAdminList& managers ) = 0;
+    virtual ::SecurityDomain::DomainManagerAdminList* get_child_domain_managers() = 0;
 
   protected:
     DomainManagerAdmin() {};
@@ -265,10 +265,10 @@ class DomainManagerFactory :
 
     virtual void *_narrow_helper( const char *repoid );
 
-    virtual DomainManagerAdmin_ptr get_root_domain_manager( const char* type ) = 0;
+    virtual ::SecurityDomain::DomainManagerAdmin_ptr get_root_domain_manager( const char* type ) = 0;
     virtual void add_root_domain_manager( const char* type ) = 0;
-    virtual DomainManagerAdmin_ptr create_domain_manager() = 0;
-    virtual void release_domain_manager( DomainManagerAdmin_ptr domainManager ) = 0;
+    virtual ::SecurityDomain::DomainManagerAdmin_ptr create_domain_manager() = 0;
+    virtual void release_domain_manager( ::SecurityDomain::DomainManagerAdmin_ptr domainManager ) = 0;
     virtual CORBA::Boolean load_config_file( const char* filename, const char* type ) = 0;
 
   protected:
@@ -312,11 +312,11 @@ class DomainAuthority :
 
     virtual CORBA::Boolean is_root() = 0;
     virtual CORBA::Boolean exists() = 0;
-    virtual PolicyCombinator get_policy_combinator( ::CORBA::PolicyType policyType ) = 0;
-    virtual PolicyCombinator get_policy_combinator_for_multi_parents( ::CORBA::PolicyType policyType, DomainManagerAdmin_ptr parent ) = 0;
-    virtual NameIterator_ptr get_child_domain_names() = 0;
-    virtual Name* get_domain_name( DomainManagerAdmin_ptr domainManager ) = 0;
-    virtual DomainManagerAdmin_ptr get_domain_manager( const Name& domainName ) = 0;
+    virtual ::SecurityDomain::PolicyCombinator get_policy_combinator( ::CORBA::PolicyType policyType ) = 0;
+    virtual ::SecurityDomain::PolicyCombinator get_policy_combinator_for_multi_parents( ::CORBA::PolicyType policyType, ::SecurityDomain::DomainManagerAdmin_ptr parent ) = 0;
+    virtual ::SecurityDomain::NameIterator_ptr get_child_domain_names() = 0;
+    virtual ::SecurityDomain::Name* get_domain_name( ::SecurityDomain::DomainManagerAdmin_ptr domainManager ) = 0;
+    virtual ::SecurityDomain::DomainManagerAdmin_ptr get_domain_manager( const ::SecurityDomain::Name& domainName ) = 0;
 
   protected:
     DomainAuthority() {};
@@ -357,10 +357,10 @@ class DomainAuthorityAdmin :
 
     virtual void *_narrow_helper( const char *repoid );
 
-    virtual void add_domain_manager( DomainManagerAdmin_ptr domainManager, const Name& domainName ) = 0;
-    virtual void remove_domain_manager( DomainManagerAdmin_ptr child ) = 0;
-    virtual void set_policy_combinator( ::CORBA::PolicyType policyType, PolicyCombinator combinator ) = 0;
-    virtual void set_policy_combinator_for_multi_parents( ::CORBA::PolicyType policyType, PolicyCombinator combinator, DomainManagerAdmin_ptr parent ) = 0;
+    virtual void add_domain_manager( ::SecurityDomain::DomainManagerAdmin_ptr domainManager, const ::SecurityDomain::Name& domainName ) = 0;
+    virtual void remove_domain_manager( ::SecurityDomain::DomainManagerAdmin_ptr child ) = 0;
+    virtual void set_policy_combinator( ::CORBA::PolicyType policyType, ::SecurityDomain::PolicyCombinator combinator ) = 0;
+    virtual void set_policy_combinator_for_multi_parents( ::CORBA::PolicyType policyType, ::SecurityDomain::PolicyCombinator combinator, ::SecurityDomain::DomainManagerAdmin_ptr parent ) = 0;
 
   protected:
     DomainAuthorityAdmin() {};
@@ -401,8 +401,8 @@ class NameExt :
 
     virtual void *_narrow_helper( const char *repoid );
 
-    virtual char* to_string( const Name& domainName ) = 0;
-    virtual Name* to_name( const char* urlName ) = 0;
+    virtual char* to_string( const ::SecurityDomain::Name& domainName ) = 0;
+    virtual ::SecurityDomain::Name* to_name( const char* urlName ) = 0;
 
   protected:
     NameExt() {};

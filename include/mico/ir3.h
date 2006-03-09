@@ -156,11 +156,11 @@ class ComponentDef :
     virtual ::CORBA::InterfaceDefSeq* supported_interfaces() = 0;
     virtual void supported_interfaces( const ::CORBA::InterfaceDefSeq& value ) = 0;
 
-    virtual ProvidesDef_ptr create_provides( const char* id, const char* name, const char* version, InterfaceDef_ptr interface_type ) = 0;
-    virtual UsesDef_ptr create_uses( const char* id, const char* name, const char* version, InterfaceDef_ptr interface_type, CORBA::Boolean is_multiple ) = 0;
-    virtual EmitsDef_ptr create_emits( const char* id, const char* name, const char* version, EventDef_ptr event ) = 0;
-    virtual PublishesDef_ptr create_publishes( const char* id, const char* name, const char* version, EventDef_ptr event ) = 0;
-    virtual ConsumesDef_ptr create_consumes( const char* id, const char* name, const char* version, EventDef_ptr event ) = 0;
+    virtual ::CORBA::ComponentIR::ProvidesDef_ptr create_provides( const char* id, const char* name, const char* version, ::CORBA::InterfaceDef_ptr interface_type ) = 0;
+    virtual ::CORBA::ComponentIR::UsesDef_ptr create_uses( const char* id, const char* name, const char* version, ::CORBA::InterfaceDef_ptr interface_type, CORBA::Boolean is_multiple ) = 0;
+    virtual ::CORBA::ComponentIR::EmitsDef_ptr create_emits( const char* id, const char* name, const char* version, ::CORBA::ComponentIR::EventDef_ptr event ) = 0;
+    virtual ::CORBA::ComponentIR::PublishesDef_ptr create_publishes( const char* id, const char* name, const char* version, ::CORBA::ComponentIR::EventDef_ptr event ) = 0;
+    virtual ::CORBA::ComponentIR::ConsumesDef_ptr create_consumes( const char* id, const char* name, const char* version, ::CORBA::ComponentIR::EventDef_ptr event ) = 0;
 
   protected:
     ComponentDef() {};
@@ -183,11 +183,11 @@ class ComponentDef_stub:
     ::CORBA::InterfaceDefSeq* supported_interfaces();
     void supported_interfaces( const ::CORBA::InterfaceDefSeq& value );
 
-    ProvidesDef_ptr create_provides( const char* id, const char* name, const char* version, InterfaceDef_ptr interface_type );
-    UsesDef_ptr create_uses( const char* id, const char* name, const char* version, InterfaceDef_ptr interface_type, CORBA::Boolean is_multiple );
-    EmitsDef_ptr create_emits( const char* id, const char* name, const char* version, EventDef_ptr event );
-    PublishesDef_ptr create_publishes( const char* id, const char* name, const char* version, EventDef_ptr event );
-    ConsumesDef_ptr create_consumes( const char* id, const char* name, const char* version, EventDef_ptr event );
+    ::CORBA::ComponentIR::ProvidesDef_ptr create_provides( const char* id, const char* name, const char* version, ::CORBA::InterfaceDef_ptr interface_type );
+    ::CORBA::ComponentIR::UsesDef_ptr create_uses( const char* id, const char* name, const char* version, ::CORBA::InterfaceDef_ptr interface_type, CORBA::Boolean is_multiple );
+    ::CORBA::ComponentIR::EmitsDef_ptr create_emits( const char* id, const char* name, const char* version, ::CORBA::ComponentIR::EventDef_ptr event );
+    ::CORBA::ComponentIR::PublishesDef_ptr create_publishes( const char* id, const char* name, const char* version, ::CORBA::ComponentIR::EventDef_ptr event );
+    ::CORBA::ComponentIR::ConsumesDef_ptr create_consumes( const char* id, const char* name, const char* version, ::CORBA::ComponentIR::EventDef_ptr event );
 
   private:
     void operator=( const ComponentDef_stub& );
@@ -207,11 +207,11 @@ class ComponentDef_stub_clp :
     ::CORBA::InterfaceDefSeq* supported_interfaces();
     void supported_interfaces( const ::CORBA::InterfaceDefSeq& value );
 
-    ProvidesDef_ptr create_provides( const char* id, const char* name, const char* version, InterfaceDef_ptr interface_type );
-    UsesDef_ptr create_uses( const char* id, const char* name, const char* version, InterfaceDef_ptr interface_type, CORBA::Boolean is_multiple );
-    EmitsDef_ptr create_emits( const char* id, const char* name, const char* version, EventDef_ptr event );
-    PublishesDef_ptr create_publishes( const char* id, const char* name, const char* version, EventDef_ptr event );
-    ConsumesDef_ptr create_consumes( const char* id, const char* name, const char* version, EventDef_ptr event );
+    ::CORBA::ComponentIR::ProvidesDef_ptr create_provides( const char* id, const char* name, const char* version, ::CORBA::InterfaceDef_ptr interface_type );
+    ::CORBA::ComponentIR::UsesDef_ptr create_uses( const char* id, const char* name, const char* version, ::CORBA::InterfaceDef_ptr interface_type, CORBA::Boolean is_multiple );
+    ::CORBA::ComponentIR::EmitsDef_ptr create_emits( const char* id, const char* name, const char* version, ::CORBA::ComponentIR::EventDef_ptr event );
+    ::CORBA::ComponentIR::PublishesDef_ptr create_publishes( const char* id, const char* name, const char* version, ::CORBA::ComponentIR::EventDef_ptr event );
+    ::CORBA::ComponentIR::ConsumesDef_ptr create_consumes( const char* id, const char* name, const char* version, ::CORBA::ComponentIR::EventDef_ptr event );
 
   protected:
     ComponentDef_stub_clp ();
@@ -261,8 +261,8 @@ class HomeDef :
     virtual ::CORBA::ValueDef_ptr primary_key() = 0;
     virtual void primary_key( ::CORBA::ValueDef_ptr value ) = 0;
 
-    virtual FactoryDef_ptr create_factory( const char* id, const char* name, const char* version, const ParDescriptionSeq& params, const ExceptionDefSeq& exceptions ) = 0;
-    virtual FinderDef_ptr create_finder( const char* id, const char* name, const char* version, const ParDescriptionSeq& params, const ExceptionDefSeq& exceptions ) = 0;
+    virtual ::CORBA::ComponentIR::FactoryDef_ptr create_factory( const char* id, const char* name, const char* version, const ::CORBA::ParDescriptionSeq& params, const ::CORBA::ExceptionDefSeq& exceptions ) = 0;
+    virtual ::CORBA::ComponentIR::FinderDef_ptr create_finder( const char* id, const char* name, const char* version, const ::CORBA::ParDescriptionSeq& params, const ::CORBA::ExceptionDefSeq& exceptions ) = 0;
 
   protected:
     HomeDef() {};
@@ -289,8 +289,8 @@ class HomeDef_stub:
     ::CORBA::ValueDef_ptr primary_key();
     void primary_key( ::CORBA::ValueDef_ptr value );
 
-    FactoryDef_ptr create_factory( const char* id, const char* name, const char* version, const ParDescriptionSeq& params, const ExceptionDefSeq& exceptions );
-    FinderDef_ptr create_finder( const char* id, const char* name, const char* version, const ParDescriptionSeq& params, const ExceptionDefSeq& exceptions );
+    ::CORBA::ComponentIR::FactoryDef_ptr create_factory( const char* id, const char* name, const char* version, const ::CORBA::ParDescriptionSeq& params, const ::CORBA::ExceptionDefSeq& exceptions );
+    ::CORBA::ComponentIR::FinderDef_ptr create_finder( const char* id, const char* name, const char* version, const ::CORBA::ParDescriptionSeq& params, const ::CORBA::ExceptionDefSeq& exceptions );
 
   private:
     void operator=( const HomeDef_stub& );
@@ -314,8 +314,8 @@ class HomeDef_stub_clp :
     ::CORBA::ValueDef_ptr primary_key();
     void primary_key( ::CORBA::ValueDef_ptr value );
 
-    FactoryDef_ptr create_factory( const char* id, const char* name, const char* version, const ParDescriptionSeq& params, const ExceptionDefSeq& exceptions );
-    FinderDef_ptr create_finder( const char* id, const char* name, const char* version, const ParDescriptionSeq& params, const ExceptionDefSeq& exceptions );
+    ::CORBA::ComponentIR::FactoryDef_ptr create_factory( const char* id, const char* name, const char* version, const ::CORBA::ParDescriptionSeq& params, const ::CORBA::ExceptionDefSeq& exceptions );
+    ::CORBA::ComponentIR::FinderDef_ptr create_finder( const char* id, const char* name, const char* version, const ::CORBA::ParDescriptionSeq& params, const ::CORBA::ExceptionDefSeq& exceptions );
 
   protected:
     HomeDef_stub_clp ();
@@ -424,9 +424,9 @@ class Container :
 
     virtual void *_narrow_helper( const char *repoid );
 
-    virtual ComponentDef_ptr create_component( const char* id, const char* name, const char* version, ComponentDef_ptr base_component, const InterfaceDefSeq& supports_interfaces ) = 0;
-    virtual HomeDef_ptr create_home( const char* id, const char* name, const char* version, HomeDef_ptr base_home, ComponentDef_ptr managed_component, const InterfaceDefSeq& supports_interfaces, ValueDef_ptr primary_key ) = 0;
-    virtual EventDef_ptr create_event( const char* id, const char* name, const char* version, CORBA::Boolean is_custom, CORBA::Boolean is_abstract, ValueDef_ptr base_value, CORBA::Boolean is_truncatable, const ValueDefSeq& abstract_base_values, const InterfaceDefSeq& supported_interfaces, const ExtInitializerSeq& initializers ) = 0;
+    virtual ::CORBA::ComponentIR::ComponentDef_ptr create_component( const char* id, const char* name, const char* version, ::CORBA::ComponentIR::ComponentDef_ptr base_component, const ::CORBA::InterfaceDefSeq& supports_interfaces ) = 0;
+    virtual ::CORBA::ComponentIR::HomeDef_ptr create_home( const char* id, const char* name, const char* version, ::CORBA::ComponentIR::HomeDef_ptr base_home, ::CORBA::ComponentIR::ComponentDef_ptr managed_component, const ::CORBA::InterfaceDefSeq& supports_interfaces, ::CORBA::ValueDef_ptr primary_key ) = 0;
+    virtual ::CORBA::ComponentIR::EventDef_ptr create_event( const char* id, const char* name, const char* version, CORBA::Boolean is_custom, CORBA::Boolean is_abstract, ::CORBA::ValueDef_ptr base_value, CORBA::Boolean is_truncatable, const ::CORBA::ValueDefSeq& abstract_base_values, const ::CORBA::InterfaceDefSeq& supported_interfaces, const ::CORBA::ExtInitializerSeq& initializers ) = 0;
 
   protected:
     Container() {};
@@ -444,9 +444,9 @@ class Container_stub:
 {
   public:
     virtual ~Container_stub();
-    ComponentDef_ptr create_component( const char* id, const char* name, const char* version, ComponentDef_ptr base_component, const InterfaceDefSeq& supports_interfaces );
-    HomeDef_ptr create_home( const char* id, const char* name, const char* version, HomeDef_ptr base_home, ComponentDef_ptr managed_component, const InterfaceDefSeq& supports_interfaces, ValueDef_ptr primary_key );
-    EventDef_ptr create_event( const char* id, const char* name, const char* version, CORBA::Boolean is_custom, CORBA::Boolean is_abstract, ValueDef_ptr base_value, CORBA::Boolean is_truncatable, const ValueDefSeq& abstract_base_values, const InterfaceDefSeq& supported_interfaces, const ExtInitializerSeq& initializers );
+    ::CORBA::ComponentIR::ComponentDef_ptr create_component( const char* id, const char* name, const char* version, ::CORBA::ComponentIR::ComponentDef_ptr base_component, const ::CORBA::InterfaceDefSeq& supports_interfaces );
+    ::CORBA::ComponentIR::HomeDef_ptr create_home( const char* id, const char* name, const char* version, ::CORBA::ComponentIR::HomeDef_ptr base_home, ::CORBA::ComponentIR::ComponentDef_ptr managed_component, const ::CORBA::InterfaceDefSeq& supports_interfaces, ::CORBA::ValueDef_ptr primary_key );
+    ::CORBA::ComponentIR::EventDef_ptr create_event( const char* id, const char* name, const char* version, CORBA::Boolean is_custom, CORBA::Boolean is_abstract, ::CORBA::ValueDef_ptr base_value, CORBA::Boolean is_truncatable, const ::CORBA::ValueDefSeq& abstract_base_values, const ::CORBA::InterfaceDefSeq& supported_interfaces, const ::CORBA::ExtInitializerSeq& initializers );
 
   private:
     void operator=( const Container_stub& );
@@ -461,9 +461,9 @@ class Container_stub_clp :
   public:
     Container_stub_clp (PortableServer::POA_ptr, CORBA::Object_ptr);
     virtual ~Container_stub_clp ();
-    ComponentDef_ptr create_component( const char* id, const char* name, const char* version, ComponentDef_ptr base_component, const InterfaceDefSeq& supports_interfaces );
-    HomeDef_ptr create_home( const char* id, const char* name, const char* version, HomeDef_ptr base_home, ComponentDef_ptr managed_component, const InterfaceDefSeq& supports_interfaces, ValueDef_ptr primary_key );
-    EventDef_ptr create_event( const char* id, const char* name, const char* version, CORBA::Boolean is_custom, CORBA::Boolean is_abstract, ValueDef_ptr base_value, CORBA::Boolean is_truncatable, const ValueDefSeq& abstract_base_values, const InterfaceDefSeq& supported_interfaces, const ExtInitializerSeq& initializers );
+    ::CORBA::ComponentIR::ComponentDef_ptr create_component( const char* id, const char* name, const char* version, ::CORBA::ComponentIR::ComponentDef_ptr base_component, const ::CORBA::InterfaceDefSeq& supports_interfaces );
+    ::CORBA::ComponentIR::HomeDef_ptr create_home( const char* id, const char* name, const char* version, ::CORBA::ComponentIR::HomeDef_ptr base_home, ::CORBA::ComponentIR::ComponentDef_ptr managed_component, const ::CORBA::InterfaceDefSeq& supports_interfaces, ::CORBA::ValueDef_ptr primary_key );
+    ::CORBA::ComponentIR::EventDef_ptr create_event( const char* id, const char* name, const char* version, CORBA::Boolean is_custom, CORBA::Boolean is_abstract, ::CORBA::ValueDef_ptr base_value, CORBA::Boolean is_truncatable, const ::CORBA::ValueDefSeq& abstract_base_values, const ::CORBA::InterfaceDefSeq& supported_interfaces, const ::CORBA::ExtInitializerSeq& initializers );
 
   protected:
     Container_stub_clp ();

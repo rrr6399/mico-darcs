@@ -228,13 +228,13 @@ class ImplRepository :
 
     static MICO_EXPORT CORBA::TypeCodeConst _tc_ImplDefSeq;
 
-    virtual ImplementationDef_ptr restore( const char* asstring ) = 0;
-    virtual ImplementationDef_ptr create( ImplementationDef::ActivationMode mode, const ImplementationDef::ObjectInfoList& objs, const char* name, const char* command ) = 0;
-    virtual void destroy( ImplementationDef_ptr impl_def ) = 0;
-    virtual ImplDefSeq* find_by_name( const char* name ) = 0;
-    virtual ImplDefSeq* find_by_repoid( const char* repoid ) = 0;
-    virtual ImplDefSeq* find_by_repoid_tag( const char* repoid, const ImplementationDef::ObjectTag& tag ) = 0;
-    virtual ImplDefSeq* find_all() = 0;
+    virtual ::CORBA::ImplementationDef_ptr restore( const char* asstring ) = 0;
+    virtual ::CORBA::ImplementationDef_ptr create( ::CORBA::ImplementationDef::ActivationMode mode, const ::CORBA::ImplementationDef::ObjectInfoList& objs, const char* name, const char* command ) = 0;
+    virtual void destroy( ::CORBA::ImplementationDef_ptr impl_def ) = 0;
+    virtual ::CORBA::ImplRepository::ImplDefSeq* find_by_name( const char* name ) = 0;
+    virtual ::CORBA::ImplRepository::ImplDefSeq* find_by_repoid( const char* repoid ) = 0;
+    virtual ::CORBA::ImplRepository::ImplDefSeq* find_by_repoid_tag( const char* repoid, const ::CORBA::ImplementationDef::ObjectTag& tag ) = 0;
+    virtual ::CORBA::ImplRepository::ImplDefSeq* find_all() = 0;
 
   protected:
     ImplRepository() {};
@@ -251,13 +251,13 @@ class ImplRepository_stub:
 {
   public:
     virtual ~ImplRepository_stub();
-    ImplementationDef_ptr restore( const char* asstring );
-    ImplementationDef_ptr create( ImplementationDef::ActivationMode mode, const ImplementationDef::ObjectInfoList& objs, const char* name, const char* command );
-    void destroy( ImplementationDef_ptr impl_def );
-    ImplDefSeq* find_by_name( const char* name );
-    ImplDefSeq* find_by_repoid( const char* repoid );
-    ImplDefSeq* find_by_repoid_tag( const char* repoid, const ImplementationDef::ObjectTag& tag );
-    ImplDefSeq* find_all();
+    ::CORBA::ImplementationDef_ptr restore( const char* asstring );
+    ::CORBA::ImplementationDef_ptr create( ::CORBA::ImplementationDef::ActivationMode mode, const ::CORBA::ImplementationDef::ObjectInfoList& objs, const char* name, const char* command );
+    void destroy( ::CORBA::ImplementationDef_ptr impl_def );
+    ::CORBA::ImplRepository::ImplDefSeq* find_by_name( const char* name );
+    ::CORBA::ImplRepository::ImplDefSeq* find_by_repoid( const char* repoid );
+    ::CORBA::ImplRepository::ImplDefSeq* find_by_repoid_tag( const char* repoid, const ::CORBA::ImplementationDef::ObjectTag& tag );
+    ::CORBA::ImplRepository::ImplDefSeq* find_all();
 
   private:
     void operator=( const ImplRepository_stub& );
@@ -272,13 +272,13 @@ class ImplRepository_stub_clp :
   public:
     ImplRepository_stub_clp (PortableServer::POA_ptr, CORBA::Object_ptr);
     virtual ~ImplRepository_stub_clp ();
-    ImplementationDef_ptr restore( const char* asstring );
-    ImplementationDef_ptr create( ImplementationDef::ActivationMode mode, const ImplementationDef::ObjectInfoList& objs, const char* name, const char* command );
-    void destroy( ImplementationDef_ptr impl_def );
-    ImplDefSeq* find_by_name( const char* name );
-    ImplDefSeq* find_by_repoid( const char* repoid );
-    ImplDefSeq* find_by_repoid_tag( const char* repoid, const ImplementationDef::ObjectTag& tag );
-    ImplDefSeq* find_all();
+    ::CORBA::ImplementationDef_ptr restore( const char* asstring );
+    ::CORBA::ImplementationDef_ptr create( ::CORBA::ImplementationDef::ActivationMode mode, const ::CORBA::ImplementationDef::ObjectInfoList& objs, const char* name, const char* command );
+    void destroy( ::CORBA::ImplementationDef_ptr impl_def );
+    ::CORBA::ImplRepository::ImplDefSeq* find_by_name( const char* name );
+    ::CORBA::ImplRepository::ImplDefSeq* find_by_repoid( const char* repoid );
+    ::CORBA::ImplRepository::ImplDefSeq* find_by_repoid_tag( const char* repoid, const ::CORBA::ImplementationDef::ObjectTag& tag );
+    ::CORBA::ImplRepository::ImplDefSeq* find_all();
 
   protected:
     ImplRepository_stub_clp ();
@@ -322,10 +322,10 @@ class POAMediator :
     virtual char* create_impl( const char* svid, const char* ior ) = 0;
     virtual void activate_impl( const char* svid ) = 0;
     virtual void deactivate_impl( const char* svid ) = 0;
-    virtual CORBA::Boolean force_activation( ImplementationDef_ptr impl ) = 0;
-    virtual CORBA::Boolean hold( ImplementationDef_ptr impl ) = 0;
-    virtual CORBA::Boolean stop( ImplementationDef_ptr impl ) = 0;
-    virtual CORBA::Boolean _cxx_continue( ImplementationDef_ptr impl ) = 0;
+    virtual CORBA::Boolean force_activation( ::CORBA::ImplementationDef_ptr impl ) = 0;
+    virtual CORBA::Boolean hold( ::CORBA::ImplementationDef_ptr impl ) = 0;
+    virtual CORBA::Boolean stop( ::CORBA::ImplementationDef_ptr impl ) = 0;
+    virtual CORBA::Boolean _cxx_continue( ::CORBA::ImplementationDef_ptr impl ) = 0;
     virtual void shutdown_server() = 0;
 
   protected:
@@ -346,10 +346,10 @@ class POAMediator_stub:
     char* create_impl( const char* svid, const char* ior );
     void activate_impl( const char* svid );
     void deactivate_impl( const char* svid );
-    CORBA::Boolean force_activation( ImplementationDef_ptr impl );
-    CORBA::Boolean hold( ImplementationDef_ptr impl );
-    CORBA::Boolean stop( ImplementationDef_ptr impl );
-    CORBA::Boolean _cxx_continue( ImplementationDef_ptr impl );
+    CORBA::Boolean force_activation( ::CORBA::ImplementationDef_ptr impl );
+    CORBA::Boolean hold( ::CORBA::ImplementationDef_ptr impl );
+    CORBA::Boolean stop( ::CORBA::ImplementationDef_ptr impl );
+    CORBA::Boolean _cxx_continue( ::CORBA::ImplementationDef_ptr impl );
     void shutdown_server();
 
   private:
@@ -368,10 +368,10 @@ class POAMediator_stub_clp :
     char* create_impl( const char* svid, const char* ior );
     void activate_impl( const char* svid );
     void deactivate_impl( const char* svid );
-    CORBA::Boolean force_activation( ImplementationDef_ptr impl );
-    CORBA::Boolean hold( ImplementationDef_ptr impl );
-    CORBA::Boolean stop( ImplementationDef_ptr impl );
-    CORBA::Boolean _cxx_continue( ImplementationDef_ptr impl );
+    CORBA::Boolean force_activation( ::CORBA::ImplementationDef_ptr impl );
+    CORBA::Boolean hold( ::CORBA::ImplementationDef_ptr impl );
+    CORBA::Boolean stop( ::CORBA::ImplementationDef_ptr impl );
+    CORBA::Boolean _cxx_continue( ::CORBA::ImplementationDef_ptr impl );
     void shutdown_server();
 
   protected:
