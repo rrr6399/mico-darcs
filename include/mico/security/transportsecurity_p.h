@@ -141,12 +141,12 @@ class ContextEstablisher :
     virtual CORBA::ULong remote_port() = 0;
     virtual ::IOP::TaggedComponentSeq* transport_components() = 0;
 
-    virtual CORBA::Boolean establish_context( InitiatingContext_out initiating_context ) = 0;
-    virtual CORBA::Boolean establish_context_timeout( CORBA::ULong timeout, InitiatingContext_out initiating_context ) = 0;
-    virtual CORBA::Boolean establish_alt_context( ::SL3CM::CredsDirective creds_directive, InitiatingContext_out initiating_context ) = 0;
-    virtual CORBA::Boolean establish_alt_context_timeout( ::SL3CM::CredsDirective creds_directive, CORBA::ULong timeout, InitiatingContext_out initiating_context ) = 0;
-    virtual CORBA::Boolean is_usable( const char* host, CORBA::ULong port, ::SL3CM::CredsDirective creds_directive, ::SL3CM::FeatureDirective client_authentication, ::SL3CM::FeatureDirective target_authentication, ::SL3CM::FeatureDirective confidentiality, ::SL3CM::FeatureDirective integrity, CSIVersion csi_version, const ::IOP::TaggedComponentSeq& transport_components ) = 0;
-    virtual CORBA::Boolean equivalent( ContextEstablisher_ptr estab ) = 0;
+    virtual CORBA::Boolean establish_context( ::TransportSecurity::InitiatingContext_out initiating_context ) = 0;
+    virtual CORBA::Boolean establish_context_timeout( CORBA::ULong timeout, ::TransportSecurity::InitiatingContext_out initiating_context ) = 0;
+    virtual CORBA::Boolean establish_alt_context( ::SL3CM::CredsDirective creds_directive, ::TransportSecurity::InitiatingContext_out initiating_context ) = 0;
+    virtual CORBA::Boolean establish_alt_context_timeout( ::SL3CM::CredsDirective creds_directive, CORBA::ULong timeout, ::TransportSecurity::InitiatingContext_out initiating_context ) = 0;
+    virtual CORBA::Boolean is_usable( const char* host, CORBA::ULong port, ::SL3CM::CredsDirective creds_directive, ::SL3CM::FeatureDirective client_authentication, ::SL3CM::FeatureDirective target_authentication, ::SL3CM::FeatureDirective confidentiality, ::SL3CM::FeatureDirective integrity, ::TransportSecurity::CSIVersion csi_version, const ::IOP::TaggedComponentSeq& transport_components ) = 0;
+    virtual CORBA::Boolean equivalent( ::TransportSecurity::ContextEstablisher_ptr estab ) = 0;
 
   protected:
     ContextEstablisher() {};
@@ -194,7 +194,7 @@ class InitiatingContext :
 
     virtual void *_narrow_helper( const char *repoid );
 
-    virtual CORBA::Boolean is_usable( const char* host, CORBA::ULong port, ::SL3CM::CredsDirective creds_directive, ::SL3CM::FeatureDirective client_authentication, ::SL3CM::FeatureDirective target_authentication, ::SL3CM::FeatureDirective confidentiality, ::SL3CM::FeatureDirective integrity, CSIVersion csi_version, const ::IOP::TaggedComponentSeq& transport_components ) = 0;
+    virtual CORBA::Boolean is_usable( const char* host, CORBA::ULong port, ::SL3CM::CredsDirective creds_directive, ::SL3CM::FeatureDirective client_authentication, ::SL3CM::FeatureDirective target_authentication, ::SL3CM::FeatureDirective confidentiality, ::SL3CM::FeatureDirective integrity, ::TransportSecurity::CSIVersion csi_version, const ::IOP::TaggedComponentSeq& transport_components ) = 0;
     virtual void shutdown() = 0;
 
   protected:
@@ -243,7 +243,7 @@ class AcceptingContext :
 
     virtual void *_narrow_helper( const char *repoid );
 
-    virtual IdentityTokenGenerator_ptr create_client_identity_token_generator() = 0;
+    virtual ::TransportSecurity::IdentityTokenGenerator_ptr create_client_identity_token_generator() = 0;
 
   protected:
     AcceptingContext() {};
@@ -378,10 +378,10 @@ class TransportInitiator :
     virtual void increment_work() = 0;
     virtual void decrement_work() = 0;
     virtual CORBA::Boolean supports_invoc_options( ::CSIIOP::AssociationOptions invocation_options_supported, ::CSIIOP::AssociationOptions invocation_options_required ) = 0;
-    virtual CORBA::Boolean supports_csi_version( CSIVersion csi_version ) = 0;
-    virtual CORBA::Boolean is_usable( const char* host, CORBA::ULong port, ::SL3CM::CredsDirective creds_directive, ::SL3CM::FeatureDirective client_authentication, ::SL3CM::FeatureDirective target_authentication, ::SL3CM::FeatureDirective confidentiality, ::SL3CM::FeatureDirective integrity, CSIVersion csi_version, const ::IOP::TaggedComponentSeq& transport_components ) = 0;
-    virtual ContextEstablisherList* create_context_establishers( const char* host, CORBA::ULong port, ::SL3CM::CredsDirective creds_directive, ::SL3CM::FeatureDirective client_authentication, ::SL3CM::FeatureDirective target_authentication, ::SL3CM::FeatureDirective confidentiality, ::SL3CM::FeatureDirective integrity, CSIVersion csi_version, const ::IOP::TaggedComponentSeq& transport_components ) = 0;
-    virtual ContextEstablisher_ptr get_context_establisher( const char* id ) = 0;
+    virtual CORBA::Boolean supports_csi_version( ::TransportSecurity::CSIVersion csi_version ) = 0;
+    virtual CORBA::Boolean is_usable( const char* host, CORBA::ULong port, ::SL3CM::CredsDirective creds_directive, ::SL3CM::FeatureDirective client_authentication, ::SL3CM::FeatureDirective target_authentication, ::SL3CM::FeatureDirective confidentiality, ::SL3CM::FeatureDirective integrity, ::TransportSecurity::CSIVersion csi_version, const ::IOP::TaggedComponentSeq& transport_components ) = 0;
+    virtual ::TransportSecurity::ContextEstablisherList* create_context_establishers( const char* host, CORBA::ULong port, ::SL3CM::CredsDirective creds_directive, ::SL3CM::FeatureDirective client_authentication, ::SL3CM::FeatureDirective target_authentication, ::SL3CM::FeatureDirective confidentiality, ::SL3CM::FeatureDirective integrity, ::TransportSecurity::CSIVersion csi_version, const ::IOP::TaggedComponentSeq& transport_components ) = 0;
+    virtual ::TransportSecurity::ContextEstablisher_ptr get_context_establisher( const char* id ) = 0;
 
   protected:
     TransportInitiator() {};
@@ -429,9 +429,9 @@ class TransportAcceptor :
 
     virtual void increment_work() = 0;
     virtual void decrement_work() = 0;
-    virtual ::IOP::TaggedComponentSeq* transport_components( CSIVersion csi_version ) = 0;
+    virtual ::IOP::TaggedComponentSeq* transport_components( ::TransportSecurity::CSIVersion csi_version ) = 0;
     virtual CORBA::Boolean transport_matches( const char* host, CORBA::ULong port, const ::IOP::TaggedComponentSeq& transport_components ) = 0;
-    virtual AcceptingContext_ptr accept( CORBA::Boolean block ) = 0;
+    virtual ::TransportSecurity::AcceptingContext_ptr accept( CORBA::Boolean block ) = 0;
     virtual void shutdown() = 0;
     virtual void enable() = 0;
 
@@ -504,7 +504,7 @@ class IdentityTokenGenerator :
 
     virtual ::SL3PM::SimplePrincipal* the_principal() = 0;
     virtual ::SL3PM::IdentityStatement* the_statement() = 0;
-    virtual CORBA::Boolean generate_identity( ::CSI::IdentityTokenType id_token_types, const ::CSI::OIDList& gss_naming_mechs, IdentityTokenInfo_out identity_token_info ) = 0;
+    virtual CORBA::Boolean generate_identity( ::CSI::IdentityTokenType id_token_types, const ::CSI::OIDList& gss_naming_mechs, ::TransportSecurity::IdentityTokenInfo_out identity_token_info ) = 0;
     virtual void destroy() = 0;
 
   protected:
@@ -546,7 +546,7 @@ class CredentialsAcquirerFactory :
 
     virtual void *_narrow_helper( const char *repoid );
 
-    virtual CredentialsAcquirer_ptr create( ::SL3AQArgs::Argument_ptr value ) = 0;
+    virtual ::TransportSecurity::CredentialsAcquirer_ptr create( ::SL3AQArgs::Argument_ptr value ) = 0;
     virtual CORBA::Boolean supports_all_args( ::SL3AQArgs::Argument_ptr value ) = 0;
 
   protected:

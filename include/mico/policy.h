@@ -90,7 +90,7 @@ class Policy :
 
     virtual ::CORBA::PolicyType policy_type() = 0;
 
-    virtual Policy_ptr copy() = 0;
+    virtual ::CORBA::Policy_ptr copy() = 0;
     virtual void destroy() = 0;
 
   protected:
@@ -143,9 +143,9 @@ class DomainManager :
 
     virtual void *_narrow_helper( const char *repoid );
 
-    virtual Policy_ptr get_domain_policy( PolicyType policy_type ) = 0;
-    virtual void set_domain_policy( Policy_ptr policy ) = 0;
-    virtual DomainManager_ptr copy() = 0;
+    virtual ::CORBA::Policy_ptr get_domain_policy( ::CORBA::PolicyType policy_type ) = 0;
+    virtual void set_domain_policy( ::CORBA::Policy_ptr policy ) = 0;
+    virtual ::CORBA::DomainManager_ptr copy() = 0;
 
   protected:
     DomainManager() {};
@@ -187,7 +187,7 @@ class ConstructionPolicy :
 
     virtual void *_narrow_helper( const char *repoid );
 
-    virtual void make_domain_manager( InterfaceDef_ptr object_type, CORBA::Boolean constr_policy ) = 0;
+    virtual void make_domain_manager( ::CORBA::InterfaceDef_ptr object_type, CORBA::Boolean constr_policy ) = 0;
     virtual CORBA::Boolean constr_policy( CORBA::Object_ptr object ) = 0;
 
   protected:

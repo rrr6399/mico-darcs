@@ -298,8 +298,8 @@ class Contained :
     virtual char* absolute_name() = 0;
     virtual ::CORBA::Repository_ptr containing_repository() = 0;
 
-    virtual Description* describe() = 0;
-    virtual void move( Container_ptr new_container, const char* new_name, const char* new_version ) = 0;
+    virtual ::CORBA::Contained::Description* describe() = 0;
+    virtual void move( ::CORBA::Container_ptr new_container, const char* new_name, const char* new_version ) = 0;
 
   protected:
     Contained() {};
@@ -327,8 +327,8 @@ class Contained_stub:
     char* absolute_name();
     ::CORBA::Repository_ptr containing_repository();
 
-    Description* describe();
-    void move( Container_ptr new_container, const char* new_name, const char* new_version );
+    ::CORBA::Contained::Description* describe();
+    void move( ::CORBA::Container_ptr new_container, const char* new_name, const char* new_version );
 
   private:
     void operator=( const Contained_stub& );
@@ -353,8 +353,8 @@ class Contained_stub_clp :
     char* absolute_name();
     ::CORBA::Repository_ptr containing_repository();
 
-    Description* describe();
-    void move( Container_ptr new_container, const char* new_name, const char* new_version );
+    ::CORBA::Contained::Description* describe();
+    void move( ::CORBA::Container_ptr new_container, const char* new_name, const char* new_version );
 
   protected:
     Contained_stub_clp ();
@@ -470,24 +470,24 @@ class Container :
 
     static MICO_EXPORT CORBA::TypeCodeConst _tc_DescriptionSeq;
 
-    virtual Contained_ptr lookup( const char* search_name ) = 0;
-    virtual ContainedSeq* contents( DefinitionKind limit_type, CORBA::Boolean exclude_inherited ) = 0;
-    virtual ContainedSeq* lookup_name( const char* search_name, CORBA::Long levels_to_search, DefinitionKind limit_type, CORBA::Boolean exclude_inherited ) = 0;
-    virtual DescriptionSeq* describe_contents( DefinitionKind limit_type, CORBA::Boolean exclude_inherited, CORBA::Long max_returned_objs ) = 0;
-    virtual ModuleDef_ptr create_module( const char* id, const char* name, const char* version ) = 0;
-    virtual ConstantDef_ptr create_constant( const char* id, const char* name, const char* version, IDLType_ptr type, const CORBA::Any& value ) = 0;
-    virtual StructDef_ptr create_struct( const char* id, const char* name, const char* version, const StructMemberSeq& members ) = 0;
-    virtual ExceptionDef_ptr create_exception( const char* id, const char* name, const char* version, const StructMemberSeq& members ) = 0;
-    virtual UnionDef_ptr create_union( const char* id, const char* name, const char* version, IDLType_ptr discriminator_type, const UnionMemberSeq& members ) = 0;
-    virtual EnumDef_ptr create_enum( const char* id, const char* name, const char* version, const EnumMemberSeq& members ) = 0;
-    virtual AliasDef_ptr create_alias( const char* id, const char* name, const char* version, IDLType_ptr original_type ) = 0;
-    virtual InterfaceDef_ptr create_interface( const char* id, const char* name, const char* version, const InterfaceDefSeq& base_interfaces ) = 0;
-    virtual AbstractInterfaceDef_ptr create_abstract_interface( const char* id, const char* name, const char* version, const AbstractInterfaceDefSeq& base_interfaces ) = 0;
-    virtual LocalInterfaceDef_ptr create_local_interface( const char* id, const char* name, const char* version, const InterfaceDefSeq& base_interfaces ) = 0;
-    virtual ValueDef_ptr create_value( const char* id, const char* name, const char* version, CORBA::Boolean is_custom, CORBA::Boolean is_abstract, ValueDef_ptr base_value, CORBA::Boolean is_truncatable, const ValueDefSeq& abstract_base_values, const InterfaceDefSeq& supported_interfaces, const InitializerSeq& initializers ) = 0;
-    virtual ExtValueDef_ptr create_ext_value( const char* id, const char* name, const char* version, CORBA::Boolean is_custom, CORBA::Boolean is_abstract, ValueDef_ptr base_value, CORBA::Boolean is_truncatable, const ValueDefSeq& abstract_base_values, const InterfaceDefSeq& supported_interfaces, const ExtInitializerSeq& initializers ) = 0;
-    virtual ValueBoxDef_ptr create_value_box( const char* id, const char* name, const char* version, IDLType_ptr original_type_def ) = 0;
-    virtual NativeDef_ptr create_native( const char* id, const char* name, const char* version ) = 0;
+    virtual ::CORBA::Contained_ptr lookup( const char* search_name ) = 0;
+    virtual ::CORBA::ContainedSeq* contents( ::CORBA::DefinitionKind limit_type, CORBA::Boolean exclude_inherited ) = 0;
+    virtual ::CORBA::ContainedSeq* lookup_name( const char* search_name, CORBA::Long levels_to_search, ::CORBA::DefinitionKind limit_type, CORBA::Boolean exclude_inherited ) = 0;
+    virtual ::CORBA::Container::DescriptionSeq* describe_contents( ::CORBA::DefinitionKind limit_type, CORBA::Boolean exclude_inherited, CORBA::Long max_returned_objs ) = 0;
+    virtual ::CORBA::ModuleDef_ptr create_module( const char* id, const char* name, const char* version ) = 0;
+    virtual ::CORBA::ConstantDef_ptr create_constant( const char* id, const char* name, const char* version, ::CORBA::IDLType_ptr type, const CORBA::Any& value ) = 0;
+    virtual ::CORBA::StructDef_ptr create_struct( const char* id, const char* name, const char* version, const ::CORBA::StructMemberSeq& members ) = 0;
+    virtual ::CORBA::ExceptionDef_ptr create_exception( const char* id, const char* name, const char* version, const ::CORBA::StructMemberSeq& members ) = 0;
+    virtual ::CORBA::UnionDef_ptr create_union( const char* id, const char* name, const char* version, ::CORBA::IDLType_ptr discriminator_type, const ::CORBA::UnionMemberSeq& members ) = 0;
+    virtual ::CORBA::EnumDef_ptr create_enum( const char* id, const char* name, const char* version, const ::CORBA::EnumMemberSeq& members ) = 0;
+    virtual ::CORBA::AliasDef_ptr create_alias( const char* id, const char* name, const char* version, ::CORBA::IDLType_ptr original_type ) = 0;
+    virtual ::CORBA::InterfaceDef_ptr create_interface( const char* id, const char* name, const char* version, const ::CORBA::InterfaceDefSeq& base_interfaces ) = 0;
+    virtual ::CORBA::AbstractInterfaceDef_ptr create_abstract_interface( const char* id, const char* name, const char* version, const ::CORBA::AbstractInterfaceDefSeq& base_interfaces ) = 0;
+    virtual ::CORBA::LocalInterfaceDef_ptr create_local_interface( const char* id, const char* name, const char* version, const ::CORBA::InterfaceDefSeq& base_interfaces ) = 0;
+    virtual ::CORBA::ValueDef_ptr create_value( const char* id, const char* name, const char* version, CORBA::Boolean is_custom, CORBA::Boolean is_abstract, ::CORBA::ValueDef_ptr base_value, CORBA::Boolean is_truncatable, const ::CORBA::ValueDefSeq& abstract_base_values, const ::CORBA::InterfaceDefSeq& supported_interfaces, const ::CORBA::InitializerSeq& initializers ) = 0;
+    virtual ::CORBA::ExtValueDef_ptr create_ext_value( const char* id, const char* name, const char* version, CORBA::Boolean is_custom, CORBA::Boolean is_abstract, ::CORBA::ValueDef_ptr base_value, CORBA::Boolean is_truncatable, const ::CORBA::ValueDefSeq& abstract_base_values, const ::CORBA::InterfaceDefSeq& supported_interfaces, const ::CORBA::ExtInitializerSeq& initializers ) = 0;
+    virtual ::CORBA::ValueBoxDef_ptr create_value_box( const char* id, const char* name, const char* version, ::CORBA::IDLType_ptr original_type_def ) = 0;
+    virtual ::CORBA::NativeDef_ptr create_native( const char* id, const char* name, const char* version ) = 0;
 
   protected:
     Container() {};
@@ -505,24 +505,24 @@ class Container_stub:
 {
   public:
     virtual ~Container_stub();
-    Contained_ptr lookup( const char* search_name );
-    ContainedSeq* contents( DefinitionKind limit_type, CORBA::Boolean exclude_inherited );
-    ContainedSeq* lookup_name( const char* search_name, CORBA::Long levels_to_search, DefinitionKind limit_type, CORBA::Boolean exclude_inherited );
-    DescriptionSeq* describe_contents( DefinitionKind limit_type, CORBA::Boolean exclude_inherited, CORBA::Long max_returned_objs );
-    ModuleDef_ptr create_module( const char* id, const char* name, const char* version );
-    ConstantDef_ptr create_constant( const char* id, const char* name, const char* version, IDLType_ptr type, const CORBA::Any& value );
-    StructDef_ptr create_struct( const char* id, const char* name, const char* version, const StructMemberSeq& members );
-    ExceptionDef_ptr create_exception( const char* id, const char* name, const char* version, const StructMemberSeq& members );
-    UnionDef_ptr create_union( const char* id, const char* name, const char* version, IDLType_ptr discriminator_type, const UnionMemberSeq& members );
-    EnumDef_ptr create_enum( const char* id, const char* name, const char* version, const EnumMemberSeq& members );
-    AliasDef_ptr create_alias( const char* id, const char* name, const char* version, IDLType_ptr original_type );
-    InterfaceDef_ptr create_interface( const char* id, const char* name, const char* version, const InterfaceDefSeq& base_interfaces );
-    AbstractInterfaceDef_ptr create_abstract_interface( const char* id, const char* name, const char* version, const AbstractInterfaceDefSeq& base_interfaces );
-    LocalInterfaceDef_ptr create_local_interface( const char* id, const char* name, const char* version, const InterfaceDefSeq& base_interfaces );
-    ValueDef_ptr create_value( const char* id, const char* name, const char* version, CORBA::Boolean is_custom, CORBA::Boolean is_abstract, ValueDef_ptr base_value, CORBA::Boolean is_truncatable, const ValueDefSeq& abstract_base_values, const InterfaceDefSeq& supported_interfaces, const InitializerSeq& initializers );
-    ExtValueDef_ptr create_ext_value( const char* id, const char* name, const char* version, CORBA::Boolean is_custom, CORBA::Boolean is_abstract, ValueDef_ptr base_value, CORBA::Boolean is_truncatable, const ValueDefSeq& abstract_base_values, const InterfaceDefSeq& supported_interfaces, const ExtInitializerSeq& initializers );
-    ValueBoxDef_ptr create_value_box( const char* id, const char* name, const char* version, IDLType_ptr original_type_def );
-    NativeDef_ptr create_native( const char* id, const char* name, const char* version );
+    ::CORBA::Contained_ptr lookup( const char* search_name );
+    ::CORBA::ContainedSeq* contents( ::CORBA::DefinitionKind limit_type, CORBA::Boolean exclude_inherited );
+    ::CORBA::ContainedSeq* lookup_name( const char* search_name, CORBA::Long levels_to_search, ::CORBA::DefinitionKind limit_type, CORBA::Boolean exclude_inherited );
+    ::CORBA::Container::DescriptionSeq* describe_contents( ::CORBA::DefinitionKind limit_type, CORBA::Boolean exclude_inherited, CORBA::Long max_returned_objs );
+    ::CORBA::ModuleDef_ptr create_module( const char* id, const char* name, const char* version );
+    ::CORBA::ConstantDef_ptr create_constant( const char* id, const char* name, const char* version, ::CORBA::IDLType_ptr type, const CORBA::Any& value );
+    ::CORBA::StructDef_ptr create_struct( const char* id, const char* name, const char* version, const ::CORBA::StructMemberSeq& members );
+    ::CORBA::ExceptionDef_ptr create_exception( const char* id, const char* name, const char* version, const ::CORBA::StructMemberSeq& members );
+    ::CORBA::UnionDef_ptr create_union( const char* id, const char* name, const char* version, ::CORBA::IDLType_ptr discriminator_type, const ::CORBA::UnionMemberSeq& members );
+    ::CORBA::EnumDef_ptr create_enum( const char* id, const char* name, const char* version, const ::CORBA::EnumMemberSeq& members );
+    ::CORBA::AliasDef_ptr create_alias( const char* id, const char* name, const char* version, ::CORBA::IDLType_ptr original_type );
+    ::CORBA::InterfaceDef_ptr create_interface( const char* id, const char* name, const char* version, const ::CORBA::InterfaceDefSeq& base_interfaces );
+    ::CORBA::AbstractInterfaceDef_ptr create_abstract_interface( const char* id, const char* name, const char* version, const ::CORBA::AbstractInterfaceDefSeq& base_interfaces );
+    ::CORBA::LocalInterfaceDef_ptr create_local_interface( const char* id, const char* name, const char* version, const ::CORBA::InterfaceDefSeq& base_interfaces );
+    ::CORBA::ValueDef_ptr create_value( const char* id, const char* name, const char* version, CORBA::Boolean is_custom, CORBA::Boolean is_abstract, ::CORBA::ValueDef_ptr base_value, CORBA::Boolean is_truncatable, const ::CORBA::ValueDefSeq& abstract_base_values, const ::CORBA::InterfaceDefSeq& supported_interfaces, const ::CORBA::InitializerSeq& initializers );
+    ::CORBA::ExtValueDef_ptr create_ext_value( const char* id, const char* name, const char* version, CORBA::Boolean is_custom, CORBA::Boolean is_abstract, ::CORBA::ValueDef_ptr base_value, CORBA::Boolean is_truncatable, const ::CORBA::ValueDefSeq& abstract_base_values, const ::CORBA::InterfaceDefSeq& supported_interfaces, const ::CORBA::ExtInitializerSeq& initializers );
+    ::CORBA::ValueBoxDef_ptr create_value_box( const char* id, const char* name, const char* version, ::CORBA::IDLType_ptr original_type_def );
+    ::CORBA::NativeDef_ptr create_native( const char* id, const char* name, const char* version );
 
   private:
     void operator=( const Container_stub& );
@@ -537,24 +537,24 @@ class Container_stub_clp :
   public:
     Container_stub_clp (PortableServer::POA_ptr, CORBA::Object_ptr);
     virtual ~Container_stub_clp ();
-    Contained_ptr lookup( const char* search_name );
-    ContainedSeq* contents( DefinitionKind limit_type, CORBA::Boolean exclude_inherited );
-    ContainedSeq* lookup_name( const char* search_name, CORBA::Long levels_to_search, DefinitionKind limit_type, CORBA::Boolean exclude_inherited );
-    DescriptionSeq* describe_contents( DefinitionKind limit_type, CORBA::Boolean exclude_inherited, CORBA::Long max_returned_objs );
-    ModuleDef_ptr create_module( const char* id, const char* name, const char* version );
-    ConstantDef_ptr create_constant( const char* id, const char* name, const char* version, IDLType_ptr type, const CORBA::Any& value );
-    StructDef_ptr create_struct( const char* id, const char* name, const char* version, const StructMemberSeq& members );
-    ExceptionDef_ptr create_exception( const char* id, const char* name, const char* version, const StructMemberSeq& members );
-    UnionDef_ptr create_union( const char* id, const char* name, const char* version, IDLType_ptr discriminator_type, const UnionMemberSeq& members );
-    EnumDef_ptr create_enum( const char* id, const char* name, const char* version, const EnumMemberSeq& members );
-    AliasDef_ptr create_alias( const char* id, const char* name, const char* version, IDLType_ptr original_type );
-    InterfaceDef_ptr create_interface( const char* id, const char* name, const char* version, const InterfaceDefSeq& base_interfaces );
-    AbstractInterfaceDef_ptr create_abstract_interface( const char* id, const char* name, const char* version, const AbstractInterfaceDefSeq& base_interfaces );
-    LocalInterfaceDef_ptr create_local_interface( const char* id, const char* name, const char* version, const InterfaceDefSeq& base_interfaces );
-    ValueDef_ptr create_value( const char* id, const char* name, const char* version, CORBA::Boolean is_custom, CORBA::Boolean is_abstract, ValueDef_ptr base_value, CORBA::Boolean is_truncatable, const ValueDefSeq& abstract_base_values, const InterfaceDefSeq& supported_interfaces, const InitializerSeq& initializers );
-    ExtValueDef_ptr create_ext_value( const char* id, const char* name, const char* version, CORBA::Boolean is_custom, CORBA::Boolean is_abstract, ValueDef_ptr base_value, CORBA::Boolean is_truncatable, const ValueDefSeq& abstract_base_values, const InterfaceDefSeq& supported_interfaces, const ExtInitializerSeq& initializers );
-    ValueBoxDef_ptr create_value_box( const char* id, const char* name, const char* version, IDLType_ptr original_type_def );
-    NativeDef_ptr create_native( const char* id, const char* name, const char* version );
+    ::CORBA::Contained_ptr lookup( const char* search_name );
+    ::CORBA::ContainedSeq* contents( ::CORBA::DefinitionKind limit_type, CORBA::Boolean exclude_inherited );
+    ::CORBA::ContainedSeq* lookup_name( const char* search_name, CORBA::Long levels_to_search, ::CORBA::DefinitionKind limit_type, CORBA::Boolean exclude_inherited );
+    ::CORBA::Container::DescriptionSeq* describe_contents( ::CORBA::DefinitionKind limit_type, CORBA::Boolean exclude_inherited, CORBA::Long max_returned_objs );
+    ::CORBA::ModuleDef_ptr create_module( const char* id, const char* name, const char* version );
+    ::CORBA::ConstantDef_ptr create_constant( const char* id, const char* name, const char* version, ::CORBA::IDLType_ptr type, const CORBA::Any& value );
+    ::CORBA::StructDef_ptr create_struct( const char* id, const char* name, const char* version, const ::CORBA::StructMemberSeq& members );
+    ::CORBA::ExceptionDef_ptr create_exception( const char* id, const char* name, const char* version, const ::CORBA::StructMemberSeq& members );
+    ::CORBA::UnionDef_ptr create_union( const char* id, const char* name, const char* version, ::CORBA::IDLType_ptr discriminator_type, const ::CORBA::UnionMemberSeq& members );
+    ::CORBA::EnumDef_ptr create_enum( const char* id, const char* name, const char* version, const ::CORBA::EnumMemberSeq& members );
+    ::CORBA::AliasDef_ptr create_alias( const char* id, const char* name, const char* version, ::CORBA::IDLType_ptr original_type );
+    ::CORBA::InterfaceDef_ptr create_interface( const char* id, const char* name, const char* version, const ::CORBA::InterfaceDefSeq& base_interfaces );
+    ::CORBA::AbstractInterfaceDef_ptr create_abstract_interface( const char* id, const char* name, const char* version, const ::CORBA::AbstractInterfaceDefSeq& base_interfaces );
+    ::CORBA::LocalInterfaceDef_ptr create_local_interface( const char* id, const char* name, const char* version, const ::CORBA::InterfaceDefSeq& base_interfaces );
+    ::CORBA::ValueDef_ptr create_value( const char* id, const char* name, const char* version, CORBA::Boolean is_custom, CORBA::Boolean is_abstract, ::CORBA::ValueDef_ptr base_value, CORBA::Boolean is_truncatable, const ::CORBA::ValueDefSeq& abstract_base_values, const ::CORBA::InterfaceDefSeq& supported_interfaces, const ::CORBA::InitializerSeq& initializers );
+    ::CORBA::ExtValueDef_ptr create_ext_value( const char* id, const char* name, const char* version, CORBA::Boolean is_custom, CORBA::Boolean is_abstract, ::CORBA::ValueDef_ptr base_value, CORBA::Boolean is_truncatable, const ::CORBA::ValueDefSeq& abstract_base_values, const ::CORBA::InterfaceDefSeq& supported_interfaces, const ::CORBA::ExtInitializerSeq& initializers );
+    ::CORBA::ValueBoxDef_ptr create_value_box( const char* id, const char* name, const char* version, ::CORBA::IDLType_ptr original_type_def );
+    ::CORBA::NativeDef_ptr create_native( const char* id, const char* name, const char* version );
 
   protected:
     Container_stub_clp ();
@@ -624,13 +624,13 @@ class Repository :
 
     virtual void *_narrow_helper( const char *repoid );
 
-    virtual Contained_ptr lookup_id( const char* search_id ) = 0;
-    virtual PrimitiveDef_ptr get_primitive( PrimitiveKind kind ) = 0;
-    virtual StringDef_ptr create_string( CORBA::ULong bound ) = 0;
-    virtual WstringDef_ptr create_wstring( CORBA::ULong bound ) = 0;
-    virtual SequenceDef_ptr create_sequence( CORBA::ULong bound, IDLType_ptr element_type ) = 0;
-    virtual ArrayDef_ptr create_array( CORBA::ULong length, IDLType_ptr element_type ) = 0;
-    virtual FixedDef_ptr create_fixed( CORBA::UShort digits, CORBA::Short scale ) = 0;
+    virtual ::CORBA::Contained_ptr lookup_id( const char* search_id ) = 0;
+    virtual ::CORBA::PrimitiveDef_ptr get_primitive( ::CORBA::PrimitiveKind kind ) = 0;
+    virtual ::CORBA::StringDef_ptr create_string( CORBA::ULong bound ) = 0;
+    virtual ::CORBA::WstringDef_ptr create_wstring( CORBA::ULong bound ) = 0;
+    virtual ::CORBA::SequenceDef_ptr create_sequence( CORBA::ULong bound, ::CORBA::IDLType_ptr element_type ) = 0;
+    virtual ::CORBA::ArrayDef_ptr create_array( CORBA::ULong length, ::CORBA::IDLType_ptr element_type ) = 0;
+    virtual ::CORBA::FixedDef_ptr create_fixed( CORBA::UShort digits, CORBA::Short scale ) = 0;
 
   protected:
     Repository() {};
@@ -648,13 +648,13 @@ class Repository_stub:
 {
   public:
     virtual ~Repository_stub();
-    Contained_ptr lookup_id( const char* search_id );
-    PrimitiveDef_ptr get_primitive( PrimitiveKind kind );
-    StringDef_ptr create_string( CORBA::ULong bound );
-    WstringDef_ptr create_wstring( CORBA::ULong bound );
-    SequenceDef_ptr create_sequence( CORBA::ULong bound, IDLType_ptr element_type );
-    ArrayDef_ptr create_array( CORBA::ULong length, IDLType_ptr element_type );
-    FixedDef_ptr create_fixed( CORBA::UShort digits, CORBA::Short scale );
+    ::CORBA::Contained_ptr lookup_id( const char* search_id );
+    ::CORBA::PrimitiveDef_ptr get_primitive( ::CORBA::PrimitiveKind kind );
+    ::CORBA::StringDef_ptr create_string( CORBA::ULong bound );
+    ::CORBA::WstringDef_ptr create_wstring( CORBA::ULong bound );
+    ::CORBA::SequenceDef_ptr create_sequence( CORBA::ULong bound, ::CORBA::IDLType_ptr element_type );
+    ::CORBA::ArrayDef_ptr create_array( CORBA::ULong length, ::CORBA::IDLType_ptr element_type );
+    ::CORBA::FixedDef_ptr create_fixed( CORBA::UShort digits, CORBA::Short scale );
 
   private:
     void operator=( const Repository_stub& );
@@ -669,13 +669,13 @@ class Repository_stub_clp :
   public:
     Repository_stub_clp (PortableServer::POA_ptr, CORBA::Object_ptr);
     virtual ~Repository_stub_clp ();
-    Contained_ptr lookup_id( const char* search_id );
-    PrimitiveDef_ptr get_primitive( PrimitiveKind kind );
-    StringDef_ptr create_string( CORBA::ULong bound );
-    WstringDef_ptr create_wstring( CORBA::ULong bound );
-    SequenceDef_ptr create_sequence( CORBA::ULong bound, IDLType_ptr element_type );
-    ArrayDef_ptr create_array( CORBA::ULong length, IDLType_ptr element_type );
-    FixedDef_ptr create_fixed( CORBA::UShort digits, CORBA::Short scale );
+    ::CORBA::Contained_ptr lookup_id( const char* search_id );
+    ::CORBA::PrimitiveDef_ptr get_primitive( ::CORBA::PrimitiveKind kind );
+    ::CORBA::StringDef_ptr create_string( CORBA::ULong bound );
+    ::CORBA::WstringDef_ptr create_wstring( CORBA::ULong bound );
+    ::CORBA::SequenceDef_ptr create_sequence( CORBA::ULong bound, ::CORBA::IDLType_ptr element_type );
+    ::CORBA::ArrayDef_ptr create_array( CORBA::ULong length, ::CORBA::IDLType_ptr element_type );
+    ::CORBA::FixedDef_ptr create_fixed( CORBA::UShort digits, CORBA::Short scale );
 
   protected:
     Repository_stub_clp ();
@@ -1459,9 +1459,9 @@ class InterfaceDef :
     virtual void base_interfaces( const ::CORBA::InterfaceDefSeq& value ) = 0;
 
     virtual CORBA::Boolean is_a( const char* interface_id ) = 0;
-    virtual FullInterfaceDescription* describe_interface() = 0;
-    virtual AttributeDef_ptr create_attribute( const char* id, const char* name, const char* version, IDLType_ptr type, AttributeMode mode ) = 0;
-    virtual OperationDef_ptr create_operation( const char* id, const char* name, const char* version, IDLType_ptr result, OperationMode mode, const ParDescriptionSeq& params, const ExceptionDefSeq& exceptions, const ContextIdSeq& contexts ) = 0;
+    virtual ::CORBA::InterfaceDef::FullInterfaceDescription* describe_interface() = 0;
+    virtual ::CORBA::AttributeDef_ptr create_attribute( const char* id, const char* name, const char* version, ::CORBA::IDLType_ptr type, ::CORBA::AttributeMode mode ) = 0;
+    virtual ::CORBA::OperationDef_ptr create_operation( const char* id, const char* name, const char* version, ::CORBA::IDLType_ptr result, ::CORBA::OperationMode mode, const ::CORBA::ParDescriptionSeq& params, const ::CORBA::ExceptionDefSeq& exceptions, const ::CORBA::ContextIdSeq& contexts ) = 0;
 
   protected:
     InterfaceDef() {};
@@ -1485,9 +1485,9 @@ class InterfaceDef_stub:
     void base_interfaces( const ::CORBA::InterfaceDefSeq& value );
 
     CORBA::Boolean is_a( const char* interface_id );
-    FullInterfaceDescription* describe_interface();
-    AttributeDef_ptr create_attribute( const char* id, const char* name, const char* version, IDLType_ptr type, AttributeMode mode );
-    OperationDef_ptr create_operation( const char* id, const char* name, const char* version, IDLType_ptr result, OperationMode mode, const ParDescriptionSeq& params, const ExceptionDefSeq& exceptions, const ContextIdSeq& contexts );
+    ::CORBA::InterfaceDef::FullInterfaceDescription* describe_interface();
+    ::CORBA::AttributeDef_ptr create_attribute( const char* id, const char* name, const char* version, ::CORBA::IDLType_ptr type, ::CORBA::AttributeMode mode );
+    ::CORBA::OperationDef_ptr create_operation( const char* id, const char* name, const char* version, ::CORBA::IDLType_ptr result, ::CORBA::OperationMode mode, const ::CORBA::ParDescriptionSeq& params, const ::CORBA::ExceptionDefSeq& exceptions, const ::CORBA::ContextIdSeq& contexts );
 
   private:
     void operator=( const InterfaceDef_stub& );
@@ -1508,9 +1508,9 @@ class InterfaceDef_stub_clp :
     void base_interfaces( const ::CORBA::InterfaceDefSeq& value );
 
     CORBA::Boolean is_a( const char* interface_id );
-    FullInterfaceDescription* describe_interface();
-    AttributeDef_ptr create_attribute( const char* id, const char* name, const char* version, IDLType_ptr type, AttributeMode mode );
-    OperationDef_ptr create_operation( const char* id, const char* name, const char* version, IDLType_ptr result, OperationMode mode, const ParDescriptionSeq& params, const ExceptionDefSeq& exceptions, const ContextIdSeq& contexts );
+    ::CORBA::InterfaceDef::FullInterfaceDescription* describe_interface();
+    ::CORBA::AttributeDef_ptr create_attribute( const char* id, const char* name, const char* version, ::CORBA::IDLType_ptr type, ::CORBA::AttributeMode mode );
+    ::CORBA::OperationDef_ptr create_operation( const char* id, const char* name, const char* version, ::CORBA::IDLType_ptr result, ::CORBA::OperationMode mode, const ::CORBA::ParDescriptionSeq& params, const ::CORBA::ExceptionDefSeq& exceptions, const ::CORBA::ContextIdSeq& contexts );
 
   protected:
     InterfaceDef_stub_clp ();
@@ -1740,10 +1740,10 @@ class ValueDef :
     virtual void is_truncatable( CORBA::Boolean value ) = 0;
 
     virtual CORBA::Boolean is_a( const char* value_id ) = 0;
-    virtual FullValueDescription* describe_value() = 0;
-    virtual ValueMemberDef_ptr create_value_member( const char* id, const char* name, const char* version, IDLType_ptr type, Visibility access ) = 0;
-    virtual AttributeDef_ptr create_attribute( const char* id, const char* name, const char* version, IDLType_ptr type, AttributeMode mode ) = 0;
-    virtual OperationDef_ptr create_operation( const char* id, const char* name, const char* version, IDLType_ptr result, OperationMode mode, const ParDescriptionSeq& params, const ExceptionDefSeq& exceptions, const ContextIdSeq& contexts ) = 0;
+    virtual ::CORBA::ValueDef::FullValueDescription* describe_value() = 0;
+    virtual ::CORBA::ValueMemberDef_ptr create_value_member( const char* id, const char* name, const char* version, ::CORBA::IDLType_ptr type, ::CORBA::Visibility access ) = 0;
+    virtual ::CORBA::AttributeDef_ptr create_attribute( const char* id, const char* name, const char* version, ::CORBA::IDLType_ptr type, ::CORBA::AttributeMode mode ) = 0;
+    virtual ::CORBA::OperationDef_ptr create_operation( const char* id, const char* name, const char* version, ::CORBA::IDLType_ptr result, ::CORBA::OperationMode mode, const ::CORBA::ParDescriptionSeq& params, const ::CORBA::ExceptionDefSeq& exceptions, const ::CORBA::ContextIdSeq& contexts ) = 0;
 
   protected:
     ValueDef() {};
@@ -1779,10 +1779,10 @@ class ValueDef_stub:
     void is_truncatable( CORBA::Boolean value );
 
     CORBA::Boolean is_a( const char* value_id );
-    FullValueDescription* describe_value();
-    ValueMemberDef_ptr create_value_member( const char* id, const char* name, const char* version, IDLType_ptr type, Visibility access );
-    AttributeDef_ptr create_attribute( const char* id, const char* name, const char* version, IDLType_ptr type, AttributeMode mode );
-    OperationDef_ptr create_operation( const char* id, const char* name, const char* version, IDLType_ptr result, OperationMode mode, const ParDescriptionSeq& params, const ExceptionDefSeq& exceptions, const ContextIdSeq& contexts );
+    ::CORBA::ValueDef::FullValueDescription* describe_value();
+    ::CORBA::ValueMemberDef_ptr create_value_member( const char* id, const char* name, const char* version, ::CORBA::IDLType_ptr type, ::CORBA::Visibility access );
+    ::CORBA::AttributeDef_ptr create_attribute( const char* id, const char* name, const char* version, ::CORBA::IDLType_ptr type, ::CORBA::AttributeMode mode );
+    ::CORBA::OperationDef_ptr create_operation( const char* id, const char* name, const char* version, ::CORBA::IDLType_ptr result, ::CORBA::OperationMode mode, const ::CORBA::ParDescriptionSeq& params, const ::CORBA::ExceptionDefSeq& exceptions, const ::CORBA::ContextIdSeq& contexts );
 
   private:
     void operator=( const ValueDef_stub& );
@@ -1815,10 +1815,10 @@ class ValueDef_stub_clp :
     void is_truncatable( CORBA::Boolean value );
 
     CORBA::Boolean is_a( const char* value_id );
-    FullValueDescription* describe_value();
-    ValueMemberDef_ptr create_value_member( const char* id, const char* name, const char* version, IDLType_ptr type, Visibility access );
-    AttributeDef_ptr create_attribute( const char* id, const char* name, const char* version, IDLType_ptr type, AttributeMode mode );
-    OperationDef_ptr create_operation( const char* id, const char* name, const char* version, IDLType_ptr result, OperationMode mode, const ParDescriptionSeq& params, const ExceptionDefSeq& exceptions, const ContextIdSeq& contexts );
+    ::CORBA::ValueDef::FullValueDescription* describe_value();
+    ::CORBA::ValueMemberDef_ptr create_value_member( const char* id, const char* name, const char* version, ::CORBA::IDLType_ptr type, ::CORBA::Visibility access );
+    ::CORBA::AttributeDef_ptr create_attribute( const char* id, const char* name, const char* version, ::CORBA::IDLType_ptr type, ::CORBA::AttributeMode mode );
+    ::CORBA::OperationDef_ptr create_operation( const char* id, const char* name, const char* version, ::CORBA::IDLType_ptr result, ::CORBA::OperationMode mode, const ::CORBA::ParDescriptionSeq& params, const ::CORBA::ExceptionDefSeq& exceptions, const ::CORBA::ContextIdSeq& contexts );
 
   protected:
     ValueDef_stub_clp ();
@@ -2053,8 +2053,8 @@ class ExtValueDef :
     virtual ::CORBA::ExtInitializerSeq* ext_initializers() = 0;
     virtual void ext_initializers( const ::CORBA::ExtInitializerSeq& value ) = 0;
 
-    virtual ExtFullValueDescription* describe_ext_value() = 0;
-    virtual ExtAttributeDef_ptr create_ext_attribute( const char* id, const char* name, const char* version, IDLType_ptr type, AttributeMode mode, const ExceptionDefSeq& get_exceptions, const ExceptionDefSeq& set_exceptions ) = 0;
+    virtual ::CORBA::ExtValueDef::ExtFullValueDescription* describe_ext_value() = 0;
+    virtual ::CORBA::ExtAttributeDef_ptr create_ext_attribute( const char* id, const char* name, const char* version, ::CORBA::IDLType_ptr type, ::CORBA::AttributeMode mode, const ::CORBA::ExceptionDefSeq& get_exceptions, const ::CORBA::ExceptionDefSeq& set_exceptions ) = 0;
 
   protected:
     ExtValueDef() {};
@@ -2075,8 +2075,8 @@ class ExtValueDef_stub:
     ::CORBA::ExtInitializerSeq* ext_initializers();
     void ext_initializers( const ::CORBA::ExtInitializerSeq& value );
 
-    ExtFullValueDescription* describe_ext_value();
-    ExtAttributeDef_ptr create_ext_attribute( const char* id, const char* name, const char* version, IDLType_ptr type, AttributeMode mode, const ExceptionDefSeq& get_exceptions, const ExceptionDefSeq& set_exceptions );
+    ::CORBA::ExtValueDef::ExtFullValueDescription* describe_ext_value();
+    ::CORBA::ExtAttributeDef_ptr create_ext_attribute( const char* id, const char* name, const char* version, ::CORBA::IDLType_ptr type, ::CORBA::AttributeMode mode, const ::CORBA::ExceptionDefSeq& get_exceptions, const ::CORBA::ExceptionDefSeq& set_exceptions );
 
   private:
     void operator=( const ExtValueDef_stub& );
@@ -2094,8 +2094,8 @@ class ExtValueDef_stub_clp :
     ::CORBA::ExtInitializerSeq* ext_initializers();
     void ext_initializers( const ::CORBA::ExtInitializerSeq& value );
 
-    ExtFullValueDescription* describe_ext_value();
-    ExtAttributeDef_ptr create_ext_attribute( const char* id, const char* name, const char* version, IDLType_ptr type, AttributeMode mode, const ExceptionDefSeq& get_exceptions, const ExceptionDefSeq& set_exceptions );
+    ::CORBA::ExtValueDef::ExtFullValueDescription* describe_ext_value();
+    ::CORBA::ExtAttributeDef_ptr create_ext_attribute( const char* id, const char* name, const char* version, ::CORBA::IDLType_ptr type, ::CORBA::AttributeMode mode, const ::CORBA::ExceptionDefSeq& get_exceptions, const ::CORBA::ExceptionDefSeq& set_exceptions );
 
   protected:
     ExtValueDef_stub_clp ();
@@ -2902,7 +2902,7 @@ class ExtAttributeDef :
     virtual ::CORBA::ExceptionDefSeq* set_exceptions() = 0;
     virtual void set_exceptions( const ::CORBA::ExceptionDefSeq& value ) = 0;
 
-    virtual ExtAttributeDescription* describe_attribute() = 0;
+    virtual ::CORBA::ExtAttributeDescription* describe_attribute() = 0;
 
   protected:
     ExtAttributeDef() {};
@@ -2925,7 +2925,7 @@ class ExtAttributeDef_stub:
     ::CORBA::ExceptionDefSeq* set_exceptions();
     void set_exceptions( const ::CORBA::ExceptionDefSeq& value );
 
-    ExtAttributeDescription* describe_attribute();
+    ::CORBA::ExtAttributeDescription* describe_attribute();
 
   private:
     void operator=( const ExtAttributeDef_stub& );
@@ -2945,7 +2945,7 @@ class ExtAttributeDef_stub_clp :
     ::CORBA::ExceptionDefSeq* set_exceptions();
     void set_exceptions( const ::CORBA::ExceptionDefSeq& value );
 
-    ExtAttributeDescription* describe_attribute();
+    ::CORBA::ExtAttributeDescription* describe_attribute();
 
   protected:
     ExtAttributeDef_stub_clp ();
@@ -3196,8 +3196,8 @@ class InterfaceAttrExtension :
 
     static MICO_EXPORT CORBA::TypeCodeConst _tc_ExtFullInterfaceDescription;
 
-    virtual ExtFullInterfaceDescription* describe_ext_interface() = 0;
-    virtual ExtAttributeDef_ptr create_ext_attribute( const char* id, const char* name, const char* version, IDLType_ptr type, AttributeMode mode, const ExceptionDefSeq& get_exceptions, const ExceptionDefSeq& set_exceptions ) = 0;
+    virtual ::CORBA::InterfaceAttrExtension::ExtFullInterfaceDescription* describe_ext_interface() = 0;
+    virtual ::CORBA::ExtAttributeDef_ptr create_ext_attribute( const char* id, const char* name, const char* version, ::CORBA::IDLType_ptr type, ::CORBA::AttributeMode mode, const ::CORBA::ExceptionDefSeq& get_exceptions, const ::CORBA::ExceptionDefSeq& set_exceptions ) = 0;
 
   protected:
     InterfaceAttrExtension() {};
@@ -3214,8 +3214,8 @@ class InterfaceAttrExtension_stub:
 {
   public:
     virtual ~InterfaceAttrExtension_stub();
-    ExtFullInterfaceDescription* describe_ext_interface();
-    ExtAttributeDef_ptr create_ext_attribute( const char* id, const char* name, const char* version, IDLType_ptr type, AttributeMode mode, const ExceptionDefSeq& get_exceptions, const ExceptionDefSeq& set_exceptions );
+    ::CORBA::InterfaceAttrExtension::ExtFullInterfaceDescription* describe_ext_interface();
+    ::CORBA::ExtAttributeDef_ptr create_ext_attribute( const char* id, const char* name, const char* version, ::CORBA::IDLType_ptr type, ::CORBA::AttributeMode mode, const ::CORBA::ExceptionDefSeq& get_exceptions, const ::CORBA::ExceptionDefSeq& set_exceptions );
 
   private:
     void operator=( const InterfaceAttrExtension_stub& );
@@ -3230,8 +3230,8 @@ class InterfaceAttrExtension_stub_clp :
   public:
     InterfaceAttrExtension_stub_clp (PortableServer::POA_ptr, CORBA::Object_ptr);
     virtual ~InterfaceAttrExtension_stub_clp ();
-    ExtFullInterfaceDescription* describe_ext_interface();
-    ExtAttributeDef_ptr create_ext_attribute( const char* id, const char* name, const char* version, IDLType_ptr type, AttributeMode mode, const ExceptionDefSeq& get_exceptions, const ExceptionDefSeq& set_exceptions );
+    ::CORBA::InterfaceAttrExtension::ExtFullInterfaceDescription* describe_ext_interface();
+    ::CORBA::ExtAttributeDef_ptr create_ext_attribute( const char* id, const char* name, const char* version, ::CORBA::IDLType_ptr type, ::CORBA::AttributeMode mode, const ::CORBA::ExceptionDefSeq& get_exceptions, const ::CORBA::ExceptionDefSeq& set_exceptions );
 
   protected:
     InterfaceAttrExtension_stub_clp ();

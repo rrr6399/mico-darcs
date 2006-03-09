@@ -172,19 +172,19 @@ class DataInputStream :
     virtual CORBA::AbstractBase_ptr read_Abstract() = 0;
     virtual CORBA::ValueBase* read_Value() = 0;
     virtual CORBA::TypeCode_ptr read_TypeCode() = 0;
-    virtual void read_any_array( AnySeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
-    virtual void read_boolean_array( BooleanSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
-    virtual void read_char_array( CharSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
-    virtual void read_wchar_array( WCharSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
-    virtual void read_octet_array( OctetSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
-    virtual void read_short_array( ShortSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
-    virtual void read_ushort_array( UShortSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
-    virtual void read_long_array( LongSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
-    virtual void read_ulong_array( ULongSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
-    virtual void read_longlong_array( LongLongSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
-    virtual void read_ulonglong_array( ULongLongSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
-    virtual void read_float_array( FloatSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
-    virtual void read_double_array( DoubleSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
+    virtual void read_any_array( ::CORBA::AnySeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
+    virtual void read_boolean_array( ::CORBA::BooleanSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
+    virtual void read_char_array( ::CORBA::CharSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
+    virtual void read_wchar_array( ::CORBA::WCharSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
+    virtual void read_octet_array( ::CORBA::OctetSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
+    virtual void read_short_array( ::CORBA::ShortSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
+    virtual void read_ushort_array( ::CORBA::UShortSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
+    virtual void read_long_array( ::CORBA::LongSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
+    virtual void read_ulong_array( ::CORBA::ULongSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
+    virtual void read_longlong_array( ::CORBA::LongLongSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
+    virtual void read_ulonglong_array( ::CORBA::ULongLongSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
+    virtual void read_float_array( ::CORBA::FloatSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
+    virtual void read_double_array( ::CORBA::DoubleSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
 
   public:
     CORBA::ValueDef_ptr get_value_def ();
@@ -239,19 +239,19 @@ class DataOutputStream :
     virtual void write_Abstract( CORBA::AbstractBase_ptr value ) = 0;
     virtual void write_Value( CORBA::ValueBase* value ) = 0;
     virtual void write_TypeCode( CORBA::TypeCode_ptr value ) = 0;
-    virtual void write_any_array( const AnySeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
-    virtual void write_boolean_array( const BooleanSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
-    virtual void write_char_array( const CharSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
-    virtual void write_wchar_array( const WCharSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
-    virtual void write_octet_array( const OctetSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
-    virtual void write_short_array( const ShortSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
-    virtual void write_ushort_array( const UShortSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
-    virtual void write_long_array( const LongSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
-    virtual void write_ulong_array( const ULongSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
-    virtual void write_longlong_array( const LongLongSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
-    virtual void write_ulonglong_array( const ULongLongSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
-    virtual void write_float_array( const FloatSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
-    virtual void write_double_array( const DoubleSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
+    virtual void write_any_array( const ::CORBA::AnySeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
+    virtual void write_boolean_array( const ::CORBA::BooleanSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
+    virtual void write_char_array( const ::CORBA::CharSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
+    virtual void write_wchar_array( const ::CORBA::WCharSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
+    virtual void write_octet_array( const ::CORBA::OctetSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
+    virtual void write_short_array( const ::CORBA::ShortSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
+    virtual void write_ushort_array( const ::CORBA::UShortSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
+    virtual void write_long_array( const ::CORBA::LongSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
+    virtual void write_ulong_array( const ::CORBA::ULongSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
+    virtual void write_longlong_array( const ::CORBA::LongLongSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
+    virtual void write_ulonglong_array( const ::CORBA::ULongLongSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
+    virtual void write_float_array( const ::CORBA::FloatSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
+    virtual void write_double_array( const ::CORBA::DoubleSeq& seq, CORBA::ULong offset, CORBA::ULong length ) = 0;
 
   public:
     CORBA::ValueDef_ptr get_value_def ();
@@ -286,8 +286,8 @@ class CustomMarshal :
     static CustomMarshal* _downcast (CORBA::ValueBase *);
     static CustomMarshal* _downcast (CORBA::AbstractBase *);
 
-    virtual void marshal( DataOutputStream* os ) = 0;
-    virtual void unmarshal( DataInputStream* is ) = 0;
+    virtual void marshal( ::CORBA::DataOutputStream* os ) = 0;
+    virtual void unmarshal( ::CORBA::DataInputStream* is ) = 0;
 
   public:
     CORBA::ValueDef_ptr get_value_def ();

@@ -546,7 +546,7 @@ class CredentialsAcquirer :
 
     virtual void *_narrow_helper( const char *repoid );
 
-    virtual OwnCredentials_ptr get_credentials( CORBA::Boolean on_list ) = 0;
+    virtual ::SecurityLevel3::OwnCredentials_ptr get_credentials( CORBA::Boolean on_list ) = 0;
     virtual void destroy() = 0;
 
   protected:
@@ -590,8 +590,8 @@ class CredentialsCurator :
 
     virtual ::SecurityLevel3::OwnCredentialsList* default_creds_list() = 0;
 
-    virtual CredentialsAcquirer_ptr acquire_credentials( ::SL3AQArgs::Argument_ptr acquisition_arguments ) = 0;
-    virtual OwnCredentials_ptr get_own_credentials( const char* credentials_id ) = 0;
+    virtual ::SecurityLevel3::CredentialsAcquirer_ptr acquire_credentials( ::SL3AQArgs::Argument_ptr acquisition_arguments ) = 0;
+    virtual ::SecurityLevel3::OwnCredentials_ptr get_own_credentials( const char* credentials_id ) = 0;
     virtual void release_own_credentials( const char* credentials_id ) = 0;
 
   protected:
@@ -635,9 +635,9 @@ class SecurityManager :
 
     virtual ::SecurityLevel3::CredentialsCurator_ptr credentials_curator() = 0;
 
-    virtual TargetCredentials_ptr get_target_credentials( CORBA::Object_ptr the_object ) = 0;
-    virtual ContextEstablishmentPolicy_ptr create_context_estab_policy( ::SL3CM::CredsDirective creds_directive, const OwnCredentialsList& creds_list, ::SL3CM::FeatureDirective use_client_auth, ::SL3CM::FeatureDirective use_target_auth, ::SL3CM::FeatureDirective use_confidentiality, ::SL3CM::FeatureDirective use_integrity ) = 0;
-    virtual ObjectCredentialsPolicy_ptr create_object_creds_policy( const OwnCredentialsList& creds_list ) = 0;
+    virtual ::SecurityLevel3::TargetCredentials_ptr get_target_credentials( CORBA::Object_ptr the_object ) = 0;
+    virtual ::SecurityLevel3::ContextEstablishmentPolicy_ptr create_context_estab_policy( ::SL3CM::CredsDirective creds_directive, const ::SecurityLevel3::OwnCredentialsList& creds_list, ::SL3CM::FeatureDirective use_client_auth, ::SL3CM::FeatureDirective use_target_auth, ::SL3CM::FeatureDirective use_confidentiality, ::SL3CM::FeatureDirective use_integrity ) = 0;
+    virtual ::SecurityLevel3::ObjectCredentialsPolicy_ptr create_object_creds_policy( const ::SecurityLevel3::OwnCredentialsList& creds_list ) = 0;
 
   protected:
     SecurityManager() {};

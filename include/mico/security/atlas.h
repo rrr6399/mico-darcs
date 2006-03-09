@@ -183,8 +183,8 @@ class AuthTokenDispenser :
 
     virtual void *_narrow_helper( const char *repoid );
 
-    virtual AuthTokenData* get_my_authorization_token() = 0;
-    virtual AuthTokenData* translate_authorization_token( const ::CSI::IdentityToken& the_subject, const ::CSI::AuthorizationToken& the_token ) = 0;
+    virtual ::ATLAS::AuthTokenData* get_my_authorization_token() = 0;
+    virtual ::ATLAS::AuthTokenData* translate_authorization_token( const ::CSI::IdentityToken& the_subject, const ::CSI::AuthorizationToken& the_token ) = 0;
 
   protected:
     AuthTokenDispenser() {};
@@ -201,8 +201,8 @@ class AuthTokenDispenser_stub:
 {
   public:
     virtual ~AuthTokenDispenser_stub();
-    AuthTokenData* get_my_authorization_token();
-    AuthTokenData* translate_authorization_token( const ::CSI::IdentityToken& the_subject, const ::CSI::AuthorizationToken& the_token );
+    ::ATLAS::AuthTokenData* get_my_authorization_token();
+    ::ATLAS::AuthTokenData* translate_authorization_token( const ::CSI::IdentityToken& the_subject, const ::CSI::AuthorizationToken& the_token );
 
   private:
     void operator=( const AuthTokenDispenser_stub& );
@@ -217,8 +217,8 @@ class AuthTokenDispenser_stub_clp :
   public:
     AuthTokenDispenser_stub_clp (PortableServer::POA_ptr, CORBA::Object_ptr);
     virtual ~AuthTokenDispenser_stub_clp ();
-    AuthTokenData* get_my_authorization_token();
-    AuthTokenData* translate_authorization_token( const ::CSI::IdentityToken& the_subject, const ::CSI::AuthorizationToken& the_token );
+    ::ATLAS::AuthTokenData* get_my_authorization_token();
+    ::ATLAS::AuthTokenData* translate_authorization_token( const ::CSI::IdentityToken& the_subject, const ::CSI::AuthorizationToken& the_token );
 
   protected:
     AuthTokenDispenser_stub_clp ();

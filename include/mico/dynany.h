@@ -209,12 +209,12 @@ class DynAny :
     static MICO_EXPORT CORBA::TypeCodeConst _tc_TypeMismatch;
 
     virtual CORBA::TypeCode_ptr type() = 0;
-    virtual void assign( DynAny_ptr dyn_any ) = 0;
+    virtual void assign( ::DynamicAny::DynAny_ptr dyn_any ) = 0;
     virtual void from_any( const CORBA::Any& value ) = 0;
     virtual CORBA::Any* to_any() = 0;
-    virtual CORBA::Boolean equal( DynAny_ptr dyn_any ) = 0;
+    virtual CORBA::Boolean equal( ::DynamicAny::DynAny_ptr dyn_any ) = 0;
     virtual void destroy() = 0;
-    virtual DynAny_ptr copy() = 0;
+    virtual ::DynamicAny::DynAny_ptr copy() = 0;
     virtual void insert_boolean( CORBA::Boolean value ) = 0;
     virtual void insert_octet( CORBA::Octet value ) = 0;
     virtual void insert_char( CORBA::Char value ) = 0;
@@ -233,7 +233,7 @@ class DynAny :
     virtual void insert_wchar( CORBA::WChar value ) = 0;
     virtual void insert_wstring( const CORBA::WChar* value ) = 0;
     virtual void insert_any( const CORBA::Any& value ) = 0;
-    virtual void insert_dyn_any( DynAny_ptr value ) = 0;
+    virtual void insert_dyn_any( ::DynamicAny::DynAny_ptr value ) = 0;
     virtual void insert_val( CORBA::ValueBase* value ) = 0;
     virtual CORBA::Boolean get_boolean() = 0;
     virtual CORBA::Octet get_octet() = 0;
@@ -253,13 +253,13 @@ class DynAny :
     virtual CORBA::WChar get_wchar() = 0;
     virtual CORBA::WChar* get_wstring() = 0;
     virtual CORBA::Any* get_any() = 0;
-    virtual DynAny_ptr get_dyn_any() = 0;
+    virtual ::DynamicAny::DynAny_ptr get_dyn_any() = 0;
     virtual CORBA::ValueBase* get_val() = 0;
     virtual CORBA::Boolean seek( CORBA::Long index ) = 0;
     virtual void rewind() = 0;
     virtual CORBA::Boolean next() = 0;
     virtual CORBA::ULong component_count() = 0;
-    virtual DynAny_ptr current_component() = 0;
+    virtual ::DynamicAny::DynAny_ptr current_component() = 0;
     virtual void insert_abstract( CORBA::AbstractBase_ptr value ) = 0;
     virtual CORBA::AbstractBase_ptr get_abstract() = 0;
 
@@ -491,10 +491,10 @@ class DynStruct :
 
     virtual char* current_member_name() = 0;
     virtual ::CORBA::TCKind current_member_kind() = 0;
-    virtual NameValuePairSeq* get_members() = 0;
-    virtual void set_members( const NameValuePairSeq& value ) = 0;
-    virtual NameDynAnyPairSeq* get_members_as_dyn_any() = 0;
-    virtual void set_members_as_dyn_any( const NameDynAnyPairSeq& value ) = 0;
+    virtual ::DynamicAny::NameValuePairSeq* get_members() = 0;
+    virtual void set_members( const ::DynamicAny::NameValuePairSeq& value ) = 0;
+    virtual ::DynamicAny::NameDynAnyPairSeq* get_members_as_dyn_any() = 0;
+    virtual void set_members_as_dyn_any( const ::DynamicAny::NameDynAnyPairSeq& value ) = 0;
 
   protected:
     DynStruct() {};
@@ -535,13 +535,13 @@ class DynUnion :
 
     virtual void *_narrow_helper( const char *repoid );
 
-    virtual DynAny_ptr get_discriminator() = 0;
-    virtual void set_discriminator( DynAny_ptr d ) = 0;
+    virtual ::DynamicAny::DynAny_ptr get_discriminator() = 0;
+    virtual void set_discriminator( ::DynamicAny::DynAny_ptr d ) = 0;
     virtual void set_to_default_member() = 0;
     virtual void set_to_no_active_member() = 0;
     virtual CORBA::Boolean has_no_active_member() = 0;
     virtual ::CORBA::TCKind discriminator_kind() = 0;
-    virtual DynAny_ptr member() = 0;
+    virtual ::DynamicAny::DynAny_ptr member() = 0;
     virtual char* member_name() = 0;
     virtual ::CORBA::TCKind member_kind() = 0;
 
@@ -598,10 +598,10 @@ class DynSequence :
 
     virtual CORBA::ULong get_length() = 0;
     virtual void set_length( CORBA::ULong len ) = 0;
-    virtual AnySeq* get_elements() = 0;
-    virtual void set_elements( const AnySeq& value ) = 0;
-    virtual DynAnySeq* get_elements_as_dyn_any() = 0;
-    virtual void set_elements_as_dyn_any( const DynAnySeq& value ) = 0;
+    virtual ::DynamicAny::AnySeq* get_elements() = 0;
+    virtual void set_elements( const ::DynamicAny::AnySeq& value ) = 0;
+    virtual ::DynamicAny::DynAnySeq* get_elements_as_dyn_any() = 0;
+    virtual void set_elements_as_dyn_any( const ::DynamicAny::DynAnySeq& value ) = 0;
 
   protected:
     DynSequence() {};
@@ -642,10 +642,10 @@ class DynArray :
 
     virtual void *_narrow_helper( const char *repoid );
 
-    virtual AnySeq* get_elements() = 0;
-    virtual void set_elements( const AnySeq& value ) = 0;
-    virtual DynAnySeq* get_elements_as_dyn_any() = 0;
-    virtual void set_elements_as_dyn_any( const DynAnySeq& value ) = 0;
+    virtual ::DynamicAny::AnySeq* get_elements() = 0;
+    virtual void set_elements( const ::DynamicAny::AnySeq& value ) = 0;
+    virtual ::DynamicAny::DynAnySeq* get_elements_as_dyn_any() = 0;
+    virtual void set_elements_as_dyn_any( const ::DynamicAny::DynAnySeq& value ) = 0;
 
   protected:
     DynArray() {};
@@ -731,10 +731,10 @@ class DynValue :
 
     virtual char* current_member_name() = 0;
     virtual ::CORBA::TCKind current_member_kind() = 0;
-    virtual NameValuePairSeq* get_members() = 0;
-    virtual void set_members( const NameValuePairSeq& values ) = 0;
-    virtual NameDynAnyPairSeq* get_members_as_dyn_any() = 0;
-    virtual void set_members_as_dyn_any( const NameDynAnyPairSeq& values ) = 0;
+    virtual ::DynamicAny::NameValuePairSeq* get_members() = 0;
+    virtual void set_members( const ::DynamicAny::NameValuePairSeq& values ) = 0;
+    virtual ::DynamicAny::NameDynAnyPairSeq* get_members_as_dyn_any() = 0;
+    virtual void set_members_as_dyn_any( const ::DynamicAny::NameDynAnyPairSeq& values ) = 0;
 
   protected:
     DynValue() {};
@@ -777,8 +777,8 @@ class DynValueBox :
 
     virtual CORBA::Any* get_boxed_value() = 0;
     virtual void set_boxed_value( const CORBA::Any& boxed ) = 0;
-    virtual DynAny_ptr get_boxed_value_as_dyn_any() = 0;
-    virtual void set_boxed_value_as_dyn_any( DynAny_ptr boxed ) = 0;
+    virtual ::DynamicAny::DynAny_ptr get_boxed_value_as_dyn_any() = 0;
+    virtual void set_boxed_value_as_dyn_any( ::DynamicAny::DynAny_ptr boxed ) = 0;
 
   protected:
     DynValueBox() {};
@@ -853,8 +853,8 @@ class DynAnyFactory :
 
     static MICO_EXPORT CORBA::TypeCodeConst _tc_InconsistentTypeCode;
 
-    virtual DynAny_ptr create_dyn_any( const CORBA::Any& value ) = 0;
-    virtual DynAny_ptr create_dyn_any_from_type_code( CORBA::TypeCode_ptr type ) = 0;
+    virtual ::DynamicAny::DynAny_ptr create_dyn_any( const CORBA::Any& value ) = 0;
+    virtual ::DynamicAny::DynAny_ptr create_dyn_any_from_type_code( CORBA::TypeCode_ptr type ) = 0;
 
   protected:
     DynAnyFactory() {};
