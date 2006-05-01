@@ -1,28 +1,24 @@
 #!/bin/sh
 #set -x
-AC=`which autoconf 2>/dev/null`
-if test -z $AC; then
-  echo "ERROR: autoconf2.13 is missing"
+AUTOCONF=""
+NAMES="autoconf autoconf2.13 autoconf-2.13"
+for i in $NAMES
+do
+  AC=`which $i 2>/dev/null`
+  ret=$?
+  if [ $ret -eq 0 ] ; then
+    VER=`$i --version 2>&1`
+    case $VER in
+    *version*2.13*)
+      AUTOCONF=$i
+      ;;
+    esac
+  fi
+done
+if [ ! $AUTOCONF ] ; then
+  "ERROR: autoconf 2.13 not detected. Tested names are: $NAMES"
   exit 1
 fi
-VER=`autoconf --version 2>&1`
-case $VER in
-*version*2.13*)
-  AUTOCONF=autoconf
-  ;;
-*)
-  AC=`which autoconf2.13 2>/dev/null`
-  if test -z $AC; then
-    echo "ERROR: autoconf2.13 is missing"
-    exit 1
-  fi
-  VER2=`autoconf2.13 --version 2>&1`
-  case $VER2 in
-  *autoconf*2.13*)
-    AUTOCONF=autoconf2.13
-  ;;
-  esac
-esac
 echo "autoconf 2.13 detected as: \`$AUTOCONF'"
 echo "generating configure..."
 $AUTOCONF
