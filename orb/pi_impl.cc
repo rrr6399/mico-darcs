@@ -1,6 +1,6 @@
 //
 //  MICO PI --- an Open Source Portable Interceptor implementation
-//  Copyright (C) 2001, 2002, 2003, 2004, 2005 ObjectSecurity Ltd.
+//  Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 ObjectSecurity Ltd.
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Library General Public
@@ -1674,7 +1674,7 @@ PInterceptor::ORBInitInfo_impl::ORBInitInfo_impl
  char** argv)
 {
     orb_ = CORBA::ORB::_duplicate(orb);
-    orb_id_ = CORBA::string_dup(id);
+    orb_id_ = id;
     CORBA::ULong length = 0;
     args_.length(length);
     for (int i=1; i<argc; i++) {
@@ -2736,8 +2736,8 @@ void
 PInterceptor::PI::_exec_add_client_interceptor
 (PortableInterceptor::ClientRequestInterceptor_ptr interceptor)
 {
-    string i_name = interceptor->name();
-    if (i_name != "") {
+    CORBA::String_var i_name = interceptor->name();
+    if (strcmp(i_name.in(), "") != 0) {
 	// it's non-anonymous interceptor
 	// so we have to check if it has unique name
 	// as CORBA 2.6 (21.7.2.1) says
@@ -2745,10 +2745,10 @@ PInterceptor::PI::_exec_add_client_interceptor
 	for (it = S_client_req_int_.begin();
 	     it != S_client_req_int_.end();
 	     it++) {
-	    string s = (*it)->name();
-	    if (i_name == s) {
+	    CORBA::String_var s = (*it)->name();
+	    if (strcmp(i_name.in(), s.in()) == 0) {
 		PortableInterceptor::ORBInitInfo::DuplicateName ex;
-		ex.name = s.c_str();
+		ex.name = s.in();
 		mico_throw(ex);
 	    }
 	}
@@ -2761,8 +2761,8 @@ void
 PInterceptor::PI::_exec_add_server_interceptor
 (PortableInterceptor::ServerRequestInterceptor_ptr interceptor)
 {
-    string i_name = interceptor->name();
-    if (i_name != "") {
+    CORBA::String_var i_name = interceptor->name();
+    if (strcmp(i_name, "") != 0) {
 	// it's non-anonymous interceptor
 	// so we have to check if it has unique name
 	// as CORBA 2.6 (21.7.2.1) says
@@ -2770,10 +2770,10 @@ PInterceptor::PI::_exec_add_server_interceptor
 	for (it = S_server_req_int_.begin();
 	     it != S_server_req_int_.end();
 	     it++) {
-	    string s = (*it)->name();
-	    if (i_name == s) {
+	    CORBA::String_var s = (*it)->name();
+	    if (strcmp(i_name.in(), s.in()) == 0) {
 		PortableInterceptor::ORBInitInfo::DuplicateName ex;
-		ex.name = s.c_str();
+		ex.name = s.in();
 		mico_throw(ex);
 	    }
 	}
@@ -2787,18 +2787,18 @@ PInterceptor::PI::_exec_add_ior_interceptor
 (PortableInterceptor::IORInterceptor_ptr interceptor)
 {
     IORList::iterator it;
-    string i_name = interceptor->name();
-    if (i_name != "") {
+    CORBA::String_var i_name = interceptor->name();
+    if (strcmp(i_name.in(), "") != 0) {
 	// it's non-anonymous interceptor
 	// so we have to check if it has unique name
 	// as CORBA 2.6 (21.7.2.1) says
 	for (it = S_ior_interceptors_.begin();
 	     it != S_ior_interceptors_.end();
 	     it++) {
-	    string s = (*it)->name();
-	    if (i_name == s) {
+	    CORBA::String_var s = (*it)->name();
+	    if (strcmp(i_name.in(), s.in()) == 0) {
 		PortableInterceptor::ORBInitInfo::DuplicateName ex;
-		ex.name = s.c_str();
+		ex.name = s.in();
 		mico_throw(ex);
 	    }
 	}
