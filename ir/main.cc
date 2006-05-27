@@ -61,6 +61,7 @@ using namespace std;
 
 static CORBA::Repository_ptr therepo;
 static string thedb;
+static int save_db_on_exit;
 
 void save_db ()
 {
@@ -76,9 +77,16 @@ void save_db ()
 }
 
 void
-sighandler (int)
+save_db_sighandler (int)
 {
   save_db ();
+}
+
+void
+sighandler (int)
+{
+  if (save_db_on_exit)
+    save_db ();
   exit (0);
 }
 
@@ -89,13 +97,22 @@ void usage( const char *progname )
   cerr << "    --help" << endl;
   cerr << "    --db <idl database file>" << endl;
   cerr << "    --ior <IOR ref file>" << endl;
+  cerr << "    --do_not_save_db" << endl;
   exit( 1 );
 }
 
 int main (int argc, char *_argv[])
 {
+  save_db_on_exit = 1;
+
   signal (SIGINT, sighandler);
   signal (SIGTERM, sighandler);
+#ifdef SIGUSR1
+  /*
+   * at least not in _WIN32
+   */
+  signal (SIGUSR1, save_db_sighandler);
+#endif
 
   /*
    * also add -POAImplName if missing...
@@ -125,6 +142,7 @@ int main (int argc, char *_argv[])
   opts["--help"] = "";
   opts["--db"]   = "arg-expected";
   opts["--ior"]  = "arg-expected";
+  opts["--do_not_save_db"]  = "";
 
   MICOGetOpt opt_parser (opts);
   if (!opt_parser.parse (argc, argv))
@@ -143,6 +161,8 @@ int main (int argc, char *_argv[])
       reffile = val;
     } else if (arg == "--help") {
       usage( argv[ 0 ] );
+    } else if (arg == "--do_not_save_db") {
+      save_db_on_exit = 0;
     } else {
       usage( argv[ 0 ] );
     }
