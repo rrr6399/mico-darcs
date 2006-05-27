@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2005 by The Mico Team
+ *  Copyright (c) 1997-2006 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -462,6 +462,7 @@ MICO::UniCodesetConv::supported_csid (CORBA::Codeset::CodesetId csid)
     case C_IBM_860:
     case C_IBM_863:
     case C_IBM_865:
+    case C_IBM_866:
     case C_UCS4:
     case C_UTF16:
     case C_UTF8:

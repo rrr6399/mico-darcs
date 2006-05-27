@@ -1,6 +1,7 @@
 /*
  *  Code Set Converters for MICO
  *  Copyright (C) 1997 Marcus Mueller & Thomas Holubar
+ *  Copyright (c) 1998-2006 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -57,6 +58,7 @@ enum /* string_type */
   C_IBM_863 = 0x1002035f,     /* IBM Codepage 863 - Canada       */
   /* not in registry, using IBM-277 instead */
   C_IBM_865 = 0x10020115,     /* IBM Codepage 865 - Norway       */
+  C_IBM_866 = 0x10020362,     /* IBM Codepage 866 - Cyrillic 2 */
 
   C_WIN31_LATIN1 = 0xffff0005,
 
@@ -116,6 +118,7 @@ enum /* line_type */
 #define C_IBM_860_UNKNOWN      0xDB
 #define C_IBM_863_UNKNOWN      0xDB
 #define C_IBM_865_UNKNOWN      0xDB
+#define C_IBM_866_UNKNOWN      0xDB
 #define C_WIN31_LATIN1_UNKNOWN 0xBF
 #define C_UCS4_UNKNOWN         0x2588
 #define C_UTF16_UNKNOWN        0x2588
