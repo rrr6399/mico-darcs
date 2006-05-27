@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2005 by The Mico Team
+ *  Copyright (c) 1997-2006 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -1786,6 +1786,11 @@ CORBA::ORB::destroy ()
     }
     // destroy all registered PIs
     PortableInterceptor::destroy_all_interceptors();
+
+    // clear some variables which hold reference to us
+    _init_refs.clear ();
+    _value_facs.clear ();
+    _def_manager = DomainManager::_nil ();
 
     CORBA::release(orb_instance);
     orb_instance = _nil();
