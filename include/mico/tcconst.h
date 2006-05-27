@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2001 by The Mico Team
+ *  Copyright (c) 1997-2006 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -32,6 +32,7 @@ class TypeCodeConst {
 public:
     TypeCodeConst ();
     TypeCodeConst (const char *s);
+    ~TypeCodeConst();
     TypeCodeConst &operator= (const char *s);
     TypeCode_ptr operator->();
     operator TypeCode_ptr();
