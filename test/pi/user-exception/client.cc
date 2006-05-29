@@ -20,7 +20,7 @@ public:
     MyClientInterceptor()
     { nm = ""; }
 
-    MyClientInterceptor(char * name)
+    MyClientInterceptor(const char * name)
     { nm = name; }
 	
     char*
