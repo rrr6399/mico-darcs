@@ -21,7 +21,7 @@ public:
     MyClientInterceptor() : count_(0)
     { nm = ""; }
 
-    MyClientInterceptor(char * name) : count_(0)
+    MyClientInterceptor(const char * name) : count_(0)
     { nm = name; }
 	
     char* name()

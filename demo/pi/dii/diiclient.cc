@@ -25,12 +25,12 @@ public:
     MyClientInterceptor() {
 	nm = "";
     }
-    MyClientInterceptor(char * name) {	
+    MyClientInterceptor(const char * name) {	
 	nm = name;
     }
 	
     char* name() {
-	return (char *)nm.c_str();
+	return CORBA::string_dup(nm.c_str());
     }
 
     void destroy()
