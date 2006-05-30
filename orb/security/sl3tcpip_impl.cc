@@ -1,6 +1,6 @@
 //
 //  MICO SL3 --- an Open Source SL3 implementation
-//  Copyright (C) 2002, 2003, 2004, 2005 ObjectSecurity Ltd.
+//  Copyright (C) 2002, 2003, 2004, 2005, 2006 ObjectSecurity Ltd.
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Library General Public
@@ -615,6 +615,8 @@ MICOSL3_SL3TCPIP::TCPIPAcceptor::enable()
     addr += this->bind();
     addr += ":";
     MICO::InetAddress* i_addr = NULL;
+    StringSeq_var hosts = this->hosts();
+    assert(hosts->length() <= 1);
     if (this->low_port() != 0) {
 	if (this->low_port() < this->high_port()) {
 	    // we will try to bind to specified port range
@@ -627,7 +629,14 @@ MICOSL3_SL3TCPIP::TCPIPAcceptor::enable()
 		}
 		Address* addr = Address::parse(naddr.c_str());
 		assert(addr);
-		if (server->listen(addr, 0)) {
+                Address* ior_addr = NULL;
+                if (hosts->length() == 1) {
+                    string ior_addr_str = "inet:";
+                    ior_addr_str +=  hosts[0u].in();
+                    ior_addr_str += ":" + xdec(i);
+                    ior_addr = Address::parse(ior_addr_str.c_str());
+                }
+		if (server->listen(addr, ior_addr)) {
 		    i_addr = dynamic_cast<MICO::InetAddress*>(addr);
 		    assert(i_addr != NULL);
 		    break;
@@ -651,7 +660,14 @@ MICOSL3_SL3TCPIP::TCPIPAcceptor::enable()
 	    }
 	    Address* addr = Address::parse(naddr.c_str());
 	    assert(addr);
-	    if (server->listen(addr, 0)) {
+            Address* ior_addr = NULL;
+            if (hosts->length() == 1) {
+                string ior_addr_str = "inet:";
+                ior_addr_str +=  hosts[0u].in();
+                ior_addr_str += ":" + xdec(this->low_port());
+                ior_addr = Address::parse(ior_addr_str.c_str());
+            }
+	    if (server->listen(addr, ior_addr)) {
 		i_addr = dynamic_cast<MICO::InetAddress*>(addr);
 		assert(i_addr != NULL);
 	    }
