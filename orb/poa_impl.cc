@@ -1936,7 +1936,8 @@ MICOPOA::POA_impl::POA_impl (const char * _name,
                       = dynamic_cast<MICOSL3_SL3TCPIP::TCPIPAcceptor*>(acceptor.in());
                   if (tcpip_acceptor != NULL) {
                       if ((*(tcpip_acceptor->bound_addr())) == (*(iiop_prof->addr()))
-                          ||(*(tcpip_acceptor->ior_addr())) == (*(iiop_prof->addr()))) {
+                          ||(tcpip_acceptor->ior_addr() != NULL
+                             && (*(tcpip_acceptor->ior_addr())) == (*(iiop_prof->addr())))) {
                           match = true;
                           break;
                       }
@@ -1953,7 +1954,8 @@ MICOPOA::POA_impl::POA_impl (const char * _name,
                       = dynamic_cast<MICOSL3_SL3TLS::TLSAcceptor*>(acceptor.in());
                   if (tls_acceptor != NULL) {
                       if ((*(tls_acceptor->bound_addr())) == (*(ssl_prof->addr()))
-                          ||(*(tls_acceptor->ior_addr())) == (*(ssl_prof->addr()))) {
+                          ||(tls_acceptor->ior_addr() != NULL
+                             && (*(tls_acceptor->ior_addr())) == (*(ssl_prof->addr())))) {
                           match = true;
                           break;
                       }
