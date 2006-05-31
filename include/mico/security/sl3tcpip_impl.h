@@ -1,7 +1,7 @@
 // -*- c++ -*-
 //
 //  MICO SL3 --- an Open Source SL3 implementation
-//  Copyright (C) 2002, 2003, 2004, 2005 ObjectSecurity Ltd.
+//  Copyright (C) 2002, 2003, 2004, 2005, 2006 ObjectSecurity Ltd.
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Library General Public
@@ -188,9 +188,13 @@ namespace MICOSL3_SL3TCPIP
 
         const CORBA::Address*
         bound_addr();
+
+        const CORBA::Address*
+        ior_addr();
     private:
 	SL3AQArgs::TCPIPAcceptorOptions options_;
 	CORBA::Address* bound_addr_;
+        CORBA::Address* ior_addr_;
     };
 
     class TCPIPInitiatingContext

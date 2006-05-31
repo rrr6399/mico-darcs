@@ -503,7 +503,7 @@ MICOSL3_SL3TCPIP::TCPIPInitiator::~TCPIPInitiator()
 //
 
 MICOSL3_SL3TCPIP::TCPIPAcceptor::TCPIPAcceptor(SL3AQArgs::Argument_ptr arg)
-    : bound_addr_(NULL)
+    : bound_addr_(NULL), ior_addr_(NULL)
 {
     TCPIPAcceptorArgument_var argument = TCPIPAcceptorArgument::_narrow(arg);
     assert(!CORBA::is_nil(argument));
@@ -548,6 +548,9 @@ MICOSL3_SL3TCPIP::TCPIPAcceptor::~TCPIPAcceptor()
     //cerr << "~TCPIPAcceptor(): " << this << endl;
     if (bound_addr_ != NULL) {
         delete bound_addr_;
+    }
+    if (ior_addr_ != NULL) {
+        delete ior_addr_;
     }
 }
 
@@ -615,6 +618,7 @@ MICOSL3_SL3TCPIP::TCPIPAcceptor::enable()
     addr += this->bind();
     addr += ":";
     MICO::InetAddress* i_addr = NULL;
+    MICO::InetAddress* i_ior_addr = NULL;
     StringSeq_var hosts = this->hosts();
     assert(hosts->length() <= 1);
     if (this->low_port() != 0) {
@@ -639,6 +643,10 @@ MICOSL3_SL3TCPIP::TCPIPAcceptor::enable()
 		if (server->listen(addr, ior_addr)) {
 		    i_addr = dynamic_cast<MICO::InetAddress*>(addr);
 		    assert(i_addr != NULL);
+                    if (ior_addr != NULL) {
+                        i_ior_addr = dynamic_cast<MICO::InetAddress*>(ior_addr);
+                        assert(i_ior_addr != NULL);
+                    }
 		    break;
 		}
 		if (MICO::Logger::IsLogged(MICO::Logger::Security)) {
@@ -670,6 +678,10 @@ MICOSL3_SL3TCPIP::TCPIPAcceptor::enable()
 	    if (server->listen(addr, ior_addr)) {
 		i_addr = dynamic_cast<MICO::InetAddress*>(addr);
 		assert(i_addr != NULL);
+                if (ior_addr != NULL) {
+                    i_ior_addr = dynamic_cast<MICO::InetAddress*>(ior_addr);
+                    assert(i_ior_addr != NULL);
+                }
 	    }
 	    else {
 		if (MICO::Logger::IsLogged(MICO::Logger::Security)) {
@@ -698,6 +710,10 @@ MICOSL3_SL3TCPIP::TCPIPAcceptor::enable()
         Address* addr = Address::parse(naddr.c_str());
         const Address* baddr;
         assert(addr);
+        if (hosts->length() > 0) {
+            // unsupported case
+            assert(0);
+        }
         if (server->listen(addr, 0, baddr)) {
             Address* clone_addr = baddr->clone();
             i_addr = dynamic_cast<MICO::InetAddress*>(clone_addr);
@@ -726,6 +742,14 @@ MICOSL3_SL3TCPIP::TCPIPAcceptor::enable()
 	    + wxdec(id[2]) + L"." + wxdec(id[3]);
 	t_port = L"<unspecified value>";
     }
+    if (i_ior_addr != NULL) {
+        ior_addr_ = i_ior_addr;
+	if (MICO::Logger::IsLogged(MICO::Logger::Security)) {
+	    MICOMT::AutoDebugLock lock;
+	    MICO::Logger::Stream(MICO::Logger::Security)
+		<< "SL3TCPIP: IOR address: `" << ior_addr_->stringify() << "'" << endl;
+	}
+    }
     CORBA::WString_var ip = t_addr.c_str();
     CORBA::WString_var port = t_port.c_str();
     PrinAttributeList env_attr;
@@ -748,6 +772,13 @@ const CORBA::Address*
 MICOSL3_SL3TCPIP::TCPIPAcceptor::bound_addr()
 {
     return this->bound_addr_;
+}
+
+
+const CORBA::Address*
+MICOSL3_SL3TCPIP::TCPIPAcceptor::ior_addr()
+{
+    return this->ior_addr_;
 }
 
 
