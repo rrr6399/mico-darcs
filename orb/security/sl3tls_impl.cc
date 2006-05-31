@@ -1,6 +1,6 @@
 //
 //  MICO SL3 --- an Open Source SL3 implementation
-//  Copyright (C) 2003, 2004, 2005 ObjectSecurity Ltd.
+//  Copyright (C) 2003, 2004, 2005, 2006 ObjectSecurity Ltd.
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Library General Public
@@ -663,7 +663,7 @@ MICOSL3_SL3TLS::TLSInitiator::~TLSInitiator()
 MICOSL3_SL3TLS::TLSAcceptor::TLSAcceptor
 (Argument_ptr tcpip_arg,
  Argument_ptr openssl_arg)
-    : OpenSSLConfigHolder(openssl_arg), bound_addr_(NULL)
+    : OpenSSLConfigHolder(openssl_arg), bound_addr_(NULL), ior_addr_(NULL)
 {
     TCPIPAcceptorArgument_var accept_arg = TCPIPAcceptorArgument::_narrow
 	(tcpip_arg);
@@ -728,6 +728,9 @@ MICOSL3_SL3TLS::TLSAcceptor::~TLSAcceptor()
     //cerr << "~TLSAcceptor" << endl;
     if (bound_addr_ != NULL) {
         delete bound_addr_;
+    }
+    if (ior_addr_ != NULL) {
+        delete ior_addr_;
     }
 }
 
@@ -794,6 +797,9 @@ MICOSL3_SL3TLS::TLSAcceptor::enable()
     addr += this->bind();
     addr += ":";
     MICOSSL::SSLAddress* i_addr = NULL;
+    MICOSSL::SSLAddress* i_ior_addr = NULL;
+    StringSeq_var hosts = this->hosts();
+    assert(hosts->length() <= 1);
     if (this->low_port() != 0) {
 	if (this->low_port() < this->high_port()) {
 	    // we will try to bind to specified port range
@@ -806,9 +812,20 @@ MICOSL3_SL3TLS::TLSAcceptor::enable()
 		}
 		Address* addr = Address::parse(naddr.c_str());
 		assert(addr);
-		if (server->listen(addr, 0)) {
+                Address* ior_addr = NULL;
+                if (hosts->length() == 1) {
+                    string ior_addr_str = "ssl:inet:";
+                    ior_addr_str +=  hosts[0u].in();
+                    ior_addr_str += ":" + xdec(i);
+                    ior_addr = Address::parse(ior_addr_str.c_str());
+                }
+		if (server->listen(addr, ior_addr)) {
 		    i_addr = dynamic_cast<MICOSSL::SSLAddress*>(addr);
 		    assert(i_addr != NULL);
+                    if (ior_addr != NULL) {
+                        i_ior_addr = dynamic_cast<MICOSSL::SSLAddress*>(ior_addr);
+                        assert(i_ior_addr != NULL);
+                    }
 		    break;
 		}
 		if (MICO::Logger::IsLogged(MICO::Logger::Security)) {
@@ -830,9 +847,20 @@ MICOSL3_SL3TLS::TLSAcceptor::enable()
 	    }
 	    Address* addr = Address::parse(naddr.c_str());
 	    assert(addr);
-	    if (server->listen(addr, 0)) {
+            Address* ior_addr = NULL;
+            if (hosts->length() == 1) {
+                string ior_addr_str = "ssl:inet:";
+                ior_addr_str +=  hosts[0u].in();
+                ior_addr_str += ":" + xdec(this->low_port());
+                ior_addr = Address::parse(ior_addr_str.c_str());
+            }
+	    if (server->listen(addr, ior_addr)) {
 		i_addr = dynamic_cast<MICOSSL::SSLAddress*>(addr);
 		assert(i_addr != NULL);
+                if (ior_addr != NULL) {
+                    i_ior_addr = dynamic_cast<MICOSSL::SSLAddress*>(ior_addr);
+                    assert(i_ior_addr != NULL);
+                }
 	    }
 	    else {
 		if (MICO::Logger::IsLogged(MICO::Logger::Security)) {
@@ -861,6 +889,10 @@ MICOSL3_SL3TLS::TLSAcceptor::enable()
 	Address* addr = Address::parse(naddr.c_str());
         const Address* baddr;
 	assert(addr);
+        if (hosts->length() > 0) {
+            // unsupported case
+            assert(0);
+        }
 	if (server->listen(addr, 0, baddr)) {
             Address* clone_addr = baddr->clone();
 	    i_addr = dynamic_cast<MICOSSL::SSLAddress*>(clone_addr);
@@ -895,6 +927,14 @@ MICOSL3_SL3TLS::TLSAcceptor::enable()
 	    + wxdec(id[2]) + L"." + wxdec(id[3]);
 	t_port = L"<unspecified value>";
     }
+    if (i_ior_addr != NULL) {
+        ior_addr_ = i_ior_addr;
+	if (MICO::Logger::IsLogged(MICO::Logger::Security)) {
+	    MICOMT::AutoDebugLock lock;
+	    MICO::Logger::Stream(MICO::Logger::Security)
+		<< "SL3TCPIP: IOR address: `" << ior_addr_->stringify() << "'" << endl;
+	}
+    }
     CORBA::WString_var ip = t_addr.c_str();
     CORBA::WString_var port = t_port.c_str();
     PrinAttributeList env_attr;
@@ -917,6 +957,13 @@ const CORBA::Address*
 MICOSL3_SL3TLS::TLSAcceptor::bound_addr()
 {
     return this->bound_addr_;
+}
+
+
+const CORBA::Address*
+MICOSL3_SL3TLS::TLSAcceptor::ior_addr()
+{
+    return this->ior_addr_;
 }
 
 
