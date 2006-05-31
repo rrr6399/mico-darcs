@@ -1,7 +1,7 @@
 /*
  *  MICO --- an Open Source CORBA implementation
  *  Copyright (C) 1998 Frank Pilhofer
- *  Copyright (c) 1999-2005 by The Mico Team
+ *  Copyright (c) 1999-2006 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -1935,7 +1935,8 @@ MICOPOA::POA_impl::POA_impl (const char * _name,
                   MICOSL3_SL3TCPIP::TCPIPAcceptor* tcpip_acceptor
                       = dynamic_cast<MICOSL3_SL3TCPIP::TCPIPAcceptor*>(acceptor.in());
                   if (tcpip_acceptor != NULL) {
-                      if ((*(tcpip_acceptor->bound_addr())) == (*(iiop_prof->addr()))) {
+                      if ((*(tcpip_acceptor->bound_addr())) == (*(iiop_prof->addr()))
+                          ||(*(tcpip_acceptor->ior_addr())) == (*(iiop_prof->addr()))) {
                           match = true;
                           break;
                       }
@@ -1951,7 +1952,8 @@ MICOPOA::POA_impl::POA_impl (const char * _name,
                   MICOSL3_SL3TLS::TLSAcceptor* tls_acceptor
                       = dynamic_cast<MICOSL3_SL3TLS::TLSAcceptor*>(acceptor.in());
                   if (tls_acceptor != NULL) {
-                      if ((*(tls_acceptor->bound_addr())) == (*(ssl_prof->addr()))) {
+                      if ((*(tls_acceptor->bound_addr())) == (*(ssl_prof->addr()))
+                          ||(*(tls_acceptor->ior_addr())) == (*(ssl_prof->addr()))) {
                           match = true;
                           break;
                       }
