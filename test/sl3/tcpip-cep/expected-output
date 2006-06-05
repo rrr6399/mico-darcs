@@ -389,7 +389,7 @@ interface InitiatingContext {
 Hello World
 client credentials: 
 interface AcceptingContext {
-  context_id = MICO_TCPIPAcceptingContext:2
+  context_id = MICO_TCPIPAcceptingContext:0
   client_principal = valuetype SimplePrincipal {
     the_type = 0
     the_name = struct PrincipalName {
@@ -472,7 +472,7 @@ interface AcceptingContext {
   }
   environmental_attributes = {
     PrinAttribute("SL3:TransportMechanism","TCPIP")
-    PrinAttribute("SL3:ChannelIdentifier","TCPIPv4:127.0.0.1:6690-127.0.0.1:2345")
+    PrinAttribute("SL3:ChannelIdentifier","TCPIPv4:127.0.0.1:6689-127.0.0.1:2345")
   }
   parent_credentials = MICO_TCPIP:0
   client_authentication = false
@@ -488,7 +488,7 @@ interface AcceptingContext {
 Hello World
 client credentials: 
 interface AcceptingContext {
-  context_id = MICO_TCPIPAcceptingContext:3
+  context_id = MICO_TCPIPAcceptingContext:1
   client_principal = valuetype SimplePrincipal {
     the_type = 0
     the_name = struct PrincipalName {
@@ -571,7 +571,7 @@ interface AcceptingContext {
   }
   environmental_attributes = {
     PrinAttribute("SL3:TransportMechanism","TCPIP")
-    PrinAttribute("SL3:ChannelIdentifier","TCPIPv4:127.0.0.1:12346-127.0.0.1:2345")
+    PrinAttribute("SL3:ChannelIdentifier","TCPIPv4:127.0.0.1:12345-127.0.0.1:2345")
   }
   parent_credentials = MICO_TCPIP:0
   client_authentication = false
