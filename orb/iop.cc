@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2005 by The Mico Team
+ *  Copyright (c) 1997-2006 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -2773,6 +2773,14 @@ MICO::GIOPConn::do_read ( const CORBA::Boolean break_after_read )
 		//_cb->callback (this, GIOPConnCallback::InputReady);
 		if (!this->input_ready() || break_after_read)
 		    break;
+                // kcg: in case when we do not break above, we need to
+                // `continue' here, since otherwise we would also send
+                // the buffer to the input handler below in the code
+                // handling ordinary GIOP messages. The problem is
+                // that this time the buffer will be empty (see
+                // _inbuf->reset() call above) which will cause
+                // sending GIOP Error Message to the remote peer
+                continue;
 	      }
 
 	      if (_inflags & GIOP_FRAGMENT_BIT) {
