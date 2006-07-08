@@ -2488,9 +2488,7 @@ CORBA::ORB::invoke_async (Object_ptr obj,
     // we need to know OA before calling
     // receive_request_service_context start point
     // - it's called from init_invoke
-    ObjectAdapter *oa = NULL;
-    if (!builtin_invoke (rec, obj, req, pr))
-	oa = get_oa (obj);
+    ObjectAdapter *oa = get_oa (obj);
 #ifdef HAVE_THREADS
 	if (!cb && response_exp) 
 	    cb = new ORBAsyncCallback;
