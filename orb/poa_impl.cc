@@ -430,6 +430,7 @@ MICOPOA::ObjectId::ObjectId ()
   octets = NULL;
   oid = NULL;
   own = true;
+  idlength = 0;
 }
 
 MICOPOA::ObjectId::ObjectId (const ObjectId & id, bool copy)
