@@ -636,7 +636,7 @@ MICOSL3_SL3TCPIP::TCPIPAcceptor::enable()
                 Address* ior_addr = NULL;
                 if (hosts->length() == 1) {
                     string ior_addr_str = "inet:";
-                    ior_addr_str +=  hosts[0u].in();
+                    ior_addr_str +=  hosts[(CORBA::ULong)0].in();
                     ior_addr_str += ":" + xdec(i);
                     ior_addr = Address::parse(ior_addr_str.c_str());
                 }
@@ -671,7 +671,7 @@ MICOSL3_SL3TCPIP::TCPIPAcceptor::enable()
             Address* ior_addr = NULL;
             if (hosts->length() == 1) {
                 string ior_addr_str = "inet:";
-                ior_addr_str +=  hosts[0u].in();
+                ior_addr_str +=  hosts[(CORBA::ULong)0].in();
                 ior_addr_str += ":" + xdec(this->low_port());
                 ior_addr = Address::parse(ior_addr_str.c_str());
             }
