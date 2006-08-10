@@ -34,7 +34,7 @@ server.exe: bench.obj server.obj
 	$(LD)  $(LDFLAGS) bench.obj server.obj $(LDLIBS) /out:$@
 
 bench.h bench.cc : bench.idl $(IDLGEN)
-	$(IDL) --boa bench.idl
+	$(IDL) bench.idl
 
 clean:
 	-$(RM) /f /q 2> nul  bench.cc bench.h *.o core client server *~ .depend *.exe *.obj *.pdb
