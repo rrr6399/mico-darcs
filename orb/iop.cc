@@ -4266,7 +4266,8 @@ MICO::IIOPProxy::invoke (CORBA::ORBMsgId id, CORBA::Object_ptr obj,
 	return FALSE;
     }
 #ifdef HAVE_THREADS
-    assert(conn->active_ref());
+    CORBA::Boolean ref = conn->active_ref();
+    assert(ref);
 #endif
     if (!conn->codec()->converter()) {
 #ifdef HAVE_THREADS
@@ -4365,7 +4366,8 @@ MICO::IIOPProxy::bind (CORBA::ORBMsgId id, const char *repoid,
         return TRUE;
     }
 #ifdef HAVE_THREADS
-    assert(conn->active_ref());
+    CORBA::Boolean ref = conn->active_ref();
+    assert(ref);
 #endif
     if (MICO::Logger::IsLogged (MICO::Logger::GIOP)) {
       MICOMT::AutoDebugLock __lock;
