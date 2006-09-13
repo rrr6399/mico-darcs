@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2005 by The Mico Team
+ *  Copyright (c) 1997-2006 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -250,8 +250,8 @@ static BIO_METHOD *BIO_mico ()
 //
 #ifdef USE_OPENSSL_THREAD_FUNCTIONS
 
-static MICOMT::Mutex* S_ssl_mutex_array;
-static long* S_ssl_mutex_count;
+static MICOMT::Mutex* S_ssl_mutex_array = NULL;
+static long* S_ssl_mutex_count = NULL;
 
 void
 micomt_ssl_locking_callback(int mode, int type, const char* file, int line)
@@ -2049,12 +2049,14 @@ MICOSSL::_init ()
   // In that case, please uncomment following line
   //ssl_init;
 #ifdef USE_OPENSSL_THREAD_FUNCTIONS
-  S_ssl_mutex_array = new MICOMT::Mutex[CRYPTO_num_locks()];
-  S_ssl_mutex_count = new long[CRYPTO_num_locks()];
-  for(int i=0; i<CRYPTO_num_locks(); i++)
-      S_ssl_mutex_count[i] = 0;
-  CRYPTO_set_locking_callback((void (*)(int, int, const char*, int))micomt_ssl_locking_callback);
-  CRYPTO_set_id_callback((unsigned long (*)())micomt_ssl_thread_id_callback);
+  if (S_ssl_mutex_count == NULL && S_ssl_mutex_array == NULL) {
+      S_ssl_mutex_array = new MICOMT::Mutex[CRYPTO_num_locks()];
+      S_ssl_mutex_count = new long[CRYPTO_num_locks()];
+      for(int i=0; i<CRYPTO_num_locks(); i++)
+          S_ssl_mutex_count[i] = 0;
+      CRYPTO_set_locking_callback((void (*)(int, int, const char*, int))micomt_ssl_locking_callback);
+      CRYPTO_set_id_callback((unsigned long (*)())micomt_ssl_thread_id_callback);
+  }
 #endif // USE_OPENSSL_THREAD_FUNCTIONS
 }
 
