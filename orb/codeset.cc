@@ -56,6 +56,7 @@ namespace CORBA {
   CORBA::Codeset *Codeset::_special[CORBA::Codeset::_SpecialMax] = { 0 };
   CORBA::Boolean Codeset::_disabled = FALSE;
   CORBA::Boolean Codeset::_enabled_in_iiopprofile = FALSE;
+  CORBA::Boolean Codeset::S_initialized_ = FALSE;
 }
 
 CORBA::Codeset::Codeset()
@@ -2814,7 +2815,10 @@ CORBA::Codeset::_init ()
   // Is it really needed? E.g. for some obsolete compilers?
   // In that case, please uncomment following line
   //__cs_init;
-  PortableInterceptor::register_orb_initializer(new MICO::CodesetORBInitializer());
+  if (!S_initialized_) {
+      PortableInterceptor::register_orb_initializer(new MICO::CodesetORBInitializer());
+      S_initialized_ = TRUE;
+  }
 }
 
 struct __init_CODESET
