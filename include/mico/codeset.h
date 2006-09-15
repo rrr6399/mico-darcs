@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2005 by The Mico Team
+ *  Copyright (c) 1997-2006 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -56,6 +56,8 @@ private:
     static CORBA::Boolean _disabled;
     static CORBA::Boolean _enabled_in_iiopprofile;
     static Codeset *_special[_SpecialMax];
+    static CORBA::Boolean S_initialized_;
+
     Info *_info;
 
     Codeset ();
