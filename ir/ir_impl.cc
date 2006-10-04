@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2001 by The Mico Team
+ *  Copyright (c) 1997-2006 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -4967,7 +4967,8 @@ HomeDef_impl::describe ()
 
 CORBA::Repository *
 MICO::create_interface_repository (CORBA::ORB_ptr orb,
-				   CORBA::Boolean persistent)
+				   CORBA::Boolean persistent,
+                                   CORBA::Policy_ptr pol)
 {
   CORBA::Object_var obj = orb->resolve_initial_references ("RootPOA");
   PortableServer::POA_var rootpoa = PortableServer::POA::_narrow (obj);
@@ -4980,6 +4981,10 @@ MICO::create_interface_repository (CORBA::ORB_ptr orb,
   pl.length (2);
   pl[0] = rootpoa->create_thread_policy (PortableServer::SINGLE_THREAD_MODEL);
   pl[1] = rootpoa->create_implicit_activation_policy (PortableServer::IMPLICIT_ACTIVATION);
+  if (!CORBA::is_nil(pol)) {
+      pl.length(3);
+      pl[2] = CORBA::Policy::_duplicate(pol);
+  }
 
   PortableServer::POA_var ifrpoa;
 
@@ -5007,6 +5012,10 @@ MICO::create_interface_repository (CORBA::ORB_ptr orb,
     pl.length (3);
     pl[1] = rootpoa->create_lifespan_policy (PortableServer::PERSISTENT);
     pl[2] = rootpoa->create_id_assignment_policy (PortableServer::USER_ID);
+    if (!CORBA::is_nil(pol)) {
+        pl.length(4);
+        pl[3] = CORBA::Policy::_duplicate(pol);
+    }
 
     PortableServer::POA_var repopoa =
       rootpoa->create_POA ("InterfaceRepository", manager, pl);

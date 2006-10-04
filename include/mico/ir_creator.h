@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2001 by The Mico Team
+ *  Copyright (c) 1997-2006 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -37,7 +37,8 @@
 namespace MICO {
 
   CORBA::Repository * create_interface_repository (CORBA::ORB_ptr,
-						   CORBA::Boolean = 0);
+						   CORBA::Boolean = 0,
+                                                   CORBA::Policy_ptr = CORBA::Policy::_nil());
 
 }
 
