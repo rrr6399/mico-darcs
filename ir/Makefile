@@ -1,6 +1,6 @@
 #
 #  MICO --- an Open Source CORBA implementation
-#  Copyright (c) 1997-2001 by The Mico Team
+#  Copyright (c) 1997-2006 by The Mico Team
 #
 #  This library is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Library General Public
@@ -28,7 +28,7 @@ LDLIBS   := -lidl $(LDMICOIR) $(LDMICO) $(CONFLIBS)
 
 PLATFORM_LIBS =
 ifeq ($(HAVE_CYGWIN), yes)
-PLATFORM_LIBS := $(PLATFORM_LIBS) ../orb/libmico$(VERSION).$(SOEXT)
+PLATFORM_LIBS := $(PLATFORM_LIBS) $(CONFLIBS) ../orb/libmico$(VERSION).$(SOEXT)
 endif
 
 ifeq ($(HAVE_EXCEPTIONS), yes)
