@@ -81,7 +81,7 @@ IDLParam::set_defaults()
 
   base_dir = "";
   cpp_suffix = "cc";
-  hh_prefix.clear();
+  hh_prefix = "";
   hh_suffix = "h";
   use_quotes = false;
   feed_ir = false;
