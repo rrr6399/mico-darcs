@@ -123,12 +123,14 @@ Contained_impl::Contained_impl (Container_impl * mycontainer,
 CORBA::RepositoryId
 Contained_impl::id()
 {
+  MICOMT::AutoRDLock lock(_id_lock);
   return CORBA::string_dup( _id );
 }
 
 void
 Contained_impl::id (const char* _value)
 {
+  MICOMT::AutoWRLock lock(_id_lock);
   if (strnocasecmp (_id.in(), _value) == 0) {
     return;
   }
@@ -153,12 +155,14 @@ Contained_impl::id (const char* _value)
 char*
 Contained_impl::name()
 {
+  MICOMT::AutoRDLock lock(_name_lock);
   return CORBA::string_dup( _name );
 }
 
 void
 Contained_impl::name (const char* _value)
 {
+  MICOMT::AutoWRLock lock(_name_lock);
   if (strnocasecmp (_name.in(), _value) == 0) {
     return;
   }
@@ -183,12 +187,14 @@ Contained_impl::name (const char* _value)
 char*
 Contained_impl::version()
 {
+  MICOMT::AutoRDLock lock(_version_lock);
   return CORBA::string_dup( _version );
 }
 
 void
 Contained_impl::version( const char* _value )
 {
+  MICOMT::AutoWRLock lock(_version_lock);
   _version = _value;
 }
 
@@ -201,6 +207,7 @@ Contained_impl::defined_in()
 char*
 Contained_impl::absolute_name()
 {
+  MICOMT::AutoRDLock lock(_name_lock);
   string s;
 
   CORBA::Container_var def_in = _mycontainer->_this();
@@ -238,6 +245,8 @@ Contained_impl::move (CORBA::Container_ptr new_container,
 		      const char* new_name,
 		      const char* new_version)
 {
+  MICOMT::AutoWRLock l1(_name_lock);
+  MICOMT::AutoWRLock l2(_version_lock);
   PortableServer::ServantBase_var serv;
 
   try {
@@ -263,7 +272,7 @@ Contained_impl::move (CORBA::Container_ptr new_container,
   _mycontainer = nc;
 
   _name = new_name;
-  version (new_version);
+  _version = new_version;
 }
 
 
@@ -409,7 +418,8 @@ Container_impl::lookup (const char* search_name)
     /*
      * Search current container
      */
-
+    {
+    MICOMT::AutoRDLock lock(search_container->_names);
     for (it = search_container->_names.begin();
 	 it != search_container->_names.end(); it++) {
       if (strnocasecmp ((*it).name.c_str(), scoped_name.c_str()) == 0) {
@@ -453,7 +463,7 @@ Container_impl::lookup (const char* search_name)
       }
       return CORBA::Contained::_duplicate (cs[(CORBA::ULong)0]);
     }  
-
+    }
     /*
      * Not found. Go up to parent container.
      */
@@ -512,6 +522,7 @@ CORBA::ContainedSeq*
 Container_impl::contents( CORBA::DefinitionKind limit_type,
 			  CORBA::Boolean exclude_inherited )
 {
+  MICOMT::AutoRDLock lock(_names);
   CORBA::ContainedSeq *s = new CORBA::ContainedSeq;
 
   CORBA::ULong j = 0;
@@ -593,7 +604,8 @@ Container_impl::lookup_name( const char* search_name,
 
   if( levels_to_search == 0 )
     return s;
-  
+
+  MICOMT::AutoRDLock lock(_names);
   CORBA::ULong j = 0;
   NameMap::iterator it;
 
@@ -1203,7 +1215,7 @@ Container_impl::register_name (const char * name, Contained_impl * impl)
       _dk == CORBA::dk_Module) {
     Contained_impl * me = dynamic_cast<Contained_impl *> (this);
     assert (me);
-
+    MICOMT::AutoRDLock lock(me->_name_lock);
     if (strnocasecmp (me->_name.in(), name) == 0) {
       mico_throw (CORBA::BAD_PARAM (CORBA::OMGVMCID | 3, CORBA::COMPLETED_NO));
     }
@@ -1212,7 +1224,7 @@ Container_impl::register_name (const char * name, Contained_impl * impl)
   /*
    * Insert name
    */
-
+  MICOMT::AutoWRLock lock(_names);
   NameMap::iterator it;
 
   for (it = _names.begin(); it != _names.end(); it++) {
@@ -1234,6 +1246,7 @@ Container_impl::register_name (const char * name, Contained_impl * impl)
 void
 Container_impl::unregister_name (const char * name)
 {
+  MICOMT::AutoWRLock lock(_names);
   NameMap::iterator it;
 
   for (it = _names.begin(); it != _names.end(); it++) {
@@ -1281,6 +1294,7 @@ Container_impl::deactivate ()
    * Upon deactivation, destroy all contents
    */
 
+  MICOMT::AutoWRLock lock(_names);
   NameMap::iterator it = _names.begin();
 
   while (it != _names.end()) {
@@ -1423,7 +1437,8 @@ create_event (const char * id,
 //-- IDLType ------------------------------------------------------------
 
 IDLType_impl::IDLType_impl()
-  : IRObject_impl (CORBA::dk_none)
+  : IRObject_impl (CORBA::dk_none),
+    _type_lock(FALSE, MICOMT::Mutex::Recursive)
 {
   _type = CORBA::TypeCode::_nil();
 }
@@ -1437,6 +1452,7 @@ IDLType_impl::IDLType_impl( CORBA::TypeCode_ptr type )
 CORBA::TypeCode_ptr
 IDLType_impl::type()
 {
+  MICOMT::AutoLock lock(_type_lock);
   if (CORBA::is_nil (_type)) {
     mico_throw (CORBA::BAD_INV_ORDER ());
   }
@@ -1612,6 +1628,7 @@ Repository_impl::Repository_impl()
 CORBA::Contained_ptr
 Repository_impl::lookup_id( const char* search_id )
 {
+  MICOMT::AutoRDLock lock(_repoids);
   RepoIdMap::iterator it = _repoids.find (search_id);
   if (it != _repoids.end()) {
     return (*it).second->_this();
@@ -1674,6 +1691,7 @@ Repository_impl::get_primitive( CORBA::PrimitiveKind kind )
 void
 Repository_impl::add_anonymous_type( CORBA::IDLType_ptr type )
 {
+  MICOMT::AutoWRLock lock(_anonymous_types);
   int i = _anonymous_types.length();
   _anonymous_types.length( i + 1 );
   _anonymous_types[ i ] = CORBA::IDLType::_duplicate( type );
@@ -1736,6 +1754,7 @@ Repository_impl::create_fixed( CORBA::UShort digits,
 void
 Repository_impl::register_repoid (const char * id, Contained_impl * impl)
 {
+  MICOMT::AutoWRLock lock(_repoids);
   RepoIdMap::iterator it = _repoids.find (id);
 
   if (it != _repoids.end()) {
@@ -1748,6 +1767,7 @@ Repository_impl::register_repoid (const char * id, Contained_impl * impl)
 void
 Repository_impl::unregister_repoid (const char * id)
 {
+  MICOMT::AutoWRLock lock(_repoids);
   RepoIdMap::iterator it = _repoids.find (id);
   if (it != _repoids.end()) {
     _repoids.erase (it);
@@ -1785,6 +1805,9 @@ ModuleDef_impl::ModuleDef_impl( Container_impl * mycontainer,
 CORBA::Contained::Description *
 ModuleDef_impl::describe ()
 {
+  MICOMT::AutoRDLock l1(_name_lock);
+  MICOMT::AutoRDLock l2(_id_lock);
+  MICOMT::AutoRDLock l3(_version_lock);
   CORBA::Contained::Description * desc = new CORBA::Contained::Description;
 
   CORBA::Container_var cdef_in = defined_in();
@@ -1833,6 +1856,7 @@ ConstantDef_impl::ConstantDef_impl( Container_impl * mycontainer,
 CORBA::TypeCode_ptr
 ConstantDef_impl::type()
 {
+  MICOMT::AutoRDLock lock(_type_def_lock);
   if (CORBA::is_nil (_type_def)) {
     mico_throw (CORBA::BAD_INV_ORDER ());
   }
@@ -1842,6 +1866,7 @@ ConstantDef_impl::type()
 CORBA::IDLType_ptr
 ConstantDef_impl::type_def()
 {
+  MICOMT::AutoRDLock lock(_type_def_lock);
   if (CORBA::is_nil (_type_def)) {
     mico_throw (CORBA::BAD_INV_ORDER ());
   }
@@ -1851,6 +1876,7 @@ ConstantDef_impl::type_def()
 void
 ConstantDef_impl::type_def( CORBA::IDLType_ptr value )
 {
+  MICOMT::AutoWRLock lock(_type_def_lock);
   _type_def = CORBA::IDLType::_duplicate( value );
 }
 
@@ -1858,6 +1884,7 @@ ConstantDef_impl::type_def( CORBA::IDLType_ptr value )
 CORBA::Any*
 ConstantDef_impl::value()
 {
+  MICOMT::AutoRDLock lock(_value_lock);
   CORBA::Any *a = new CORBA::Any;
   *a = _value;
   return a;
@@ -1865,6 +1892,8 @@ ConstantDef_impl::value()
 
 void ConstantDef_impl::value( const CORBA::Any& a )
 {
+  MICOMT::AutoRDLock l1(_type_def_lock);
+  MICOMT::AutoWRLock l2(_value_lock);
   if (CORBA::is_nil (_type_def)) {
     mico_throw (CORBA::BAD_INV_ORDER (0, CORBA::COMPLETED_NO));
   }
@@ -1879,6 +1908,11 @@ void ConstantDef_impl::value( const CORBA::Any& a )
 CORBA::Contained::Description *
 ConstantDef_impl::describe ()
 {
+  MICOMT::AutoRDLock l1(_name_lock);
+  MICOMT::AutoRDLock l2(_id_lock);
+  MICOMT::AutoRDLock l3(_version_lock);
+  MICOMT::AutoRDLock l4(_type_def_lock);
+  MICOMT::AutoRDLock l5(_value_lock);
   if (CORBA::is_nil (_type_def)) {
     mico_throw (CORBA::BAD_INV_ORDER (0, CORBA::COMPLETED_NO));
   }
@@ -1924,6 +1958,9 @@ TypedefDef_impl::TypedefDef_impl (Container_impl * mycontainer,
 CORBA::Contained::Description *
 TypedefDef_impl::describe ()
 {
+  MICOMT::AutoRDLock l1(_name_lock);
+  MICOMT::AutoRDLock l2(_id_lock);
+  MICOMT::AutoRDLock l3(_version_lock);
   CORBA::Contained::Description * desc = new CORBA::Contained::Description;
 
   CORBA::Container_var cdef_in = defined_in();
@@ -1960,7 +1997,10 @@ StructDef_impl::StructDef_impl( Container_impl * mycontainer,
   : IRObject_impl (CORBA::dk_Struct),
     Contained_impl (mycontainer, myrepository, id, name, version),
     TypedefDef_impl(mycontainer, myrepository, id, name, version),
-    Container_impl (mycontainer, myrepository)
+    Container_impl (mycontainer, myrepository),
+    _members_lock(FALSE, MICOMT::Mutex::Recursive),
+    _typedirty_lock(FALSE, MICOMT::Mutex::Recursive),
+    _visited_lock(FALSE, MICOMT::Mutex::Recursive)
 {
   _typedirty = 1;
   _visited = 0;
@@ -1971,13 +2011,14 @@ CORBA::StructMemberSeq* StructDef_impl::members()
   /*
    * Make sure type code (and therefore member type codes) are up to date
    */
-
+  MICOMT::AutoLock lock(_members_lock);
   CORBA::TypeCode_var mytype = type ();
   return new CORBA::StructMemberSeq (_members);
 }
 
 void StructDef_impl::members( const CORBA::StructMemberSeq& _value )
 {
+  MICOMT::AutoRDLock l(_name_lock);
   for (CORBA::ULong i=0; i<_value.length(); i++) {
     if (!*_value[i].name.in()) {
       /*
@@ -2007,7 +2048,7 @@ void StructDef_impl::members( const CORBA::StructMemberSeq& _value )
    * If a problem happens with registering the new names, then we
    * must roll back and re-register the old ones.
    */
-
+  MICOMT::AutoLock lock(_members_lock);
   CORBA::ULong j=0;
 
   for (j=0; j<_members.length(); j++) {
@@ -2041,10 +2082,14 @@ void StructDef_impl::members( const CORBA::StructMemberSeq& _value )
 CORBA::TypeCode_ptr
 StructDef_impl::recursive_type ()
 {
+  MICOMT::AutoRDLock l2(_id_lock);
+  MICOMT::AutoLock l3(_visited_lock);
   if (_visited) {
     return CORBA::TypeCode::create_recursive_tc (_id);
   }
-
+  MICOMT::AutoLock l4(_members_lock);
+  MICOMT::AutoRDLock l5(_name_lock);
+  MICOMT::AutoRDLock l6(_id_lock);
   _visited = 1;
 
   for (CORBA::ULong i = 0; i < _members.length(); ++i) {
@@ -2063,10 +2108,13 @@ StructDef_impl::recursive_type ()
 CORBA::TypeCode_ptr
 StructDef_impl::type()
 {
+  MICOMT::AutoLock l1(_visited_lock);
   if (_visited) {
     return recursive_type ();
   }
 
+  MICOMT::AutoLock l2(_typedirty_lock);
+  MICOMT::AutoLock l3(_type_lock);
   if (_typedirty) {
     _type = recursive_type ();
     _typedirty = 0;
@@ -2092,7 +2140,11 @@ UnionDef_impl::UnionDef_impl( Container_impl * mycontainer,
   : IRObject_impl(CORBA::dk_Union),
     Contained_impl (mycontainer, myrepository, id, name, version),
     TypedefDef_impl(mycontainer, myrepository, id, name, version),
-    Container_impl (mycontainer, myrepository)
+    Container_impl (mycontainer, myrepository),
+    _discr_lock(FALSE, MICOMT::Mutex::Recursive),
+    _members_lock(FALSE, MICOMT::Mutex::Recursive),
+    _typedirty_lock(FALSE, MICOMT::Mutex::Recursive),
+    _visited_lock(FALSE, MICOMT::Mutex::Recursive)
 {
   _discr = CORBA::IDLType::_nil ();
   _typedirty = 1;
@@ -2101,16 +2153,20 @@ UnionDef_impl::UnionDef_impl( Container_impl * mycontainer,
 
 CORBA::TypeCode_ptr UnionDef_impl::discriminator_type()
 {
+  MICOMT::AutoLock lock(_discr_lock);
   return _discr->type();
 }
 
 CORBA::IDLType_ptr UnionDef_impl::discriminator_type_def()
 {
+  MICOMT::AutoLock lock(_discr_lock);
   return CORBA::IDLType::_duplicate( _discr );
 }
 
 void UnionDef_impl::discriminator_type_def( CORBA::IDLType_ptr value )
 {
+  MICOMT::AutoLock lock(_discr_lock);
+  MICOMT::AutoLock lock2(_typedirty_lock);
   _typedirty = 1;
   _discr = CORBA::IDLType::_duplicate( value );
 }
@@ -2120,7 +2176,7 @@ CORBA::UnionMemberSeq* UnionDef_impl::members()
   /*
    * Make sure type code (and therefore member type codes) are up to date
    */
-
+  MICOMT::AutoLock lock(_members_lock);
   CORBA::TypeCode_var mytype = type ();
   return new CORBA::UnionMemberSeq (_members);
 }
@@ -2128,7 +2184,7 @@ CORBA::UnionMemberSeq* UnionDef_impl::members()
 void UnionDef_impl::members( const CORBA::UnionMemberSeq& _value )
 {
   check_explicit_default_case (_value);
-
+  MICOMT::AutoRDLock l(_name_lock);
   for (CORBA::ULong i=0; i<_value.length(); i++) {
     if (!*_value[i].name.in()) {
       /*
@@ -2182,7 +2238,8 @@ void UnionDef_impl::members( const CORBA::UnionMemberSeq& _value )
    * take care at each step.
    */
 
-
+  MICOMT::AutoLock l2(_members_lock);
+  MICOMT::AutoLock l3(_typedirty_lock);
   CORBA::ULong j=0, k=0;
 
   for (j=0; j<_members.length(); j++) {
@@ -2232,12 +2289,16 @@ void UnionDef_impl::members( const CORBA::UnionMemberSeq& _value )
 CORBA::TypeCode_ptr
 UnionDef_impl::recursive_type()
 {
+  MICOMT::AutoLock l(_visited_lock);
   if (_visited) {
     return CORBA::TypeCode::create_recursive_tc (_id);
   }
 
   _visited = 1;
-
+  MICOMT::AutoLock l2(_discr_lock);
+  MICOMT::AutoLock l3(_members_lock);
+  MICOMT::AutoRDLock l4(_id_lock);
+  MICOMT::AutoRDLock l5(_name_lock);
   CORBA::TypeCode_var discr_type = _discr->type ();
 
   for (CORBA::ULong i = 0; i < _members.length(); ++i) {
@@ -2256,6 +2317,9 @@ UnionDef_impl::recursive_type()
 CORBA::TypeCode_ptr
 UnionDef_impl::type()
 {
+  MICOMT::AutoLock l(_visited_lock);
+  MICOMT::AutoLock l2(_typedirty_lock);
+  MICOMT::AutoLock l3(_type_lock);
   if (_visited) {
     return recursive_type ();
   }
@@ -2285,6 +2349,7 @@ UnionDef_impl::check_explicit_default_case (const CORBA::UnionMemberSeq &mems)
     // There was no explicit default case. So there is nothing to check
     return;
 
+  MICOMT::AutoLock l(_discr_lock);
   // Determine the number of possible values for the discriminator type
   CORBA::ULongLong num_discr_vals;
   CORBA::TypeCode_var discr_tc = _discr->type();
@@ -2327,12 +2392,14 @@ EnumDef_impl::EnumDef_impl( Container_impl * mycontainer,
 			    const char* version )
   : IRObject_impl(CORBA::dk_Enum),
     Contained_impl (mycontainer, myrepository, id, name, version),
-    TypedefDef_impl(mycontainer, myrepository, id, name, version)
+    TypedefDef_impl(mycontainer, myrepository, id, name, version),
+    _members_lock(FALSE, MICOMT::Mutex::Recursive)
 {
 }
 
 CORBA::EnumMemberSeq* EnumDef_impl::members()
 {
+  MICOMT::AutoLock l(_members_lock);
   CORBA::EnumMemberSeq *m = new CORBA::EnumMemberSeq;
   *m = _members;
   return m;
@@ -2347,7 +2414,10 @@ void EnumDef_impl::members( const CORBA::EnumMemberSeq& _value )
    * If a problem happens with registering the new names, then we
    * must roll back and re-register the old ones.
    */
-
+  MICOMT::AutoLock l(_members_lock);
+  MICOMT::AutoRDLock l2(_id_lock);
+  MICOMT::AutoRDLock l3(_name_lock);
+  MICOMT::AutoLock l4(_type_lock);
   CORBA::ULong i=0;
 
   for (i=0; i<_members.length(); i++) {
@@ -2388,18 +2458,21 @@ AliasDef_impl::AliasDef_impl( Container_impl * mycontainer,
 			      const char* version )
   : IRObject_impl(CORBA::dk_Alias),
     Contained_impl (mycontainer, myrepository, id, name, version),
-    TypedefDef_impl(mycontainer, myrepository, id, name, version)
+    TypedefDef_impl(mycontainer, myrepository, id, name, version),
+    _original_lock(FALSE, MICOMT::Mutex::Recursive)
 {
   _original = CORBA::IDLType::_nil ();
 }
 
 CORBA::IDLType_ptr AliasDef_impl::original_type_def()
 {
+  MICOMT::AutoLock l(_original_lock);
   return CORBA::IDLType::_duplicate( _original );
 }
 
 void AliasDef_impl::original_type_def( CORBA::IDLType_ptr _value )
 {
+  MICOMT::AutoLock l(_original_lock);
   check_for_bad_recursion (_value);
   _original = CORBA::IDLType::_duplicate( _value );
 }
@@ -2407,6 +2480,9 @@ void AliasDef_impl::original_type_def( CORBA::IDLType_ptr _value )
 CORBA::TypeCode_ptr
 AliasDef_impl::type()
 {
+  MICOMT::AutoLock l(_original_lock);
+  MICOMT::AutoRDLock l2(_id_lock);
+  MICOMT::AutoRDLock l3(_name_lock);
   CORBA::TypeCode_var original_type = _original->type ();
   return CORBA::TypeCode::create_alias_tc (_id, _name, original_type);
 }
@@ -2531,7 +2607,8 @@ PrimitiveDef_impl::deactivate ()
 //-- StringDef ----------------------------------------------------------
 
 StringDef_impl::StringDef_impl()
-  : IRObject_impl (CORBA::dk_String)
+  : IRObject_impl (CORBA::dk_String),
+    _bound_lock(FALSE, MICOMT::Mutex::Recursive)
 {
   _type = CORBA::TypeCode::create_string_tc( 0 );
   _bound = 0;
@@ -2539,11 +2616,14 @@ StringDef_impl::StringDef_impl()
 
 CORBA::ULong StringDef_impl::bound()
 {
+  MICOMT::AutoLock l(_bound_lock);
   return _bound;
 }
 
 void StringDef_impl::bound( CORBA::ULong _value )
 {
+  MICOMT::AutoLock l(_bound_lock);
+  MICOMT::AutoLock l2(_type_lock);
   if( _value == 0 )
     mico_throw (CORBA::BAD_PARAM());
 
@@ -2559,7 +2639,8 @@ StringDef_impl::deactivate ()
 //-- WstringDef ---------------------------------------------------------
 
 WstringDef_impl::WstringDef_impl()
-  : IRObject_impl (CORBA::dk_Wstring)
+  : IRObject_impl (CORBA::dk_Wstring),
+    _bound_lock(FALSE, MICOMT::Mutex::Recursive)
 {
   _type = CORBA::TypeCode::create_wstring_tc( 0 );
   _bound = 0;
@@ -2567,11 +2648,14 @@ WstringDef_impl::WstringDef_impl()
 
 CORBA::ULong WstringDef_impl::bound()
 {
+  MICOMT::AutoLock l(_bound_lock);
   return _bound;
 }
 
 void WstringDef_impl::bound( CORBA::ULong _value )
 {
+  MICOMT::AutoLock l(_bound_lock);
+  MICOMT::AutoLock l2(_type_lock);
   if( _value == 0 )
     mico_throw (CORBA::BAD_PARAM());
 
@@ -2588,7 +2672,9 @@ WstringDef_impl::deactivate ()
 //-- FixedDef -----------------------------------------------------------
 
 FixedDef_impl::FixedDef_impl()
-  : IRObject_impl (CORBA::dk_Fixed)
+  : IRObject_impl (CORBA::dk_Fixed),
+    _digits_lock(FALSE, MICOMT::Mutex::Recursive),
+    _scale_lock(FALSE, MICOMT::Mutex::Recursive)
 {
   _type = CORBA::TypeCode::create_fixed_tc( 0, 0 );
   _digits = 0;
@@ -2597,22 +2683,30 @@ FixedDef_impl::FixedDef_impl()
 
 CORBA::UShort FixedDef_impl::digits()
 {
+  MICOMT::AutoLock l(_digits_lock);
   return _digits;
 }
 
 void FixedDef_impl::digits( CORBA::UShort _value )
 {
+  MICOMT::AutoLock l(_digits_lock);
+  MICOMT::AutoLock l2(_type_lock);
+  MICOMT::AutoLock l3(_scale_lock);
   _digits = _value;
   _type = CORBA::TypeCode::create_fixed_tc( _digits, _scale );
 }
 
 CORBA::Short FixedDef_impl::scale()
 {
+  MICOMT::AutoLock l(_scale_lock);
   return _scale;
 }
 
 void FixedDef_impl::scale( CORBA::Short _value )
 {
+  MICOMT::AutoLock l3(_scale_lock);
+  MICOMT::AutoLock l2(_type_lock);
+  MICOMT::AutoLock l(_digits_lock);
   _scale = _value;
   _type = CORBA::TypeCode::create_fixed_tc( _digits, _scale );
 }
@@ -2625,7 +2719,9 @@ FixedDef_impl::deactivate ()
 //-- SequenceDef --------------------------------------------------------
 
 SequenceDef_impl::SequenceDef_impl()
-  : IRObject_impl (CORBA::dk_Sequence)
+  : IRObject_impl (CORBA::dk_Sequence),
+    _bound_lock(FALSE, MICOMT::Mutex::Recursive),
+    _element_type_def_lock(FALSE, MICOMT::Mutex::Recursive)
 {
   _bound = 0;
   _element_type_def = CORBA::IDLType::_nil();
@@ -2634,33 +2730,40 @@ SequenceDef_impl::SequenceDef_impl()
 CORBA::TypeCode_ptr
 SequenceDef_impl::type()
 {
+  MICOMT::AutoLock l(_element_type_def_lock);
+  MICOMT::AutoLock l2(_bound_lock);
   CORBA::TypeCode_var element_type = _element_type_def->type ();
   return CORBA::TypeCode::create_sequence_tc (_bound, element_type);
 }
 
 CORBA::ULong SequenceDef_impl::bound()
 {
+  MICOMT::AutoLock l(_bound_lock);
   return _bound;
 }
 
 void SequenceDef_impl::bound( CORBA::ULong _value )
 {
+  MICOMT::AutoLock l(_bound_lock);
   _bound = _value;
 }
 
 CORBA::TypeCode_ptr SequenceDef_impl::element_type()
 {
+  MICOMT::AutoLock l(_element_type_def_lock);
   assert( !CORBA::is_nil( _element_type_def ) );
   return _element_type_def->type();
 }
 
 CORBA::IDLType_ptr SequenceDef_impl::element_type_def()
 {
+  MICOMT::AutoLock l(_element_type_def_lock);
   return CORBA::IDLType::_duplicate( _element_type_def );
 }
 
 void SequenceDef_impl::element_type_def( CORBA::IDLType_ptr _value )
 {
+  MICOMT::AutoLock l(_element_type_def_lock);
   _element_type_def = CORBA::IDLType::_duplicate( _value );
 }
 
@@ -2672,7 +2775,9 @@ SequenceDef_impl::deactivate ()
 //-- ArrayDef -----------------------------------------------------------
 
 ArrayDef_impl::ArrayDef_impl()
-  : IRObject_impl (CORBA::dk_Array)
+  : IRObject_impl (CORBA::dk_Array),
+    _length_lock(FALSE, MICOMT::Mutex::Recursive),
+    _element_type_def_lock(FALSE, MICOMT::Mutex::Recursive)
 {
   _length = 0;
   _element_type_def = CORBA::IDLType::_nil();
@@ -2681,33 +2786,40 @@ ArrayDef_impl::ArrayDef_impl()
 CORBA::TypeCode_ptr
 ArrayDef_impl::type()
 {
+  MICOMT::AutoLock l(_element_type_def_lock);
+  MICOMT::AutoLock l2(_length_lock);
   CORBA::TypeCode_var element_type = _element_type_def->type ();
   return CORBA::TypeCode::create_array_tc (_length, element_type);
 }
 
 CORBA::ULong ArrayDef_impl::length()
 {
+  MICOMT::AutoLock l(_length_lock);
   return _length;
 }
 
 void ArrayDef_impl::length( CORBA::ULong _value )
 {
+  MICOMT::AutoLock l(_length_lock);
   _length = _value;
 }
 
 CORBA::TypeCode_ptr ArrayDef_impl::element_type()
 {
+  MICOMT::AutoLock l(_element_type_def_lock);
   assert( !CORBA::is_nil( _element_type_def ) );
   return _element_type_def->type();
 }
 
 CORBA::IDLType_ptr ArrayDef_impl::element_type_def()
 {
+  MICOMT::AutoLock l(_element_type_def_lock);
   return CORBA::IDLType::_duplicate( _element_type_def );
 }
 
 void ArrayDef_impl::element_type_def( CORBA::IDLType_ptr _value )
 {
+  MICOMT::AutoLock l(_element_type_def_lock);
   check_for_bad_recursion (_value);
   _element_type_def = CORBA::IDLType::_duplicate( _value );
 }
@@ -2726,13 +2838,16 @@ ExceptionDef_impl::ExceptionDef_impl( Container_impl * mycontainer,
 				      const char* version )
   : IRObject_impl( CORBA::dk_Exception ),
     Contained_impl (mycontainer, myrepository, id, name, version),
-    Container_impl (mycontainer, myrepository)
+    Container_impl (mycontainer, myrepository),
+    _members_lock(FALSE, MICOMT::Mutex::Recursive),
+    _type_lock(FALSE, MICOMT::Mutex::Recursive)
 {
   _type = CORBA::TypeCode::_nil ();
 }
 
 CORBA::StructMemberSeq* ExceptionDef_impl::members()
 {
+  MICOMT::AutoLock l(_members_lock);
   // update member types
   CORBA::TypeCode_var dummy = type ();
   return new CORBA::StructMemberSeq (_members);
@@ -2740,6 +2855,8 @@ CORBA::StructMemberSeq* ExceptionDef_impl::members()
 
 void ExceptionDef_impl::members( const CORBA::StructMemberSeq& _value )
 {
+  MICOMT::AutoLock l(_members_lock);
+  MICOMT::AutoRDLock l2(_name_lock);
   for (CORBA::ULong i0=0; i0<_value.length(); i0++) {
     if (!*_value[i0].name.in()) {
       /*
@@ -2799,6 +2916,10 @@ void ExceptionDef_impl::members( const CORBA::StructMemberSeq& _value )
 CORBA::TypeCode_ptr
 ExceptionDef_impl::type()
 {
+  MICOMT::AutoLock l(_type_lock);
+  MICOMT::AutoLock l2(_members_lock);
+  MICOMT::AutoRDLock l3(_id_lock);
+  MICOMT::AutoRDLock l4(_name_lock);
   for (CORBA::ULong i1 = 0; i1 < _members.length(); ++i1) {
     _members[i1].type = _members[i1].type_def->type();
   }
@@ -2810,6 +2931,10 @@ ExceptionDef_impl::type()
 CORBA::Contained::Description *
 ExceptionDef_impl::describe ()
 {
+  MICOMT::AutoRDLock l(_name_lock);
+  MICOMT::AutoRDLock l2(_id_lock);
+  MICOMT::AutoRDLock l3(_version_lock);
+  MICOMT::AutoLock l4(_type_lock);
   CORBA::Contained::Description * desc = new CORBA::Contained::Description;
 
   CORBA::Container_var cdef_in = defined_in();
@@ -2851,63 +2976,81 @@ AttributeDef_impl::AttributeDef_impl (Container_impl * mycontainer,
 				      const char* name,
 				      const char* version)
   : IRObject_impl( CORBA::dk_Attribute ),
-    Contained_impl (mycontainer, myrepository, id, name, version)
+    Contained_impl (mycontainer, myrepository, id, name, version),
+    _type_def_lock(FALSE, MICOMT::Mutex::Recursive),
+    _mode_lock(FALSE, MICOMT::Mutex::Recursive),
+    _get_exceptions_lock(FALSE, MICOMT::Mutex::Recursive),
+    _set_exceptions_lock(FALSE, MICOMT::Mutex::Recursive)
 {
   _type_def = CORBA::IDLType::_nil ();
 }
 
 CORBA::TypeCode_ptr AttributeDef_impl::type()
 {
+  MICOMT::AutoLock l(_type_def_lock);
   return _type_def->type();
 }
 
 CORBA::IDLType_ptr AttributeDef_impl::type_def()
 {
+  MICOMT::AutoLock l(_type_def_lock);
   return CORBA::IDLType::_duplicate( _type_def );
 }
 
 void AttributeDef_impl::type_def( CORBA::IDLType_ptr _value )
 {
+  MICOMT::AutoLock l(_type_def_lock);
   _type_def = CORBA::IDLType::_duplicate( _value );
 }
 
 CORBA::AttributeMode AttributeDef_impl::mode()
 {
+  MICOMT::AutoLock l(_mode_lock);
   return _mode;
 }
 
 void AttributeDef_impl::mode( CORBA::AttributeMode _value )
 {
+  MICOMT::AutoLock l(_mode_lock);
   _mode = _value;
 }
 
 CORBA::ExceptionDefSeq *
 AttributeDef_impl::get_exceptions ()
 {
+  MICOMT::AutoLock l(_get_exceptions_lock);
   return new CORBA::ExceptionDefSeq (_get_exceptions);
 }
 
 void
 AttributeDef_impl::get_exceptions (const CORBA::ExceptionDefSeq & _value)
 {
+  MICOMT::AutoLock l(_get_exceptions_lock);
   _get_exceptions = _value;
 }
 
 CORBA::ExceptionDefSeq *
 AttributeDef_impl::set_exceptions ()
 {
+  MICOMT::AutoLock l(_set_exceptions_lock);
   return new CORBA::ExceptionDefSeq (_set_exceptions);
 }
 
 void
 AttributeDef_impl::set_exceptions (const CORBA::ExceptionDefSeq & _value)
 {
+  MICOMT::AutoLock l(_set_exceptions_lock);
   _set_exceptions = _value;
 }
 
 CORBA::Contained::Description *
 AttributeDef_impl::describe ()
 {
+  MICOMT::AutoRDLock l(_name_lock);
+  MICOMT::AutoRDLock l2(_id_lock);
+  MICOMT::AutoRDLock l3(_version_lock);
+  MICOMT::AutoLock l4(_type_def_lock);
+  MICOMT::AutoLock l5(_mode_lock);
   CORBA::Contained::Description * desc = new CORBA::Contained::Description;
 
   CORBA::Container_var cdef_in = defined_in();
@@ -2938,6 +3081,13 @@ AttributeDef_impl::describe ()
 CORBA::ExtAttributeDescription *
 AttributeDef_impl::describe_attribute ()
 {
+  MICOMT::AutoRDLock l(_name_lock);
+  MICOMT::AutoRDLock l2(_id_lock);
+  MICOMT::AutoRDLock l3(_version_lock);
+  MICOMT::AutoLock l4(_type_def_lock);
+  MICOMT::AutoLock l5(_mode_lock);
+  MICOMT::AutoLock l6(_get_exceptions_lock);
+  MICOMT::AutoLock l7(_set_exceptions_lock);
   CORBA::Container_var cdef_in = defined_in();
   CORBA::Contained_var def_in = CORBA::Contained::_narrow (cdef_in);
   CORBA::String_var def_in_id;
@@ -2985,28 +3135,37 @@ OperationDef_impl::OperationDef_impl( Container_impl * mycontainer,
 				      const char* name,
 				      const char* version )
   : IRObject_impl( CORBA::dk_Operation ),
-    Contained_impl (mycontainer, myrepository, id, name, version)
+    Contained_impl (mycontainer, myrepository, id, name, version),
+    _result_def_lock(FALSE, MICOMT::Mutex::Recursive),
+    _params_lock(FALSE, MICOMT::Mutex::Recursive),
+    _mode_lock(FALSE, MICOMT::Mutex::Recursive),
+    _exceptions_lock(FALSE, MICOMT::Mutex::Recursive),
+    _contexts_lock(FALSE, MICOMT::Mutex::Recursive)
 {
   _result_def = CORBA::IDLType::_nil ();
 }
 
 CORBA::TypeCode_ptr OperationDef_impl::result()
 {
+  MICOMT::AutoLock l(_result_def_lock);
   return _result_def->type();
 }
 
 CORBA::IDLType_ptr OperationDef_impl::result_def()
 {
+  MICOMT::AutoLock l(_result_def_lock);
   return CORBA::IDLType::_duplicate( _result_def );
 }
 
 void OperationDef_impl::result_def( CORBA::IDLType_ptr _value )
 {
+  MICOMT::AutoLock l(_result_def_lock);
   _result_def = CORBA::IDLType::_duplicate( _value );
 }
 
 CORBA::ParDescriptionSeq* OperationDef_impl::params()
 {
+  MICOMT::AutoLock l(_params_lock);
   for (CORBA::ULong i=0; i<_params.length(); i++) {
     _params[i].type = _params[i].type_def->type ();
   }
@@ -3016,42 +3175,57 @@ CORBA::ParDescriptionSeq* OperationDef_impl::params()
 
 void OperationDef_impl::params( const CORBA::ParDescriptionSeq& _value )
 {
+  MICOMT::AutoLock l(_params_lock);
   _params = _value;
 }
 
 CORBA::OperationMode OperationDef_impl::mode()
 {
+  MICOMT::AutoLock l(_mode_lock);
   return _mode;
 }
 
 void OperationDef_impl::mode( CORBA::OperationMode _value )
 {
+  MICOMT::AutoLock l(_mode_lock);
   _mode = _value;
 }
 
 CORBA::ContextIdSeq* OperationDef_impl::contexts()
 {
+  MICOMT::AutoLock l(_contexts_lock);
   return new CORBA::ContextIdSeq (_contexts);
 }
 
 void OperationDef_impl::contexts( const CORBA::ContextIdSeq& _value )
 {
+  MICOMT::AutoLock l(_contexts_lock);
   _contexts = _value;
 }
 
 CORBA::ExceptionDefSeq* OperationDef_impl::exceptions()
 {
+  MICOMT::AutoLock l(_exceptions_lock);
   return new CORBA::ExceptionDefSeq (_exceptions);
 }
 
 void OperationDef_impl::exceptions( const CORBA::ExceptionDefSeq& _value )
 {
+  MICOMT::AutoLock l(_exceptions_lock);
   _exceptions = _value;
 }
 
 CORBA::Contained::Description *
 OperationDef_impl::describe ()
 {
+  MICOMT::AutoRDLock l(_name_lock);
+  MICOMT::AutoRDLock l2(_id_lock);
+  MICOMT::AutoRDLock l3(_version_lock);
+  MICOMT::AutoLock l4(_result_def_lock);
+  MICOMT::AutoLock l5(_mode_lock);
+  MICOMT::AutoLock l6(_contexts_lock);
+  MICOMT::AutoLock l7(_exceptions_lock);
+
   CORBA::Contained::Description * desc = new CORBA::Contained::Description;
 
   CORBA::Container_var cdef_in = defined_in();
@@ -3095,7 +3269,8 @@ OperationDef_impl::describe ()
 
 InterfaceDef_impl::InterfaceDef_impl()
   : IRObject_impl( CORBA::dk_none ),
-    Contained_impl(0 , 0, "", "", "")
+    Contained_impl(0 , 0, "", "", ""),
+    _base_interfaces_lock(FALSE, MICOMT::Mutex::Recursive)
 {
 }
 
@@ -3106,19 +3281,22 @@ InterfaceDef_impl::InterfaceDef_impl( Container_impl * mycontainer,
 				      const char* version )
   : IRObject_impl( CORBA::dk_Interface ),
     Container_impl (mycontainer, myrepository),
-    Contained_impl (mycontainer, myrepository, id, name, version)
+    Contained_impl (mycontainer, myrepository, id, name, version),
+    _base_interfaces_lock(FALSE, MICOMT::Mutex::Recursive)
 {
 }
 
 CORBA::InterfaceDefSeq*
 InterfaceDef_impl::base_interfaces()
 {
+  MICOMT::AutoLock l(_base_interfaces_lock);
   return new CORBA::InterfaceDefSeq (_base_interfaces);
 }
 
 void
 InterfaceDef_impl::base_interfaces( const CORBA::InterfaceDefSeq& _value )
 {
+  MICOMT::AutoLock l(_base_interfaces_lock);
   for (CORBA::ULong i=0; i<_value.length(); i++) {
     if (_dk == CORBA::dk_AbstractInterface &&
 	_value[i]->def_kind() != CORBA::dk_AbstractInterface) {
@@ -3150,6 +3328,8 @@ InterfaceDef_impl::base_interfaces( const CORBA::InterfaceDefSeq& _value )
 CORBA::Boolean
 InterfaceDef_impl::is_a( const char* interface_id )
 {
+  MICOMT::AutoRDLock l(_id_lock);
+  MICOMT::AutoLock l2(_base_interfaces_lock);
   if( strcmp( _id, interface_id ) == 0 )
     return TRUE;
 
@@ -3175,6 +3355,10 @@ InterfaceDef_impl::is_a( const char* interface_id )
 CORBA::InterfaceDef::FullInterfaceDescription*
 InterfaceDef_impl::describe_interface()
 {
+  MICOMT::AutoRDLock l(_name_lock);
+  MICOMT::AutoRDLock l2(_id_lock);
+  MICOMT::AutoRDLock l3(_version_lock);
+  MICOMT::AutoLock l4(_base_interfaces_lock);
   CORBA::InterfaceDef::FullInterfaceDescription *desc =
     new CORBA::InterfaceDef::FullInterfaceDescription;
   
@@ -3224,7 +3408,11 @@ InterfaceDef_impl::describe_interface()
 CORBA::InterfaceAttrExtension::ExtFullInterfaceDescription*
 InterfaceDef_impl::describe_ext_interface()
 {
-  CORBA::InterfaceAttrExtension::ExtFullInterfaceDescription *desc =
+  MICOMT::AutoRDLock l(_name_lock);
+  MICOMT::AutoRDLock l2(_id_lock);
+  MICOMT::AutoRDLock l3(_version_lock);
+  MICOMT::AutoLock l4(_base_interfaces_lock);
+   CORBA::InterfaceAttrExtension::ExtFullInterfaceDescription *desc =
     new CORBA::InterfaceAttrExtension::ExtFullInterfaceDescription;
   
   desc->name = _name;
@@ -3408,6 +3596,10 @@ InterfaceDef_impl::create_operation( const char* id,
 CORBA::Contained::Description *
 InterfaceDef_impl::describe ()
 {
+  MICOMT::AutoRDLock l(_name_lock);
+  MICOMT::AutoRDLock l2(_id_lock);
+  MICOMT::AutoRDLock l3(_version_lock);
+  MICOMT::AutoLock l4(_base_interfaces_lock);
   CORBA::Contained::Description * desc = new CORBA::Contained::Description;
 
   CORBA::Container_var cdef_in = defined_in();
@@ -3441,6 +3633,8 @@ InterfaceDef_impl::describe ()
 CORBA::TypeCode_ptr
 InterfaceDef_impl::type()
 {
+  MICOMT::AutoRDLock l(_name_lock);
+  MICOMT::AutoRDLock l2(_id_lock);
   return CORBA::TypeCode::create_interface_tc (_id.in(), _name.in());
 }
 
@@ -3491,7 +3685,9 @@ ValueMemberDef_impl::ValueMemberDef_impl ( Container_impl * mycontainer,
 					   const char* name,
 					   const char* version )
   : IRObject_impl( CORBA::dk_ValueMember ),
-    Contained_impl (mycontainer, myrepository, id, name, version)
+    Contained_impl (mycontainer, myrepository, id, name, version),
+    _type_def_lock(FALSE, MICOMT::Mutex::Recursive),
+    _access_lock(FALSE, MICOMT::Mutex::Recursive)
 {
   _type_def = CORBA::IDLType::_nil ();
 }
@@ -3499,36 +3695,46 @@ ValueMemberDef_impl::ValueMemberDef_impl ( Container_impl * mycontainer,
 CORBA::TypeCode_ptr
 ValueMemberDef_impl::type()
 {
+  MICOMT::AutoLock l(_type_def_lock);
   return _type_def->type();
 }
 
 CORBA::IDLType_ptr
 ValueMemberDef_impl::type_def()
 {
+  MICOMT::AutoLock l(_type_def_lock);
   return CORBA::IDLType::_duplicate (_type_def);
 }
 
 void
 ValueMemberDef_impl::type_def( CORBA::IDLType_ptr _new_value )
 {
+  MICOMT::AutoLock l(_type_def_lock);
   _type_def = CORBA::IDLType::_duplicate (_new_value);
 }
 
 CORBA::Visibility
 ValueMemberDef_impl::access()
 {
+  MICOMT::AutoLock l(_access_lock);
   return _access;
 }
 
 void
 ValueMemberDef_impl::access( CORBA::Visibility _new_value )
 {
+  MICOMT::AutoLock l(_access_lock);
   _access = _new_value;
 }
 
 CORBA::Contained::Description *
 ValueMemberDef_impl::describe ()
 {
+  MICOMT::AutoRDLock l(_name_lock);
+  MICOMT::AutoRDLock l2(_id_lock);
+  MICOMT::AutoRDLock l3(_version_lock);
+  MICOMT::AutoLock l4(_type_def_lock);
+  MICOMT::AutoLock l5(_access_lock);
   CORBA::Contained::Description * desc = new CORBA::Contained::Description;
 
   CORBA::Container_var cdef_in = defined_in();
@@ -3566,7 +3772,16 @@ ValueDef_impl::ValueDef_impl ( Container_impl * mycontainer,
 			       const char* version )
   : IRObject_impl( CORBA::dk_Value ),
     Container_impl (mycontainer, myrepository),
-    Contained_impl (mycontainer, myrepository, id, name, version)
+    Contained_impl (mycontainer, myrepository, id, name, version),
+    _is_custom_lock(FALSE, MICOMT::Mutex::Recursive),
+    _is_abstract_lock(FALSE, MICOMT::Mutex::Recursive),
+    _base_value_lock(FALSE, MICOMT::Mutex::Recursive),
+    _is_truncatable_lock(FALSE, MICOMT::Mutex::Recursive),
+    _abstract_base_values_lock(FALSE, MICOMT::Mutex::Recursive),
+    _supported_interfaces_lock(FALSE, MICOMT::Mutex::Recursive),
+    _initializers_lock(FALSE, MICOMT::Mutex::Recursive),
+    _typedirty_lock(FALSE, MICOMT::Mutex::Recursive),
+    _visited_lock(FALSE, MICOMT::Mutex::Recursive)
 {
   _typedirty = 1;
   _visited = 0;
@@ -3575,12 +3790,14 @@ ValueDef_impl::ValueDef_impl ( Container_impl * mycontainer,
 CORBA::InterfaceDefSeq*
 ValueDef_impl::supported_interfaces()
 {
+  MICOMT::AutoLock l(_supported_interfaces_lock);
   return new CORBA::InterfaceDefSeq (_supported_interfaces);
 }
 
 void
 ValueDef_impl::supported_interfaces( const CORBA::InterfaceDefSeq& _new_value )
 {
+  MICOMT::AutoLock l(_supported_interfaces_lock);
   bool supports_concrete = false;
 
   for (CORBA::ULong i=0; i<_new_value.length(); i++) {
@@ -3602,12 +3819,14 @@ ValueDef_impl::supported_interfaces( const CORBA::InterfaceDefSeq& _new_value )
 CORBA::ExtInitializerSeq*
 ValueDef_impl::ext_initializers()
 {
+  MICOMT::AutoLock l(_initializers_lock);
   return new CORBA::ExtInitializerSeq (_initializers);
 }
 
 void
 ValueDef_impl::ext_initializers( const CORBA::ExtInitializerSeq& _new_value )
 {
+  MICOMT::AutoLock l(_initializers_lock);
   _initializers = _new_value;
   for (CORBA::ULong i = 0; i < _initializers.length(); ++i) {
     for (CORBA::ULong j = 0; j < _initializers[i].members.length(); ++j) {
@@ -3620,6 +3839,7 @@ ValueDef_impl::ext_initializers( const CORBA::ExtInitializerSeq& _new_value )
 CORBA::InitializerSeq*
 ValueDef_impl::initializers()
 {
+  MICOMT::AutoLock l(_initializers_lock);
   CORBA::InitializerSeq * is = new CORBA::InitializerSeq;
   is->length (_initializers.length());
 
@@ -3634,6 +3854,7 @@ ValueDef_impl::initializers()
 void
 ValueDef_impl::initializers( const CORBA::InitializerSeq& _new_value )
 {
+  MICOMT::AutoLock l(_initializers_lock);
   CORBA::ExtInitializerSeq eis;
   eis.length (_new_value.length());
 
@@ -3648,12 +3869,15 @@ ValueDef_impl::initializers( const CORBA::InitializerSeq& _new_value )
 CORBA::ValueDef_ptr
 ValueDef_impl::base_value()
 {
+  MICOMT::AutoLock l(_base_value_lock);
   return CORBA::ValueDef::_duplicate (_base_value);
 }
 
 void
 ValueDef_impl::base_value( CORBA::ValueDef_ptr _new_value )
 {
+  MICOMT::AutoLock l(_base_value_lock);
+  MICOMT::AutoLock l2(_typedirty_lock);
   _typedirty = 1;
   _base_value = CORBA::ValueDef::_duplicate (_new_value);
 }
@@ -3661,24 +3885,29 @@ ValueDef_impl::base_value( CORBA::ValueDef_ptr _new_value )
 CORBA::ValueDefSeq*
 ValueDef_impl::abstract_base_values()
 {
+  MICOMT::AutoLock l(_abstract_base_values_lock);
   return new CORBA::ValueDefSeq (_abstract_base_values);
 }
 
 void
 ValueDef_impl::abstract_base_values( const CORBA::ValueDefSeq& _new_value )
 {
+  MICOMT::AutoLock l(_abstract_base_values_lock);
   _abstract_base_values = _new_value;
 }
 
 CORBA::Boolean
 ValueDef_impl::is_abstract()
 {
+  MICOMT::AutoLock l(_is_abstract_lock);
   return _is_abstract;
 }
 
 void
 ValueDef_impl::is_abstract( CORBA::Boolean _new_value )
 {
+  MICOMT::AutoLock l(_is_abstract_lock);
+  MICOMT::AutoLock l2(_typedirty_lock);
   _typedirty = 1;
   _is_abstract = _new_value;
 }
@@ -3686,12 +3915,15 @@ ValueDef_impl::is_abstract( CORBA::Boolean _new_value )
 CORBA::Boolean
 ValueDef_impl::is_custom()
 {
+  MICOMT::AutoLock l(_is_custom_lock);
   return _is_custom;
 }
 
 void
 ValueDef_impl::is_custom( CORBA::Boolean _new_value )
 {
+  MICOMT::AutoLock l(_is_custom_lock);
+  MICOMT::AutoLock l2(_typedirty_lock);
   _typedirty = 1;
   _is_custom = _new_value;
 }
@@ -3699,12 +3931,15 @@ ValueDef_impl::is_custom( CORBA::Boolean _new_value )
 CORBA::Boolean
 ValueDef_impl::is_truncatable()
 {
+  MICOMT::AutoLock l(_is_truncatable_lock);
   return _is_truncatable;
 }
 
 void
 ValueDef_impl::is_truncatable( CORBA::Boolean _new_value )
 {
+  MICOMT::AutoLock l(_is_truncatable_lock);
+  MICOMT::AutoLock l2(_typedirty_lock);
   _typedirty = 1;
   _is_truncatable = _new_value;
 }
@@ -3712,6 +3947,10 @@ ValueDef_impl::is_truncatable( CORBA::Boolean _new_value )
 CORBA::Boolean
 ValueDef_impl::is_a( const char* value_id )
 {
+  MICOMT::AutoRDLock l(_id_lock);
+  MICOMT::AutoLock l2(_abstract_base_values_lock);
+  MICOMT::AutoLock l3(_supported_interfaces_lock);
+  MICOMT::AutoLock l4(_base_value_lock);
   if( strcmp( _id, value_id ) == 0 )
     return TRUE;
 
@@ -3736,6 +3975,15 @@ ValueDef_impl::is_a( const char* value_id )
 CORBA::ValueDef::FullValueDescription*
 ValueDef_impl::describe_value()
 {
+  MICOMT::AutoRDLock l(_name_lock);
+  MICOMT::AutoRDLock l2(_id_lock);
+  MICOMT::AutoRDLock l3(_version_lock);
+  MICOMT::AutoLock l4(_is_abstract_lock);
+  MICOMT::AutoLock l5(_is_custom_lock);
+  MICOMT::AutoLock l6(_is_truncatable_lock);
+  MICOMT::AutoLock l7(_abstract_base_values_lock);
+  MICOMT::AutoLock l8(_supported_interfaces_lock);
+  MICOMT::AutoLock l9(_base_value_lock);
   CORBA::ValueDef::FullValueDescription *desc =
     new CORBA::ValueDef::FullValueDescription;
   
@@ -3813,6 +4061,16 @@ ValueDef_impl::describe_value()
 CORBA::ExtValueDef::ExtFullValueDescription*
 ValueDef_impl::describe_ext_value()
 {
+  MICOMT::AutoRDLock l(_name_lock);
+  MICOMT::AutoRDLock l2(_id_lock);
+  MICOMT::AutoRDLock l3(_version_lock);
+  MICOMT::AutoLock l4(_is_abstract_lock);
+  MICOMT::AutoLock l5(_is_custom_lock);
+  MICOMT::AutoLock l6(_is_truncatable_lock);
+  MICOMT::AutoLock l7(_abstract_base_values_lock);
+  MICOMT::AutoLock l8(_supported_interfaces_lock);
+  MICOMT::AutoLock l9(_base_value_lock);
+  MICOMT::AutoLock l10(_initializers_lock);
   CORBA::ExtValueDef::ExtFullValueDescription *desc =
     new CORBA::ExtValueDef::ExtFullValueDescription;
   
@@ -3892,6 +4150,7 @@ ValueDef_impl::create_value_member( const char* id,
 				    CORBA::IDLType_ptr type,
 				    CORBA::Visibility accessval )
 {
+  MICOMT::AutoLock l(_typedirty_lock);
   CORBA::ContainedSeq_var cs;
 
   /*
@@ -4079,6 +4338,14 @@ ValueDef_impl::create_operation( const char* id,
 CORBA::TypeCode_ptr
 ValueDef_impl::recursive_type ()
 {
+  MICOMT::AutoRDLock l(_name_lock);
+  MICOMT::AutoRDLock l2(_id_lock);
+  MICOMT::AutoLock l3(_visited_lock);
+  MICOMT::AutoLock l4(_base_value_lock);
+  MICOMT::AutoLock l5(_is_abstract_lock);
+  MICOMT::AutoLock l6(_is_custom_lock);
+  MICOMT::AutoLock l7(_is_truncatable_lock);
+  MICOMT::AutoRDLock l8(_names);
   if (_visited) {
     return CORBA::TypeCode::create_recursive_tc (_id);
   }
@@ -4140,6 +4407,9 @@ ValueDef_impl::recursive_type ()
 CORBA::TypeCode_ptr
 ValueDef_impl::type()
 {
+  MICOMT::AutoLock l(_visited_lock);
+  MICOMT::AutoLock l2(_typedirty_lock);
+  MICOMT::AutoLock l3(_type_lock);
   if (_visited) {
     return recursive_type ();
   }
@@ -4156,6 +4426,15 @@ ValueDef_impl::type()
 CORBA::Contained::Description *
 ValueDef_impl::describe ()
 {
+  MICOMT::AutoRDLock l(_name_lock);
+  MICOMT::AutoRDLock l2(_id_lock);
+  MICOMT::AutoRDLock l3(_version_lock);
+  MICOMT::AutoLock l4(_base_value_lock);
+  MICOMT::AutoLock l5(_is_abstract_lock);
+  MICOMT::AutoLock l6(_is_custom_lock);
+  MICOMT::AutoLock l7(_is_truncatable_lock);
+  MICOMT::AutoLock l8(_supported_interfaces_lock);
+  MICOMT::AutoLock l9(_abstract_base_values_lock);
   CORBA::Contained::Description * desc = new CORBA::Contained::Description;
 
   CORBA::Container_var cdef_in = defined_in();
@@ -4217,7 +4496,9 @@ ValueBoxDef_impl::ValueBoxDef_impl ( Container_impl * mycontainer,
 				     const char* version )
   : IRObject_impl (CORBA::dk_ValueBox),
     Contained_impl (mycontainer, myrepository, id, name, version),
-    TypedefDef_impl(mycontainer, myrepository, id, name, version)
+    TypedefDef_impl(mycontainer, myrepository, id, name, version),
+    _original_type_def_lock(FALSE, MICOMT::Mutex::Recursive),
+    _typedirty_lock(FALSE, MICOMT::Mutex::Recursive)
 {
   _original_type_def = CORBA::IDLType::_nil ();
   _typedirty = 1;
@@ -4226,12 +4507,15 @@ ValueBoxDef_impl::ValueBoxDef_impl ( Container_impl * mycontainer,
 CORBA::IDLType_ptr
 ValueBoxDef_impl::original_type_def()
 {
+  MICOMT::AutoLock l(_original_type_def_lock);
   return CORBA::IDLType::_duplicate (_original_type_def);
 }
 
 void
 ValueBoxDef_impl::original_type_def( CORBA::IDLType_ptr _new_value )
 {
+  MICOMT::AutoLock l(_original_type_def_lock);
+  MICOMT::AutoLock l2(_typedirty_lock);
   _typedirty = 1;
   _original_type_def = CORBA::IDLType::_duplicate (_new_value);
 }
@@ -4239,6 +4523,8 @@ ValueBoxDef_impl::original_type_def( CORBA::IDLType_ptr _new_value )
 CORBA::TypeCode_ptr
 ValueBoxDef_impl::type()
 {
+  MICOMT::AutoLock l(_original_type_def_lock);
+  MICOMT::AutoLock l2(_typedirty_lock);
   if (_typedirty) {
     CORBA::TypeCode_var original_type = _original_type_def->type ();
     _type = CORBA::TypeCode::create_value_box_tc (_id, _name, original_type);
@@ -4963,6 +5249,7 @@ HomeDef_impl::describe ()
  *
  * We use the single-thread model, because at least recursive typecode
  * computation must be serialized.
+ * kcg: this should be fixed now, so we use threaded model
  */
 
 CORBA::Repository *
@@ -4978,12 +5265,11 @@ MICO::create_interface_repository (CORBA::ORB_ptr orb,
    */
 
   CORBA::PolicyList pl;
-  pl.length (2);
-  pl[0] = rootpoa->create_thread_policy (PortableServer::SINGLE_THREAD_MODEL);
-  pl[1] = rootpoa->create_implicit_activation_policy (PortableServer::IMPLICIT_ACTIVATION);
+  pl.length (1);
+  pl[0] = rootpoa->create_implicit_activation_policy (PortableServer::IMPLICIT_ACTIVATION);
   if (!CORBA::is_nil(pol)) {
-      pl.length(3);
-      pl[2] = CORBA::Policy::_duplicate(pol);
+      pl.length(2);
+      pl[1] = CORBA::Policy::_duplicate(pol);
   }
 
   PortableServer::POA_var ifrpoa;
@@ -5009,12 +5295,12 @@ MICO::create_interface_repository (CORBA::ORB_ptr orb,
   CORBA::Repository_ptr r;
 
   if (persistent) {
-    pl.length (3);
-    pl[1] = rootpoa->create_lifespan_policy (PortableServer::PERSISTENT);
-    pl[2] = rootpoa->create_id_assignment_policy (PortableServer::USER_ID);
+    pl.length (2);
+    pl[0] = rootpoa->create_lifespan_policy (PortableServer::PERSISTENT);
+    pl[1] = rootpoa->create_id_assignment_policy (PortableServer::USER_ID);
     if (!CORBA::is_nil(pol)) {
-        pl.length(4);
-        pl[3] = CORBA::Policy::_duplicate(pol);
+        pl.length(3);
+        pl[2] = CORBA::Policy::_duplicate(pol);
     }
 
     PortableServer::POA_var repopoa =

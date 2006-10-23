@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2001 by The Mico Team
+ *  Copyright (c) 1997-2006 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -65,6 +65,9 @@ protected:
   Container_impl * _mycontainer;
   Repository_impl * _myrepository;
 
+  MICOMT::RWLock _id_lock;
+  MICOMT::RWLock _name_lock;
+  MICOMT::RWLock _version_lock;
 public:
   Contained_impl (Container_impl * mycontainer,
 		  Repository_impl * myrepository,
@@ -105,7 +108,7 @@ protected:
   };
 
   typedef std::list<_name_entry> NameMap;
-  NameMap _names;
+  MICOMT::RWLocked<NameMap> _names;
 
   /*
    * This is a hole in the spec, which doesn't mention any ordering
@@ -283,6 +286,7 @@ class IDLType_impl :
 {
 protected:
   CORBA::TypeCode_var _type;
+  MICOMT::Mutex _type_lock;
   void check_for_bad_recursion ( CORBA::IDLType_ptr );
   
 public:
@@ -326,12 +330,12 @@ protected:
   CORBA::PrimitiveDef_var _pk_valuebase;
 
   typedef SequenceTmpl<CORBA::IDLType_var,MICO_TID_DEF> IDLTypeSeq;
-  IDLTypeSeq _anonymous_types;
+  MICOMT::RWLocked<IDLTypeSeq> _anonymous_types;
   
   void add_anonymous_type( CORBA::IDLType_ptr type );
 
   typedef std::map<std::string, Contained_impl *, std::less<std::string> > RepoIdMap;
-  RepoIdMap _repoids;
+  MICOMT::RWLocked<RepoIdMap> _repoids;
 
 public:
   Repository_impl ();
@@ -393,6 +397,8 @@ class ConstantDef_impl :
 protected:
   CORBA::IDLType_var _type_def;
   CORBA::Any         _value;
+  MICOMT::RWLock _type_def_lock;
+  MICOMT::RWLock _value_lock;
 public:
   ConstantDef_impl( Container_impl * mycontainer,
 		    Repository_impl * myrepository,
@@ -437,6 +443,9 @@ protected:
   CORBA::StructMemberSeq _members;
   CORBA::Boolean _typedirty;
   CORBA::Boolean _visited;
+  MICOMT::Mutex _members_lock;
+  MICOMT::Mutex _typedirty_lock;
+  MICOMT::Mutex _visited_lock;
 
 public:
   StructDef_impl( Container_impl * mycontainer,
@@ -466,6 +475,10 @@ protected:
   CORBA::UnionMemberSeq _members;
   CORBA::Boolean _typedirty;
   CORBA::Boolean _visited;
+  MICOMT::Mutex _discr_lock;
+  MICOMT::Mutex _members_lock;
+  MICOMT::Mutex _typedirty_lock;
+  MICOMT::Mutex _visited_lock;
 
 private:
   void check_explicit_default_case( const CORBA::UnionMemberSeq &mem );
@@ -497,6 +510,7 @@ class EnumDef_impl :
 {
 protected:
   CORBA::EnumMemberSeq _members;
+  MICOMT::Mutex _members_lock;
 public:
   EnumDef_impl( Container_impl * mycontainer,
 		Repository_impl * myrepository,
@@ -518,6 +532,7 @@ class AliasDef_impl :
 {
 protected:
   CORBA::IDLType_var _original;
+  MICOMT::Mutex _original_lock;
 
 public:
   AliasDef_impl( Container_impl * mycontainer,
@@ -576,6 +591,7 @@ class StringDef_impl :
 {
 protected:
   CORBA::ULong _bound;
+  MICOMT::Mutex _bound_lock;
 public:
   StringDef_impl();
   CORBA::ULong bound();
@@ -594,6 +610,7 @@ class WstringDef_impl :
 {
 protected:
   CORBA::ULong _bound;
+  MICOMT::Mutex _bound_lock;
 public:
   WstringDef_impl();
   CORBA::ULong bound();
@@ -613,6 +630,8 @@ class FixedDef_impl :
 protected:
   CORBA::UShort _digits;
   CORBA::Short  _scale;
+  MICOMT::Mutex _digits_lock;
+  MICOMT::Mutex _scale_lock;
 public:
   FixedDef_impl();
   CORBA::UShort digits();
@@ -634,7 +653,8 @@ class SequenceDef_impl :
 protected:
   CORBA::ULong        _bound;
   CORBA::IDLType_var  _element_type_def;
-
+  MICOMT::Mutex _bound_lock;
+  MICOMT::Mutex _element_type_def_lock;
 public:
   SequenceDef_impl();
   CORBA::ULong bound();
@@ -658,7 +678,8 @@ class ArrayDef_impl :
 protected:
   CORBA::ULong        _length;
   CORBA::IDLType_var  _element_type_def;
-
+  MICOMT::Mutex _length_lock;
+  MICOMT::Mutex _element_type_def_lock;
 public:
   ArrayDef_impl();
   CORBA::ULong length();
@@ -683,7 +704,8 @@ class ExceptionDef_impl :
 protected:
   CORBA::StructMemberSeq            _members;
   CORBA::TypeCode_var               _type;
-
+  MICOMT::Mutex _members_lock;
+  MICOMT::Mutex _type_lock;
 public:
   ExceptionDef_impl( Container_impl * mycontainer,
 		     Repository_impl * myrepository,
@@ -711,7 +733,10 @@ protected:
   CORBA::AttributeMode   _mode;
   CORBA::ExceptionDefSeq _get_exceptions;
   CORBA::ExceptionDefSeq _set_exceptions;
-  
+  MICOMT::Mutex _type_def_lock;
+  MICOMT::Mutex _mode_lock;
+  MICOMT::Mutex _get_exceptions_lock;
+  MICOMT::Mutex _set_exceptions_lock;
 public:
   AttributeDef_impl( Container_impl * mycontainer,
 		     Repository_impl * myrepository,
@@ -749,7 +774,11 @@ protected:
   CORBA::OperationMode     _mode;
   CORBA::ExceptionDefSeq   _exceptions;
   CORBA::ContextIdSeq      _contexts;
-  
+  MICOMT::Mutex _result_def_lock;
+  MICOMT::Mutex _params_lock;
+  MICOMT::Mutex _mode_lock;
+  MICOMT::Mutex _exceptions_lock;
+  MICOMT::Mutex _contexts_lock;
 public:
   OperationDef_impl( Container_impl * mycontainer,
 		     Repository_impl * myrepository,
@@ -783,7 +812,7 @@ class InterfaceDef_impl :
 {
 protected:
   CORBA::InterfaceDefSeq _base_interfaces;
-  
+  MICOMT::Mutex _base_interfaces_lock;
 public:
   InterfaceDef_impl();
   InterfaceDef_impl( Container_impl * mycontainer,
@@ -869,7 +898,8 @@ class ValueMemberDef_impl :
 protected:
   CORBA::IDLType_var _type_def;
   CORBA::Visibility _access;
-
+  MICOMT::Mutex _type_def_lock;
+  MICOMT::Mutex _access_lock;
 public:
   ValueMemberDef_impl ( Container_impl * mycontainer,
 			Repository_impl * myrepository,
@@ -905,7 +935,15 @@ protected:
   CORBA::ExtInitializerSeq _initializers;
   CORBA::Boolean _typedirty;
   CORBA::Boolean _visited;
-
+  MICOMT::Mutex _is_custom_lock;
+  MICOMT::Mutex _is_abstract_lock;
+  MICOMT::Mutex _base_value_lock;
+  MICOMT::Mutex _is_truncatable_lock;
+  MICOMT::Mutex _abstract_base_values_lock;
+  MICOMT::Mutex _supported_interfaces_lock;
+  MICOMT::Mutex _initializers_lock;
+  MICOMT::Mutex _typedirty_lock;
+  MICOMT::Mutex _visited_lock;
 public:
   ValueDef_impl ( Container_impl * mycontainer,
 		  Repository_impl * myrepository,
@@ -983,7 +1021,8 @@ class ValueBoxDef_impl :
 protected:
   CORBA::IDLType_var _original_type_def;
   CORBA::Boolean _typedirty;
-
+  MICOMT::Mutex _original_type_def_lock;
+  MICOMT::Mutex _typedirty_lock;
 public:
   ValueBoxDef_impl ( Container_impl * mycontainer,
 		     Repository_impl * myrepository,
