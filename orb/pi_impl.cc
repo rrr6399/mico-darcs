@@ -1677,7 +1677,7 @@ PInterceptor::ORBInitInfo_impl::ORBInitInfo_impl
     orb_id_ = id;
     CORBA::ULong length = 0;
     args_.length(length);
-    for (int i=1; i<argc; i++) {
+    for (int i=0; i<argc; i++) {
 	args_.length(length+1);
 	args_[length] = (const char *)argv[i];
 	length++;
