@@ -145,7 +145,14 @@ mico$(VERSION).lib mico$(VERSION).dll : mico$(VERSION).def
 		/def:mico$(VERSION).def /implib:mico$(VERSION).lib 
 	$(MAKE) /f makefile.win32 copy
 
-copy:
+!ifdef VC8
+mt:
+	$(MT) -manifest mico$(VERSION).dll.manifest -outputresource:mico$(VERSION).dll;#1
+!else
+mt:
+!endif
+
+copy: mt
 	$(COPY) mico$(VERSION).dll ..\win32-bin
 	$(COPY) mico$(VERSION).lib ..\win32-bin\lib
 	$(COPY) gendef.exe ..\win32-bin
@@ -154,8 +161,7 @@ mico$(VERSION).def: $(DLL_OBJS) gendef.exe
 	gendef.exe mico$(VERSION).def mico$(VERSION) $(DLL_OBJS)
 
 gendef.exe:	gendef.cc
-	cl /nologo /O2 /EHsc /TP gendef.cc
-	copy /y gendef.exe ..\win32-bin
+	cl /nologo /O2 /EHsc /TP  gendef.cc
 
 clean:
 	-$(RM) *.txt

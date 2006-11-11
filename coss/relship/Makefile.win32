@@ -55,9 +55,21 @@ SHARED_OBJS = $(SRCS:.cc=.obj)
 all: lib prg
 
 lib:  $(SHARED_OBJS)
+!ifdef VC8
+mt:
+	$(MT) -manifest traversald.exe.manifest -outputresource:traversald.exe;#1
+	$(MT) -manifest noded.exe.manifest -outputresource:noded.exe;#1
+	$(MT) -manifest containmentd.exe.manifest -outputresource:containmentd.exe;#1
+	$(MT) -manifest referenced.exe.manifest -outputresource:referenced.exe;#1
+	$(MT) -manifest randomd.exe.manifest -outputresource:randomd.exe;#1
+	$(MT) -manifest proxyd.exe.manifest -outputresource:proxyd.exe;#1
+!else
+mt:
+!endif
+
 prg:  traversald.exe noded.exe containmentd.exe referenced.exe randomd.exe proxyd.exe
 
-install: 
+install: prg mt
 	$(COPY) traversald.exe ..\..\win32-bin
 	$(COPY) noded.exe ..\..\win32-bin
 	$(COPY) containmentd.exe ..\..\win32-bin

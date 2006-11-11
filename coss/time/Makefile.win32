@@ -34,10 +34,17 @@ SRV_OBJS=TimeService_help.obj TimeService_impl.obj TimeService_tio.obj TimeServi
 
 all: lib prg
 
+!ifdef VC8
+mt:
+	$(MT) -manifest timed.exe.manifest -outputresource:timed.exe;#1
+!else
+mt:
+!endif
+
 prg: timed.exe
 lib: CosTime.h CosTime.obj
 
-install: 
+install: prg mt
 	$(COPY) timed.exe ..\..\win32-bin
 
 idlcompile: CosTime.cc

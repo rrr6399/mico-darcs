@@ -46,8 +46,15 @@ all: lib prg
 
 lib: $(SHARED_LIB_OBJS)
 
+!ifdef VC8
+mt:
+	$(MT) -manifest traderd.exe.manifest -outputresource:traderd.exe;#1
+!else
+mt:
+!endif
+
 prg: traderd.exe
-install:
+install: prg mt
      $(COPY) traderd.exe ..\..\win32-bin
 
 traderd.exe: $(SRV_OBJS) 

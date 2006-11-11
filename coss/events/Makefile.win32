@@ -35,12 +35,22 @@ all: lib prg
 
 lib:  CosEventComm.obj CosEventChannelAdmin.obj
 
+
+!ifdef VC8
+mt:
+	$(MT) -manifest eventd.exe.manifest -outputresource:eventd.exe;#1
+!else
+mt:
+!endif
+
 prg: eventd.exe
+
 	
 eventd.exe: $(SRV_OBJS) 
 	$(LINK)  $(LDFLAGS) $(SRV_OBJS) $(LDLIBS) /out:eventd.exe
 
-install: eventd.exe
+
+install: prg mt
 	$(COPY) eventd.exe ..\..\win32-bin
 
 CosEventComm.h CosEventComm.cc: ..\..\include\coss\CosEventComm.idl 

@@ -22,6 +22,7 @@
 !ifndef MANUALLY_SET_CONFIG_ON
 MANUALLY_SET_CONFIG_ON = 1
 
+
 #################################################################################################################
 # MANUALLY SET Configuration
 #
@@ -77,5 +78,10 @@ MPATH           =
 
 # uncomment following line if you want to compile MICO with MicoCCM support
 #USE_CCM = 1
+
+
+#setting for detecting the right version of VSTUDIO
+!include vstudio.win32
+
 
 !endif

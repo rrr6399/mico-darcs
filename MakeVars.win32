@@ -25,7 +25,7 @@
 #
 
 !include MakefileConfig.win32
-
+!include vstudio.win32
 
 
 # Adapted by Sorin Mustaca <sorinm@home.ro>
@@ -66,7 +66,6 @@ CSIV2_FLAGS = /DUSE_CSIV2
 !if defined(USE_SL3)
 CSIV2_FLAGS = /DUSE_CSIV2 /DUSE_SL3
 !endif
-
 !endif
 
 # PTHREADS adaptation by Sorin Mustaca <sorinm@home.ro>
@@ -115,9 +114,9 @@ PTHREADS_EXC= __CLEANUP_CXX
 
 PTHREADS_LIB=/LIBPATH:$(RELATIVE)\win32-bin\lib $(PTHREADS_LIB)
 !ifdef NEED_THREADID_OPERATORS
-PTHREADS_FLAGS=  /DNEED_THREADID_OPERATORS /W3 /Yd /DHAVE_PTHREADS /DHAVE_THREADS /I$(PTHREADS_PATH) /DPtW32NoCatchWarn /D$(PTHREADS_EXC) /D_WIN32_WINNT=0x400
+PTHREADS_FLAGS=  /DNEED_THREADID_OPERATORS /W3 /DHAVE_PTHREADS /DHAVE_THREADS /I$(PTHREADS_PATH) /DPtW32NoCatchWarn /D$(PTHREADS_EXC) /D_WIN32_WINNT=0x400
 !else
-PTHREADS_FLAGS=  /W3 /Yd /DHAVE_PTHREADS /DHAVE_THREADS /I$(PTHREADS_PATH) /DPtW32NoCatchWarn /D$(PTHREADS_EXC) /D_WIN32_WINNT=0x400
+PTHREADS_FLAGS=  /W3 /DHAVE_PTHREADS /DHAVE_THREADS /I$(PTHREADS_PATH) /DPtW32NoCatchWarn /D$(PTHREADS_EXC) /D_WIN32_WINNT=0x400
 !endif
 
 MPATH= $(MPATH);$(PTHREADS_PATH)
@@ -161,20 +160,20 @@ DELETE		= $(RM) *.obj *.exe *.def *.dmp *.dll *.lib *.exp  *.pdb *.pch *.ilk
 
 
 !ifdef RELEASE_BUILD
-CXXFLAGS        = /nologo /Ox /EHsc /GX /GR /TP /MD $(SSL_FLAGS) $(CSIV2_FLAGS) $(PTHREADS_FLAGS) $(CCM_FLAGS)
-CCFLAGS         = /nologo /GX /TC /MD $(SSL_FLAGS) $(CSIV2_FLAGS) $(PTHREADS_FLAGS) $(CCM_FLAGS)
-LINKFLAGS       = /nologo /subsystem:console /OPT:REF /incremental:no $(SSL_LIBS) $(PTHREADS_LIB)
-LINKDLLFLAGS    = /nologo /dll /incremental:no /OPT:REF $(SSL_LIBS) $(PTHREADS_LIB)
+CXXFLAGS        = /nologo /Ox /EHsc /GR /TP /MD $(SSL_FLAGS) $(CSIV2_FLAGS) $(PTHREADS_FLAGS) $(CCM_FLAGS) $(CXXVC)
+CCFLAGS         = /nologo /TC /MD $(SSL_FLAGS) $(CSIV2_FLAGS) $(PTHREADS_FLAGS) $(CCM_FLAGS) $(CXXVC)
+LINKFLAGS       = /nologo /subsystem:console /OPT:REF /incremental:no $(SSL_LIBS) $(PTHREADS_LIB) $(MANIFEST)
+LINKDLLFLAGS    = /nologo /dll /incremental:no /OPT:REF $(SSL_LIBS) $(PTHREADS_LIB) $(MANIFEST)
 !else
 # In Debug there are a lot of security checks: /GS,/GZ . Consult MSDN for details.
 
 # If you need faster compilation and execution times in DEBUG, just comment the var below
 #SECURITY_CHECKS	= /GS /GZ /Ge /RTCu /RTCs
 #HAVE_MEMCHECK = 1
-CXXFLAGS        = /nologo $(SECURITY_CHECKS) /EHsc /GX /GR /TP /Zi /MDd $(SSL_FLAGS) $(CSIV2_FLAGS) $(PTHREADS_FLAGS) $(CCM_FLAGS)
-CCFLAGS         = /nologo $(SECURITY_CHECKS) /GX /TC /Zi /MDd $(SSL_FLAGS) $(CSIV2_FLAGS) $(PTHREADS_FLAGS) $(CCM_FLAGS)
-LINKFLAGS       = /nologo /debug /subsystem:console /incremental:no $(SSL_LIBS) $(PTHREADS_LIB)
-LINKDLLFLAGS    = /nologo /debug /dll /incremental:no $(SSL_LIBS) $(PTHREADS_LIB)
+CXXFLAGS        = /nologo $(SECURITY_CHECKS) /Od /EHsc /GR /TP /Zi /MDd $(SSL_FLAGS) $(CSIV2_FLAGS) $(PTHREADS_FLAGS) $(CCM_FLAGS) $(CXXVC)
+CCFLAGS         = /nologo $(SECURITY_CHECKS) /TC /Zi /MDd $(SSL_FLAGS) $(CSIV2_FLAGS) $(PTHREADS_FLAGS) $(CCM_FLAGS) $(CXXVC)
+LINKFLAGS       = /nologo /debug /subsystem:console /incremental:no $(SSL_LIBS) $(PTHREADS_LIB) $(MANIFEST)
+LINKDLLFLAGS    = /nologo /debug /dll /incremental:no $(SSL_LIBS) $(PTHREADS_LIB) $(MANIFEST)
 !endif
 # uncomment if you have tcl installed and declare path
 # HAVE_TCL	= 1

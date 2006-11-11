@@ -32,10 +32,19 @@ IMRCLOBJS = imr_client.obj
 
 STATIC_OBJS = $(SRCS:.cc=.obj)
 
+!ifdef VC8
+mt:
+	$(MT) -manifest micod.exe.manifest -outputresource:micod.exe;#1
+	$(MT) -manifest imr.exe.manifest -outputresource:imr.exe;#1
+!else
+mt:
+!endif
 
 prg: micod.exe imr.exe
-	copy micod.exe ..\win32-bin
-	copy imr.exe ..\win32-bin
+
+install: prg mt
+	$(COPY) micod.exe ..\win32-bin
+	$(COPY) imr.exe ..\win32-bin
 
 imr.exe: $(IMRCLOBJS)
 	$(LINK) $(LINKFLAGS) /subsystem:console /out:imr.exe $(IMRCLOBJS) \

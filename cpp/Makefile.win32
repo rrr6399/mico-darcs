@@ -30,12 +30,18 @@ SRCS = cexp.c cccp.c config.c alloca.c
 
 STATIC_OBJS = $(SRCS:.c=.obj)
 
+!ifdef VC8
+mt:
+	$(MT) -manifest mico-cpp.exe.manifest -outputresource:mico-cpp.exe;#1
+!else
+mt:
+!endif
 
-prg: mico-cpp.exe
+prg: mico-cpp.exe mt
 	$(COPY) mico-cpp.exe ..\win32-bin
 
 install: prg
-	$(COPY) mico-cpp.exe ..\win32-bin
+
 
 
 mico-cpp.exe: $(STATIC_OBJS)
