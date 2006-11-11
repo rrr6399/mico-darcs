@@ -23,18 +23,30 @@
 
 !include MakefileConfig.win32
 
-all: dirs helper system path install
+all: dirs checkvc checknetwork helper system path install
+
+checkvc:
+	call admin\checkvstudio.bat
+
+checknetwork:
+#@-call admin\checknetwork.bat
 
 dirs:
-	-@mkdir .\win32-bin
-    -@mkdir .\win32-bin\lib
+	@-mkdir .\win32-bin
+	@-mkdir .\win32-bin\lib
 
 sslsystem: 
-	 admin\checkSSL.bat 
+	@call admin\checkSSL.bat
 
+
+# use here the same parameters as in the makefile of PTHREADS: VC,VCE,VSE
+!ifdef RELEASE_BUILD
 pthreadsystem:
-	@rem use here the same parameters as in the makefile of PTHREADS: VC,VCE,VSE
-	admin\checkPTHREADS.bat VC
+		admin\checkPTHREADS.bat VC Release
+!else
+pthreadsystem:
+		admin\checkPTHREADS.bat VC Debug
+!endif
 
 !include MakeVars.win32
 
@@ -52,9 +64,9 @@ ALLDIRS = orb cpp idl ir coss tools
 
 
 demo: demo/Makefile.win32 
-    cd demo
-    $(MAKE) /f Makefile.win32
-    cd ..
+	cd demo
+	$(MAKE) /f Makefile.win32
+	cd ..
 
 path:
 	@echo Starting the build process
@@ -69,38 +81,38 @@ path:
 !endif
 
 system:    sslsystem pthreadsystem
-    cd ir
-	    	$(MAKE) /f Makefile.win32 lib
-    cd ..\orb
-	    	$(MAKE)  /f Makefile.win32 mico$(VERSION).dll
-    cd ..\idl
+	cd ir
+	    $(MAKE) /f Makefile.win32 lib
+	cd ..\orb
+	    $(MAKE)  /f Makefile.win32 mico$(VERSION).dll
+	cd ..\idl
             $(MAKE)  /f Makefile.win32 lib
-    cd ..\cpp
+	cd ..\cpp
             $(MAKE)  /f Makefile.win32 prg
-    cd ..\idl
+	cd ..\idl
             $(MAKE)  /f Makefile.win32 prg
-    cd ..\ir
+	cd ..\ir
             $(MAKE)  /f Makefile.win32 prg
-    cd ..\daemon
+	cd ..\daemon
             $(MAKE)  /f Makefile.win32 prg
-    cd ..\coss
+	cd ..\coss
             $(MAKE)  /f Makefile.win32 all
 !if defined(USE_CCM)
-    cd ..\ccm
+	cd ..\ccm
             $(MAKE) /f Makefile.win32 all
 !endif
-    cd ..\tools
-        $(MAKE)  /f Makefile.win32 all
-    cd ..
+	cd ..\tools
+	    $(MAKE)  /f Makefile.win32 all
+	cd ..
 
 install: system
-    @echo Installing new binaries
-    for %i in ( $(TOINSTALLDIRS) ) ; do cmd /c "cd %%i & $(MAKE)  /f Makefile.win32 install"
+	@echo Installing new binaries
+	for %i in ( $(TOINSTALLDIRS) ) ; do cmd /c "cd %%i & $(MAKE)  /f Makefile.win32 install"
 
 clean:
-    @for %i in ( $(PRGDIRS) demo daemon ) ; do cmd /c "cd %%i & $(MAKE)  /f Makefile.win32 clean"
+	@for %i in ( $(PRGDIRS) demo daemon ) ; do cmd /c "cd %%i & $(MAKE)  /f Makefile.win32 clean"
 !ifdef HAVE_THREADS
-    @cd contrib\pthreads
+	@cd contrib\pthreads
 	@$(MAKE) clean
 	@cd ..\..
 !endif
@@ -136,6 +148,7 @@ helper: admin\cntfiles.exe
 
 
 admin\cntfiles.exe: admin\cntfiles.cpp
-		 cl.exe /DNDEBUG  /Ox admin\cntfiles.cpp /Foadmin\cntfiles.obj /link /OUT:admin\cntfiles.exe
+	echo $(CXXVC)
+	cl.exe $(CXXVC) /DNDEBUG  /Ox admin\cntfiles.cpp /Foadmin\cntfiles.obj /link /OUT:admin\cntfiles.exe
 
 	

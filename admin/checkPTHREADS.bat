@@ -20,10 +20,16 @@ goto build
 :build
 	@cd contrib\pthreads
 
-	rem Enable the next line for you VSTUDIO version
-	rem @call "%VS71COMNTOOLS%vsvars32.bat"
+	@rem Adapt the line below for your VSTUDIO version
+	@rem or use devenv instead of nmake to include manifests automatically in vc8
 
-	@nmake clean %1
+
+	@IF NOT EXIST "%VS80COMNTOOLS%vsvars32.bat" (
+		@nmake clean %1
+	) ELSE (
+		@devenv.exe pthread.sln /Build %2
+	)
+
 	@copy pthread%1%VER%.dll ..\..\win32-bin
 	@copy pthread%1%VER%.lib ..\..\win32-bin\lib
 	@cd ..\..

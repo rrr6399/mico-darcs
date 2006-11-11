@@ -74,7 +74,6 @@ prg: sublib micocoss$(VERSION).lib subprg
 DLL = "CREATE_DLL = 1"
 
 sublib:
-	
 	cd naming 
 	$(MAKE) $(DLL) /f Makefile.win32  lib
 
@@ -141,7 +140,14 @@ micocoss$(VERSION).lib: $(DLL_OBJS) micocoss$(VERSION).def
 micocoss$(VERSION).def:
 	..\win32-bin\gendef.exe micocoss$(VERSION).def micocoss$(VERSION) $(DLL_OBJS)
 
-install:
+!ifdef VC8
+mt:
+	$(MT) -manifest micocoss$(VERSION).dll.manifest -outputresource:micocoss$(VERSION).dll;#1
+!else
+mt:
+!endif
+
+install: mt
 	$(COPY) micocoss$(VERSION).lib ..\win32-bin\lib
 	$(COPY) micocoss$(VERSION).dll ..\win32-bin
 

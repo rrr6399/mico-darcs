@@ -33,11 +33,19 @@ SRCS = $(SRCS) ir3_skel.cc ir3.cc
 
 OBJS = $(SRCS:.cc=.obj)
 
+!ifdef VC8
+mt:
+	$(MT) -manifest ird.exe.manifest -outputresource:ird.exe;#1
+!else
+mt:
+!endif
+
 prg: lib ird.exe
 
 !ifdef USE_CCM
 lib: ir$(VERSION).lib
 install: lib prg
+	$(MT) -manifest ird.exe.manifest -outputresource:ird.exe;#1
 	$(COPY) ird.exe ..\win32-bin
 	$(COPY) ir$(VERSION).lib ..\win32-bin\lib
 	
@@ -49,7 +57,7 @@ lib: ir$(VERSION).lib
 
 ir$(VERSION).lib :  $(OBJS)
 	lib.exe $(OBJS)  /out:ir$(VERSION).lib 
-	copy ir$(VERSION).lib ..\win32-bin\lib
+	$(COPY) ir$(VERSION).lib ..\win32-bin\lib
 !else
 
 lib:
@@ -60,7 +68,7 @@ ird.exe: $(OBJS) main.obj
 
 !endif
 	
-install: prg
+install: prg mt
 	$(COPY) ird.exe ..\win32-bin
 !ifdef USE_CCM
 	$(COPY) ir$(VERSION).lib ..\win32-bin\lib

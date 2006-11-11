@@ -55,7 +55,18 @@ lib:  $(SHARED_OBJS)
 prg:	extcontainmentd.exe extreferenced.exe extnoded.exe \
 	streamd.exe extcriteriad.exe
 
-install:prg
+!ifdef VC8
+mt:
+	$(MT) -manifest extcontainmentd.exe.manifest -outputresource:extcontainmentd.exe;#1
+	$(MT) -manifest extreferenced.exe.manifest -outputresource:extreferenced.exe;#1
+	$(MT) -manifest extnoded.exe.manifest -outputresource:extnoded.exe;#1
+	$(MT) -manifest streamd.exe.manifest -outputresource:streamd.exe;#1
+	$(MT) -manifest extcriteriad.exe.manifest -outputresource:extcriteriad.exe;#1
+!else
+mt:
+!endif
+
+install: prg mt
 	$(COPY) extcontainmentd.exe ..\..\win32-bin
 	$(COPY) extreferenced.exe ..\..\win32-bin
 	$(COPY) extnoded.exe ..\..\win32-bin

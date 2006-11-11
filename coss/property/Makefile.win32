@@ -38,9 +38,16 @@ all: lib prg
 
 lib: $(SHARED_OBJS) 
 
+!ifdef VC8
+mt:
+	$(MT) -manifest propertyd.exe.manifest -outputresource:propertyd.exe;#1
+!else
+mt:
+!endif
+
 prg: propertyd.exe
 
-install: propertyd.exe 
+install: prg mt
 	$(COPY) propertyd.exe ..\..\win32-bin
 
 propertyd.exe: $(SRV_OBJS) 

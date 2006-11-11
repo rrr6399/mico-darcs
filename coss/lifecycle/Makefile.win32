@@ -56,9 +56,21 @@ SHARED_OBJS = $(SRCS:.cc=.obj)
 all: lib prg
 
 lib:  $(SHARED_OBJS)
+!ifdef VC8
+mt:
+	$(MT) -manifest factoryfinderd.exe.manifest -outputresource:factoryfinderd.exe;#1
+	$(MT) -manifest genericfactory.exe.manifest -outputresource:genericfactory.exe;#1
+	$(MT) -manifest lifecontainmentd.exe.manifest -outputresource:lifecontainmentd.exe;#1
+	$(MT) -manifest lifereferenced.exe.manifest -outputresource:lifereferenced.exe;#1
+	$(MT) -manifest lifenoded.exe.manifest -outputresource:lifenoded.exe;#1
+	$(MT) -manifest operationd.exe.manifest -outputresource:operationd.exe;#1
+	$(MT) -manifest lifecriteriad.exe.manifest -outputresource:lifecriteriad.exe;#1
+!else
+mt:
+!endif
 prg:	factoryfinderd.exe genericfactory.exe lifecontainmentd.exe lifereferenced.exe lifenoded.exe \
 	operationd.exe lifecriteriad.exe
-install: prg
+install: prg mt
 	$(COPY) factoryfinderd.exe ..\..\win32-bin
 	$(COPY) genericfactory.exe ..\..\win32-bin
 	$(COPY) lifecontainmentd.exe ..\..\win32-bin

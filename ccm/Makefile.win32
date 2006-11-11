@@ -47,12 +47,21 @@ all: lib prg
 
 lib: micoccm$(VERSION).lib
 	copy micoccm$(VERSION).lib ..\win32-bin\lib
+!ifdef VC8
+mt:
+	$(MT) -manifest mico-ccm.exe.manifest -outputresource:mico-ccm.exe;#1
+	$(MT) -manifest mico-ccmd.exe.manifest -outputresource:mico-ccmd.exe;#1
+	$(MT) -manifest componentserver.exe.manifest -outputresource:componentserver.exe;#1
+	$(MT) -manifest ccmload.exe.manifest -outputresource:ccmload.exe;#1
+!else
+mt:
+!endif	
 
-prg: lib mico-ccm.exe mico-ccmd.exe componentserver.exe ccmload.exe
-	copy mico-ccm.exe ..\win32-bin
-	copy mico-ccmd.exe ..\win32-bin
-	copy componentserver.exe ..\win32-bin
-	copy ccmload.exe ..\win32-bin
+prg: lib mt mico-ccm.exe mico-ccmd.exe componentserver.exe ccmload.exe
+	$(COPY) mico-ccm.exe ..\win32-bin
+	$(COPY) mico-ccmd.exe ..\win32-bin
+	$(COPY) componentserver.exe ..\win32-bin
+	$(COPY) ccmload.exe ..\win32-bin
 
 # Map-classes can't be passed between dlls (or dlls and apps)
 # so map-based GetOpt has to be linked explicitely

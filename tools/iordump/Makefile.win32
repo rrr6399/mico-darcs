@@ -34,12 +34,22 @@ OBJS = iordump.obj
 # normal rules
 
 all:  prg
+
+
+!ifdef VC8
+mt:
+	$(MT) -manifest iordump.exe.manifest -outputresource:iordump.exe;#1
+!else
+mt:
+!endif
+
+
 prg: iordump.exe 
 
 iordump.exe: $(OBJS) 
 	$(LD)  $(LDFLAGS) /LIBPATH:..\..\idl $(OBJS) idl$(VERSION).lib $(LDLIBS) /out:$@
 
-install: prg
+install: prg mt
 	$(COPY) iordump.exe ..\..\win32-bin
 
 # cleaning

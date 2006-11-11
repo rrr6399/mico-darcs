@@ -26,9 +26,13 @@
 @echo #No library files were found in win32-bin.Disabling OPENSSL build >> makevars.win32.ssl
 @echo #>> makevars.win32.ssl
 @echo #HAVE_SSL = 0 >> makevars.win32.ssl
+@goto finish
 
 :end
 @echo MICO SSL support enabled
 @echo #AUTOMATICALLY GENERATED FILE. DO NOT MODIFY > makevars.win32.ssl
 @echo HAVE_SSL = 1 >> makevars.win32.ssl
+@
+
+:finish
 @

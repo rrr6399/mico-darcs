@@ -38,10 +38,16 @@ SRV_OBJS  =  Naming_impl.obj nsd.obj CosNaming_skel.obj
 all: lib prg
 
 lib: CosNaming.h CosNaming.obj
-
+!ifdef VC8
+mt:
+	$(MT) -manifest nsd.exe.manifest -outputresource:nsd.exe;#1
+	$(MT) -manifest nsadmin.exe.manifest -outputresource:nsadmin.exe;#1
+!else
+mt:
+!endif
 
 prg: nsd.exe nsadmin.exe 
-install: 
+install: prg mt
 	$(COPY) nsd.exe ..\..\win32-bin
 	$(COPY) nsadmin.exe ..\..\win32-bin
 
