@@ -50,7 +50,14 @@ GENERATED = $(GEN) $(JGEN)
 
 # normal rules
 
-all: diiproxy.exe $(JOBJS)
+!ifdef VC8
+mt:
+	$(MT) -manifest diiproxy.exe.manifest -outputresource:diiproxy.exe;#1
+!else
+mt:
+!endif
+
+all: diiproxy.exe mt $(JOBJS)
 
 w95-all: all
 
