@@ -26,7 +26,20 @@ CXXFLAGS = $(CXXFLAGS) /I. /I..\..\include /I..\..\include\windows
 
 MICOLIBS = ..\..\win32-bin\lib\mico.lib
 
-all: diiclient.exe diiserver.exe siiclient.exe siiserver.exe
+!ifdef VC8
+mt:
+	$(MT) -manifest diiclient.exe.manifest -outputresource:diiclient.exe;#1
+	$(MT) -manifest diiserver.exe.manifest -outputresource:diiserver.exe;#1
+	$(MT) -manifest siiclient.exe.manifest -outputresource:siiclient.exe;#1
+	$(MT) -manifest siiserver.exe.manifest -outputresource:siiserver.exe;#1
+!else
+mt:
+!endif
+
+all: prg mt
+
+
+prg: diiclient.exe diiserver.exe siiclient.exe siiserver.exe
 
 
 diiclient.exe: diiclient.obj
