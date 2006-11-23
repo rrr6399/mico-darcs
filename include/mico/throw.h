@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2001 by The Mico Team
+ *  Copyright (c) 1997-2006 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -51,8 +51,10 @@
 static void
 mico_throw (const CORBA::Exception &ex)
 {
+#if !(defined(_WIN32) && defined(_MSC_VER))
     // avoid compiler warnings ...
     (void)mico_throw;
+#endif // !(_WIN32 && _MSC_VER)
 
 #ifdef HAVE_EXCEPTIONS
 
@@ -92,8 +94,10 @@ mico_throw (const CORBA::Exception &ex)
 static void
 mico_sii_throw (CORBA::StaticRequest *r, ...)
 {
+#if !(defined(_WIN32) && defined(_MSC_VER))
     // avoid compiler warnings ...
     (void)mico_sii_throw;
+#endif // !(_WIN32 && _MSC_VER)
 
 #ifdef HAVE_EXCEPTIONS
     if (r->exception()) {
