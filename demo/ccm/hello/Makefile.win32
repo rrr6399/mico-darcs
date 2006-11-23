@@ -1,7 +1,15 @@
 !include ..\..\..\MakeVars.win32
 !include ..\MakeVars.win32
 
-all: client.exe server.exe
+!ifdef VC8
+mt:
+	$(MT) -manifest client.exe.manifest -outputresource:client.exe;#1
+	$(MT) -manifest server.exe.manifest -outputresource:server.exe;#1
+!else
+mt:
+!endif
+
+all: client.exe server.exe mt
 
 client.exe: hello.obj client.obj
 	$(LINK) $(LINKFLAGS) client.obj hello.obj /subsystem:console /libpath:..\..\..\win32-bin\lib \

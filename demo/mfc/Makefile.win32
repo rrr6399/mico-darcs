@@ -27,7 +27,7 @@ MICO_HOME = ..\..\win32-bin
 
 CXX        = cl.exe
 CXXFLAGS   = $(CXXFLAGS) /nologo /D_DEBUG /DWIN32 /D_AFXDLL /GX /Zi
-LINKFLAGS  = /nologo /debug /subsystem:windows /incremental:no
+LINKFLAGS  = $(MANIFEST) /nologo /debug /subsystem:windows /incremental:no
 RC         = rc.exe
 
 
@@ -45,7 +45,15 @@ CXXFLAGS = $(CXXFLAGS) /I.
 MICOLIBS = $(MICO_HOME)\lib\mico.lib
 # sander  ..\..\orb\static.obj
 
-all: client.exe server.exe
+all: client.exe server.exe mt
+
+!ifdef VC8
+mt:
+	$(MT) -manifest client.exe.manifest -outputresource:client.exe;#1
+	$(MT) -manifest server.exe.manifest -outputresource:server.exe;#1
+!else
+mt:
+!endif
 
 w95-all: all
 

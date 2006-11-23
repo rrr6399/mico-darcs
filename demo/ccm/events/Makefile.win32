@@ -1,7 +1,17 @@
 !include ..\..\..\MakeVars.win32
 !include ..\MakeVars.win32
 
-all: channel.dll consumer.dll producer.dll client.exe
+!ifdef VC8
+mt:
+	$(MT) -manifest channel.dll.manifest -outputresource:channel.dll;#1
+	$(MT) -manifest consumer.dll.manifest -outputresource:consumer.dll;#1
+	$(MT) -manifest producer.dll.manifest -outputresource:producer.dll;#1
+	$(MT) -manifest client.exe.manifest -outputresource:client.exe;#1
+!else
+mt:
+!endif
+
+all: channel.dll consumer.dll producer.dll client.exe mt
 
 channel.dll: channel_impl.obj channel_ccm.obj channel.obj message_impl.obj message.obj
 	del channel.dll

@@ -18,7 +18,7 @@ IDLFLAGS     = --no-codegen-c++ --codegen-midl
 WIN32_BIN    = ..\..\..\win32-bin
 #
 CXXFLAGS     = /I. /I$(WIN32_BIN)\include /I$(WIN32_BIN)\include\windows -GX
-LDFLAGS      = $(WIN32_BIN)\lib\mico$(VERSION).lib wsock32.lib /nologo /debug /subsystem:console
+LDFLAGS      = $(MANIFEST) $(WIN32_BIN)\lib\mico$(VERSION).lib wsock32.lib /nologo /debug /subsystem:console
 
 .cxx.obj:
     $(CC) $(cdebug) $(cflags) $(cvarsdll) $(CXXFLAGS) /c $<
@@ -60,6 +60,20 @@ account_i.obj : account_i.c
 account_p.obj : account_p.c account.h
 
 #Link the proxy DLL.
+
+!ifdef VC8
+	account.dll: account_p.obj account_i.obj dlldata.obj account.def
+    	$(link) $(linkdebug) -DLL -OUT:account.dll -DEF:account.def \
+    	account_p.obj account_i.obj dlldata.obj rpcrt4.lib uuid.lib kernel32.lib
+	$(MT) -manifest account.dll.manifest -outputresource:account.dll;#1
+!else
+	account.dll: account_p.obj account_i.obj dlldata.obj account.def
+    	$(link) $(linkdebug) -DLL -OUT:account.dll -DEF:account.def \
+    	account_p.obj account_i.obj dlldata.obj rpcrt4.lib uuid.lib kernel32.lib
+
+!endif
+
+
 account.dll: account_p.obj account_i.obj dlldata.obj account.def
     $(link) $(linkdebug) -DLL -OUT:account.dll -DEF:account.def \
     account_p.obj account_i.obj dlldata.obj rpcrt4.lib uuid.lib kernel32.lib
@@ -77,14 +91,34 @@ serverCOM.obj: serverCOM.cxx account.h account_i.c
 #        caccount.obj error.obj account_i.obj serverCOM.obj  rpcrt4.lib $(ole2libsdll)
 
 #Link the server application.
-serverCOM.exe: caccount.obj error.obj account_i.obj serverCOM.obj
+
+!ifdef VC8
+	serverCOM.exe: caccount.obj error.obj account_i.obj serverCOM.obj
         $(link) -OUT:serverCOM.exe $(LDFLAGS) ..\account2\account.obj \
         caccount.obj error.obj account_i.obj serverCOM.obj  rpcrt4.lib $(ole2libsdll)
+	$(MT) -manifest serverCOM.exe.manifest -outputresource:serverCOM.exe;#1
+!else
+	serverCOM.exe: caccount.obj error.obj account_i.obj serverCOM.obj
+        $(link) -OUT:serverCOM.exe $(LDFLAGS) ..\account2\account.obj \
+        caccount.obj error.obj account_i.obj serverCOM.obj  rpcrt4.lib $(ole2libsdll)
+!endif
+
+
+
 
 #Build the files for the client application.
 clientCOM.obj: clientCOM.cxx account.h account_i.c
 
 #Link the client application.
-clientCOM.exe: clientCOM.obj error.obj account_i.obj
+
+
+!ifdef VC8
+	clientCOM.exe: clientCOM.obj error.obj account_i.obj
         $(link) $(linkdebug) $(conlflags) -OUT:clientCOM.exe \
         clientCOM.obj error.obj account_i.obj rpcrt4.lib $(ole2libsdll)
+	$(MT) -manifest clientCOM.exe.manifest -outputresource:clientCOM.exe;#1
+!else
+	clientCOM.exe: clientCOM.obj error.obj account_i.obj
+        $(link) $(linkdebug) $(conlflags) -OUT:clientCOM.exe \
+        clientCOM.obj error.obj account_i.obj rpcrt4.lib $(ole2libsdll)
+!endif
