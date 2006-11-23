@@ -137,7 +137,7 @@ This value of 3 retries is settable in the registry, and
 we recommend this be changed to 0.
 Note that changing this parameter only takes effect after a reboot.
 
-To set this manually, use REGEDIT:
+To set this manually, use REGEDIT (AT YOUR OWN RISK!):
 
 Windows NT
 ------------------
