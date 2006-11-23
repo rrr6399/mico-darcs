@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2005 by The Mico Team
+ *  Copyright (c) 1997-2006 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -382,7 +382,7 @@ CORBA::IOR::add_profile (IORProfile *prof)
     int i = tags.size();
     while (--i >= 0 && *prof < *tags[i])
 	;
-    tags.insert (tags.begin()+i+1, prof);
+    tags.insert (tags.begin()+(i+1), prof);
 }
 
 void
@@ -1693,7 +1693,7 @@ CORBA::MultiComponent::add_component (Component *c)
     int i = _comps.size();
     while (--i >= 0 && *c < *_comps[i])
 	;
-    _comps.insert (_comps.begin()+i+1, c);
+    _comps.insert (_comps.begin()+(i+1), c);
 }
 
 void
