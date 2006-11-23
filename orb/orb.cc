@@ -2751,10 +2751,21 @@ CORBA::ORB::wait (ORBMsgId id, Long tmout)
     //FIXME: this is still not right - but OK for the moment
     //       we have to behave the old way, when the ORB thread calls us !!!
 #ifdef HAVE_THREADS
+    MICO::IIOPProxyInvokeRec* proxy_invoke_rec = NULL;
+    MICO::GIOPConn *invoke_rec_conn = NULL;
+    CORBA::Boolean is_conn_reader_thread = FALSE;
+
+    if (rec != NULL) {
+        proxy_invoke_rec = (MICO::IIOPProxyInvokeRec*)rec->get_invoke_hint();
+        if (proxy_invoke_rec != NULL) {
+            invoke_rec_conn = proxy_invoke_rec->conn();
+        }
+    }
+
     if (rec
         && (MICO::MTManager::blocking_threaded_client()
             || (MICO::MTManager::threaded_client()
-                && !MICO::GIOPConn::is_this_reader_thread()))) {
+                && !((invoke_rec_conn != NULL) && invoke_rec_conn->is_this_reader_thread()) ))) {
         // kcg: either blocking_threaded or threaded client concurrency
         // model is in use, in case of threaded, we're invoking wait
         // from one of client's thread instead of connection reader thread
@@ -2767,7 +2778,7 @@ CORBA::ORB::wait (ORBMsgId id, Long tmout)
     else if (rec
              && (MICO::MTManager::reactive_client()
                  || (MICO::MTManager::threaded_client()
-                     && MICO::GIOPConn::is_this_reader_thread()))) {
+                     && ((invoke_rec_conn != NULL) && invoke_rec_conn->is_this_reader_thread()) ))) {
         // kcg: either reactive or threaded client concurrency model
         // is used. In case of threaded, we're invoking wait from reader
         // thread, hence we can not block on waitfor above but rather wait
@@ -2782,10 +2793,7 @@ CORBA::ORB::wait (ORBMsgId id, Long tmout)
 
 #ifdef HAVE_THREADS
     Dispatcher* disp_for_waiting = NULL;
-    MICO::IIOPProxyInvokeRec* proxy_invoke_rec = NULL;
-    if (rec != NULL) {
-        proxy_invoke_rec = (MICO::IIOPProxyInvokeRec*)rec->get_invoke_hint();
-    }
+
     if (proxy_invoke_rec != NULL)
         disp_for_waiting = proxy_invoke_rec->conn()->dispatcher();
     else

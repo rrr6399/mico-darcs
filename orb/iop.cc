@@ -2163,7 +2163,7 @@ MICO::GIOPConnReader::_run(void* arg) {
 	MICO::Logger::Stream(MICO::Logger::GIOP)
 	    << "MICO::GIOPConnReader::_run()" << endl;
     }
-    GIOPConn::set_as_reader_thread();
+    conn->set_as_reader_thread();
     if (MICO::MTManager::threaded_client() && conn->side() == CLIENT_SIDE) {
         // client side using threaded client
         while (conn->state() == MICOMT::StateRefCnt::Active) {
@@ -2364,7 +2364,7 @@ CORBA::Boolean
 MICO::GIOPConn::is_this_reader_thread()
 {
     assert(S_reader_key_initialized_);
-    if (MICOMT::Thread::get_specific(S_reader_key_) != NULL) {
+    if (MICOMT::Thread::get_specific(S_reader_key_) == (void*)this) {
         return TRUE;
     }
     return FALSE;
@@ -2377,7 +2377,10 @@ MICO::GIOPConn::set_as_reader_thread()
     // kcg: this is a trick: reuse bool value
     // for key setup with known storage and omit a need
     // for key value cleanup function
-    MICOMT::Thread::set_specific(S_reader_key_, &S_reader_key_initialized_);
+    // ap: changed from using &S_reader_key_initilized_
+    // to make it possible to identify which connections
+    // reader thread this is.
+    MICOMT::Thread::set_specific(S_reader_key_, (void*)this);
 }
 
 void
