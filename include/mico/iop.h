@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2005 by The Mico Team
+ *  Copyright (c) 1997-2006 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -471,10 +471,10 @@ public:
     active_deref();
 
     // three methods using TLS for `detecting' reader thread
-    static CORBA::Boolean
+    CORBA::Boolean
     is_this_reader_thread();
 
-    static void
+    void
     set_as_reader_thread();
 
     static void
