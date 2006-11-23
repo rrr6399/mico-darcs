@@ -1,7 +1,15 @@
 !include ..\..\..\MakeVars.win32
 !include ..\MakeVars.win32
 
-all: client.exe philo.dll
+!ifdef VC8
+mt:
+	$(MT) -manifest client.exe.manifest -outputresource:client.exe;#1
+	$(MT) -manifest philo.dll.manifest -outputresource:philo.dll;#1
+!else
+mt:
+!endif
+
+all: client.exe philo.dll mt
 
 client.exe: client.obj philo.obj
 	-$(RM) client.exe

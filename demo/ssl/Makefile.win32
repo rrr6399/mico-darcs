@@ -20,7 +20,15 @@
 #                mico@informatik.uni-frankfurt.de
 #
 
-all: path client.exe server.exe
+all: path client.exe server.exe mt
+
+!ifdef VC8
+mt:
+	$(MT) -manifest client.exe.manifest -outputresource:client.exe;#1
+	$(MT) -manifest server.exe.manifest -outputresource:server.exe;#1
+!else
+mt:
+!endif
 
 RELATIVE = ..\..
 
