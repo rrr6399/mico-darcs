@@ -43,7 +43,7 @@ MPATH           =
 #FAST_PCH = 1
 
 
-# Adapted by Sorin Mustaca <sorin@home.ro>
+# Adapted by Sorin Mustaca <msorin@mico.org>
 # Download and compile the OpenSSL sources. Execute the script install_openssl.bat to copy the DLLs into win32-bin
 # and the libraries in win32-bin\lib. 
 # If both the libs and headers are found, then MICO will be automatically SSL-enabled.
@@ -54,7 +54,7 @@ MPATH           =
 !include makevars.win32.ssl
 
 
-# PTHREADS adaptation by Sorin Mustaca <sorin@home.ro>
+# PTHREADS adaptation by Sorin Mustaca <msorin@mico.org>
 #
 # MICO is able to be compiled and run in multi-threaded environment on
 # top of Win32 OS by using posix threads "emulation" layer which is
