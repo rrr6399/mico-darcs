@@ -1,20 +1,49 @@
-
-@echo Checking and building (if necessary) PThreads for %1 exception type
+@rem Params are:
+@rem %1 = VC,VCE, VSE (Exception type)
+@rem %2 = debug, delease (Target)
 set VER=2
 
-@if NOT EXIST win32-bin\pthread%1%VER%.dll goto print1
-@if NOT EXIST win32-bin\lib\pthread%1%VER%.lib goto print2
+set buildtype=%1
+set target=%2
+set empty=
+
+@rem default is VC release
+
+set shorttarget=
+
+if  "%buildtype%" == ""  (
+set buildtype=VC
+)
+
+if /i "%target%" == "debug"  (
+set target=-debug
+set shorttarget=d
+@echo Build Debug target
+) else (
+set target=
+set shorttarget=
+@echo Build Release target
+)
+
+@echo Checking and building (if necessary) PThreads for %buildtype% exception type and %target% build
+
+set name=pthread%buildtype%%VER%%shorttarget%
+echo Building  %name%
+
+
+@if NOT EXIST win32-bin\%name%.dll goto print1
+@if NOT EXIST win32-bin\lib\%name%.lib goto print2
 
 @echo DLLs and LIBs found. PThreads usage is enabled
 
 @goto end
 
 :print1
-@echo The file win32-bin\pthread%1%VER%.dll was not found
+@echo The file win32-bin\%name%.dll was not found
 goto build
 
 :print2
-@echo  The file win32-bin\lib\pthread%1%VER%.lib was not found
+@echo  The file win32-bin\lib\%name%.lib was not found
 goto build
 
 :build
@@ -24,14 +53,15 @@ goto build
 	@rem or use devenv instead of nmake to include manifests automatically in vc8
 
 
-	@IF NOT EXIST "%VS80COMNTOOLS%vsvars32.bat" (
-		@nmake clean %1
-	) ELSE (
-		@devenv.exe pthread.sln /Build %2
+
+	@nmake clean %buildtype%%target%
+	@IF EXIST "%VS80COMNTOOLS%vsvars32.bat" (
+	mt.exe -manifest %name%.dll.manifest -outputresource:%name%.dll;#1
+
 	)
 
-	@copy pthread%1%VER%.dll ..\..\win32-bin
-	@copy pthread%1%VER%.lib ..\..\win32-bin\lib
+	@copy %name%.dll ..\..\win32-bin
+	@copy %name%.lib ..\..\win32-bin\lib
 	@cd ..\..
 
 @echo #AUTOMATICALLY GENERATED FILE. DO NOT MODIFY > makevars.win32.pth
