@@ -11,7 +11,7 @@
 DLL_VER	= 2
 DLL_VERD= $(DLL_VER)d
 
-DEVROOT	= C:\pthreads
+DEVROOT	= .
 
 DLLDEST	= $(DEVROOT)\DLL
 LIBDEST	= $(DEVROOT)\LIB
@@ -24,11 +24,12 @@ INLINED_STAMPS	= pthreadVCE$(DLL_VER).stamp pthreadVSE$(DLL_VER).stamp pthreadVC
 STATIC_STAMPS	= pthreadVCE$(DLL_VER).static pthreadVSE$(DLL_VER).static pthreadVC$(DLL_VER).static \
 				  pthreadVCE$(DLL_VERD).static pthreadVSE$(DLL_VERD).static pthreadVC$(DLL_VERD).static
 
-OPTIM	= /O2 /Ob2
+#OPTIM	= /O2 /Ob2
+OPTIM	=
 OPTIMD	=
 
-CFLAGS	= /W3 /MD /nologo /Yd /I. /D_WIN32_WINNT=0x400 /DHAVE_CONFIG_H
-CFLAGSD	= /Zi $(CFLAGS)
+CFLAGS	= /W3 /MD /nologo /I. /D_WIN32_WINNT=0x400 /DHAVE_CONFIG_H
+CFLAGSD	= /DDEBUG /D_DEBUG /Zi $(CFLAGS)
 
 
 # Default cleanup style

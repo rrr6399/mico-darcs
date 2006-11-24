@@ -95,7 +95,11 @@ NEED_THREADID_OPERATORS = 1
 
 # Starting with version 2.x.y, Win32 POSIX Threads library is using
 # "1" or "2" as a library name suffix
+!ifdef RELEASE_BUILD
 PTHREADS_LIB_SUFFIX = 2
+!else
+PTHREADS_LIB_SUFFIX = 2d
+!endif
 
 !if defined (HAVE_PTHREADS_VSE)
 PTHREADS_LIB= pthreadVSE$(PTHREADS_LIB_SUFFIX).lib

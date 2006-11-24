@@ -42,10 +42,10 @@ sslsystem:
 # use here the same parameters as in the makefile of PTHREADS: VC,VCE,VSE
 !ifdef RELEASE_BUILD
 pthreadsystem:
-		admin\checkPTHREADS.bat VC Release
+		admin\checkPTHREADS.bat VC release
 !else
 pthreadsystem:
-		admin\checkPTHREADS.bat VC Debug
+		admin\checkPTHREADS.bat VC debug
 !endif
 
 !include MakeVars.win32
