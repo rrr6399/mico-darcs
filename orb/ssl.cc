@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2006 by The Mico Team
+ *  Copyright (c) 1997-2007 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -935,9 +935,7 @@ X509* MICOSSL::SSLTransport::load_cert(const char *certfile)
     if (!fp)
 	return NULL;
 
-    x509 = (X509 *)PEM_ASN1_read ((char *(*)())d2i_X509,
-				  PEM_STRING_X509,
-				  fp, NULL, NULL,NULL);
+    x509 = PEM_read_X509 (fp, NULL, NULL,NULL);
 
     if (x509 == NULL) {
 	//ERR_print_errors_fp (stderr);
