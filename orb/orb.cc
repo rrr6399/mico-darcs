@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2006 by The Mico Team
+ *  Copyright (c) 1997-2007 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -2753,7 +2753,6 @@ CORBA::ORB::wait (ORBMsgId id, Long tmout)
 #ifdef HAVE_THREADS
     MICO::IIOPProxyInvokeRec* proxy_invoke_rec = NULL;
     MICO::GIOPConn *invoke_rec_conn = NULL;
-    CORBA::Boolean is_conn_reader_thread = FALSE;
 
     if (rec != NULL) {
         proxy_invoke_rec = (MICO::IIOPProxyInvokeRec*)rec->get_invoke_hint();
