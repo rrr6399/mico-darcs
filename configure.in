@@ -1,6 +1,6 @@
 #
 #  MICO --- an Open Source CORBA implementation
-#  Copyright (c) 1997-2006 by The Mico Team
+#  Copyright (c) 1997-2007 by The Mico Team
 #
 #  This library is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Library General Public
@@ -953,6 +953,23 @@ else
       CONF_LDSOFLAGS=-fPIC
       CXXFLAGS="$CXXFLAGS -tpp5"
       #CFLAGS="$CFLAGS -tpp5"
+      if test X"$use_opt" != Xyes; then
+        # by default Intel uses -O so we need to disable it
+        CONF_OPT_FLAGS=-O0
+        use_opt=yes
+      fi
+      if test X"$use_compiled_headers" = Xyes; then
+        PCHFLAGS="$PCHFLAGS -pch -pch_dir $ABSSRCDIR/pch -DFAST_PCH"
+        USE_PCH_DIR=yes
+      fi
+      if test X"$use_threads" = Xyes; then
+        CXXFLAGS="$CXXFLAGS -D_REENTRANT -D_GNU_SOURCE"
+      fi
+    elif test ! -z "`echo $cxxversion|grep Intel|grep \"Version 9.0\"`"; then
+      # Intel C++ 9 (icc) configuration
+      CONF_SHARED_CC="$CXX -shared"
+      CONF_PICFLAGS=-fPIC
+      CONF_LDSOFLAGS=-fPIC
       if test X"$use_opt" != Xyes; then
         # by default Intel uses -O so we need to disable it
         CONF_OPT_FLAGS=-O0
