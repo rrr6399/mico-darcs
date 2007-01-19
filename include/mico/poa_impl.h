@@ -2,6 +2,7 @@
 /*
  *  MICO --- an Open Source CORBA implementation
  *  Copyright (C) 1998 Frank Pilhofer
+ *  Copyright (c) 1999-2007 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -77,7 +78,7 @@ class POACurrent_impl;
 
 class POAOptions {
 public:
-  CORBA::Boolean parse (CORBA::ORB_ptr, int &, char *[]);
+  CORBA::Boolean parse (CORBA::ORB_ptr, const std::vector<std::string>&);
   const char * operator[] (const char *);
   
 private:

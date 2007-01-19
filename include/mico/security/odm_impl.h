@@ -1,7 +1,7 @@
 // -*- c++ -*-
 //
 //  MICOsec --- a free CORBA Security implementation
-//  Copyright (C) 2000 ObjectSecurity Ltd.
+//  Copyright (C) 2000, 2007 ObjectSecurity Ltd.
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Library General Public
@@ -53,7 +53,7 @@ namespace MICOSODM
     {
     public:
 	CORBA::Boolean
-	parse (CORBA::ORB_ptr, int&, char* []);
+	parse (CORBA::ORB_ptr, const std::vector<std::string>&);
 
 	const char*
 	operator[](const char *);

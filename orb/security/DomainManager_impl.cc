@@ -44,27 +44,39 @@ using namespace std;
 
 namespace MICOSDM {
     SDMOptions sdmopts; // ConfigFilename = sdmopts[-SDMConfig]
+    bool S_initialized_ = false;
 }
 
-static class SDMInit
-    : public Interceptor::InitInterceptor
+namespace MICOSDM {
+
+class ORBInitializer
+    : virtual public PortableInterceptor::ORBInitializer,
+      virtual public CORBA::LocalObject
 {
 public:
-    SDMInit()
-	: Interceptor::InitInterceptor(0)
+    ORBInitializer()
     {}
-  
-    ~SDMInit()
-    { this->deactivate (); }
 
-    Interceptor::Status initialize(CORBA::ORB_ptr orb, const char *orbid,
-				   int &argc, char *argv[])
+    virtual ~ORBInitializer()
+    {}
+
+    virtual void
+    pre_init(PortableInterceptor::ORBInitInfo_ptr info)
     {
-	if (!MICOSDM::sdmopts.parse (orb, argc, argv))
-	    return Interceptor::INVOKE_ABORT;
+        CORBA::StringSeq_var info_args = info->arguments();
+        vector<string> args;
+        for (CORBA::ULong i = 0; i < info_args->length(); i++) {
+            args.push_back(info_args[i].in());
+        }
+        CORBA::ORB_var orb = CORBA::ORB_instance("mico-local-orb", FALSE);
+        assert(!CORBA::is_nil(orb));
+	if (!MICOSDM::sdmopts.parse (orb, args)) {
+            // kcg: what to do in case of error?
+            return;
+        }
       
 	if (MICOSDM::sdmopts["-AccessConfig"] == NULL && MICOSDM::sdmopts["-AuditConfig"] == NULL)
-	    return Interceptor::INVOKE_CONTINUE;
+	    return;
     
 	MICOSDM::DomainManagerFactory_impl * dmfactory = new MICOSDM::DomainManagerFactory_impl;
 	CORBA::Boolean ac = dmfactory->load_config_file((const char *)MICOSDM::sdmopts["-AccessConfig"], "Access");
@@ -72,22 +84,27 @@ public:
 
 	if (ac || ad)
 	    orb->set_initial_reference ("DomainManagerFactory", dmfactory);
-    
-	return Interceptor::INVOKE_CONTINUE;
     }
-} InitSDM;
+    virtual void
+    post_init(PortableInterceptor::ORBInitInfo_ptr info)
+    {}
+};
+}
 
 void
 MICOSDM::_init ()
 {
-    (void)InitSDM;
+    if (!S_initialized_) {
+        PortableInterceptor::register_orb_initializer(new ORBInitializer());
+        S_initialized_ = true;
+    }
 }
 
 
 // Options parser
 
 CORBA::Boolean
-MICOSDM::SDMOptions::parse (CORBA::ORB_ptr orb, int& argc, char* argv[])
+MICOSDM::SDMOptions::parse (CORBA::ORB_ptr orb, const vector<string>& args)
 {
     MICOGetOpt::OptMap opts;
     opts["-AccessConfig"]  = "arg-expected";
@@ -97,11 +114,13 @@ MICOSDM::SDMOptions::parse (CORBA::ORB_ptr orb, int& argc, char* argv[])
     CORBA::Boolean r = opt_parser.parse (orb->rcfile(), TRUE);
     if (!r)
 	return FALSE;
-    r = opt_parser.parse (argc, argv, TRUE);
+    r = opt_parser.parse (args, TRUE);
     if (!r)
 	return FALSE;
     const MICOGetOpt::OptVec &o = opt_parser.opts();
-  
+    MICOGetOpt::OptVec options = opt_parser.opts();
+    orb->register_options_for_removal(options);
+
     for (MICOGetOpt::OptVec::const_iterator i = o.begin(); i != o.end(); ++i) {
 	string arg = (*i).first;
 	string val = (*i).second;

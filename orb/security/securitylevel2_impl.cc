@@ -1,6 +1,6 @@
 //
 //  MICOsec --- a free CORBA Security implementation
-//  Copyright (C) 2000 ObjectSecurity Ltd.
+//  Copyright (C) 2000, 2007 ObjectSecurity Ltd.
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Library General Public
@@ -53,6 +53,7 @@ namespace MICOSL2
     char MICO_defining_authority[] = "";
     MICOSL2::AttributeManager* S_attr_man = NULL;
     CORBA::Boolean paranoid = FALSE;
+    bool S_initialized_ = false;
 }
 
 Security::SecAttribute
@@ -2520,16 +2521,29 @@ MICOSL2::AccessDecision_impl::check_any_rights(Security::RightsList* irights)
 }
 
 
-static class AuditRightsInit
-    : public Interceptor::InitInterceptor
+namespace MICOSL2 {
+
+class ORBInitializer
+    : virtual public PortableInterceptor::ORBInitializer,
+      virtual public CORBA::LocalObject
 {
 public:
-    AuditRightsInit ()
-        : Interceptor::InitInterceptor(0)
+    ORBInitializer()
     {}
-    Interceptor::Status
-    initialize (CORBA::ORB_ptr orb, const char *orbid, int &argc, char *argv[])
+
+    virtual ~ORBInitializer()
+    {}
+
+    virtual void
+    pre_init(PortableInterceptor::ORBInitInfo_ptr info)
     {
+        CORBA::StringSeq_var info_args = info->arguments();
+        vector<string> args;
+        for (CORBA::ULong i = 0; i < info_args->length(); i++) {
+            args.push_back(info_args[i].in());
+        }
+        CORBA::ORB_var orb = CORBA::ORB_instance("mico-local-orb", FALSE);
+        assert(!CORBA::is_nil(orb));
 	MICOGetOpt::OptMap opts; // Audit, Required Rights
 	// Audit options
 	//    opts["-AuditType"] = "arg-expected";
@@ -2541,9 +2555,10 @@ public:
 	MICOGetOpt opt_parser(opts);
 	CORBA::Boolean r = opt_parser.parse (orb->rcfile(), TRUE);
 	assert (r);
-	r = opt_parser.parse (argc, argv, TRUE);
+	r = opt_parser.parse (args, TRUE);
 	assert (r);
 	MICOSL2::acad_options = opt_parser.opts ();
+        orb->register_options_for_removal(acad_options);
     
 	//    const MICOGetOpt::OptVec &o = acad_options;
 	//    string type_str;
@@ -2560,11 +2575,17 @@ public:
 	//      AuditClientInterceptor::_exec_deactivate();
 	//    }
 	//    
-	return Interceptor::INVOKE_CONTINUE;
     }
-} _audit_rights_init;
+    virtual void
+    post_init(PortableInterceptor::ORBInitInfo_ptr info)
+    {}
+};
+}
 
 void
 MICOSL2::_init () {
-  _audit_rights_init;
+    if (!S_initialized_) {
+        PortableInterceptor::register_orb_initializer(new ORBInitializer());
+        S_initialized_ = true;
+    }
 }

@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2006 by The Mico Team
+ *  Copyright (c) 1997-2007 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -2546,160 +2546,6 @@ static MICO::CodesetComponentDecoder codeset_component_decoder;
 //-----------------
 
 
-static class CodesetInit : public Interceptor::InitInterceptor {
-public:
-    CodesetInit ()
-        : Interceptor::InitInterceptor(0)
-    {
-    }
-    Interceptor::Status initialize (CORBA::ORB_ptr orb,
-				    const char *orbid,
-				    int &argc, char *argv[])
-    {
-	MICOGetOpt::OptMap opts;
-	opts["-ORBNativeCS"]   = "arg-expected";
-	opts["-ORBNativeWCS"]  = "arg-expected";
-	opts["-ORBNoCodeSets"] = "";
-	opts["-ORBCodeSetsInIIOPProfile"] = "";
-	opts["-ORBNoCodeSetsInMultiCompProfile"] = "";
-
-	MICOGetOpt opt_parser (opts);
-	CORBA::Boolean r = opt_parser.parse (orb->rcfile(), TRUE);
-	assert (r);
-	r = opt_parser.parse (argc, argv, TRUE);
-	assert (r);
-
-	const char *cs_name = 0;
-	const char *wcs_name = 0;
-	CORBA::Boolean disable = FALSE;
-	CORBA::Boolean iiop_profile_enable = FALSE;
-	CORBA::Boolean multi_comp_profile_disable = FALSE;
-
-	const MICOGetOpt::OptVec &o = opt_parser.opts();
-	MICOGetOpt::OptVec::const_iterator i;
-	for (i = o.begin(); i != o.end(); ++i) {
-	    const string &arg = (*i).first;
-	    const string &val = (*i).second;
-	    if (arg == "-ORBNativeCS") {
-		cs_name = val.c_str();
-	    } else if (arg == "-ORBNativeWCS") {
-		wcs_name = val.c_str();
-	    } else if (arg == "-ORBNoCodeSets") {
-		disable = TRUE;
-	    } else if (arg == "-ORBCodeSetsInIIOPProfile") {
-		iiop_profile_enable = TRUE;
-	    } else if (arg == "-ORBNoCodeSetsInMultiCompProfile") {
-		multi_comp_profile_disable = TRUE;
-	    }
-	}
-
-	CORBA::Codeset::disable (disable);
-	CORBA::Codeset::enable_in_iiop_profile(iiop_profile_enable);
-
-	// native char code set
-	if (!cs_name)
-	    cs_name = "*8859-1*";
-
-	CORBA::Codeset *cs = CORBA::Codeset::create (cs_name);
-	if (!cs) {
-	  if (MICO::Logger::IsLogged (MICO::Logger::Error)) {
-	    MICOMT::AutoDebugLock __lock;
-	    MICO::Logger::Stream (MICO::Logger::Error)
-	      << "Error: unknown native char code set: " << cs_name << endl;
-	  }
-	  assert (0);
-	}
-	CORBA::Codeset::set_special_cs (CORBA::Codeset::NativeCS, cs);
-
-	// native wide char code set
-	if (!wcs_name)
-	    wcs_name = "*UTF-16*";
-
-	cs = CORBA::Codeset::create (wcs_name);
-	if (!cs) {
-	  if (MICO::Logger::IsLogged (MICO::Logger::Error)) {
-	    MICOMT::AutoDebugLock __lock;
-	    MICO::Logger::Stream (MICO::Logger::Error)
-	      << "Error: unknown native wide char code set: "
-	      << wcs_name << endl;
-	  }
-	  assert (0);
-	}
-	CORBA::Codeset::set_special_cs (CORBA::Codeset::NativeWCS, cs);
-
-	// default char code set
-	cs_name = "*8859-1*";
-	cs = CORBA::Codeset::create (cs_name);
-	if (!cs) {
-	  if (MICO::Logger::IsLogged (MICO::Logger::Error)) {
-	    MICOMT::AutoDebugLock __lock;
-	    MICO::Logger::Stream (MICO::Logger::Error)
-	      << "Error: unknown default char code set: " << cs_name << endl;
-	  }
-	  assert (0);
-	}
-	CORBA::Codeset::set_special_cs (CORBA::Codeset::DefaultCS, cs);
-
-	// default wide char code set (spec says there is no default ...)
-	cs_name = "*UTF-16*";
-	cs = CORBA::Codeset::create (cs_name);
-	if (!cs) {
-	  if (MICO::Logger::IsLogged (MICO::Logger::Error)) {
-	    MICOMT::AutoDebugLock __lock;
-	    MICO::Logger::Stream (MICO::Logger::Error)
-	      << "Error: unknown default wide char code set: "
-	      << cs_name << endl;
-	  }
-	  assert (0);
-	}
-	CORBA::Codeset::set_special_cs (CORBA::Codeset::DefaultWCS, cs);
-
-	// fallback char code set
-	cs_name = "*UTF-8*";
-	cs = CORBA::Codeset::create (cs_name);
-	if (!cs) {
-	  if (MICO::Logger::IsLogged (MICO::Logger::Error)) {
-	    MICOMT::AutoDebugLock __lock;
-	    MICO::Logger::Stream (MICO::Logger::Error)
-	      << "Error: unknown fallback char code set: "
-	      << cs_name << endl;
-	  }
-	  assert (0);
-	}
-	CORBA::Codeset::set_special_cs (CORBA::Codeset::FallbackCS, cs);
-
-	// fallback wide char code set
-	cs_name = "*UTF-16*";
-	cs = CORBA::Codeset::create (cs_name);
-	if (!cs) {
-	  if (MICO::Logger::IsLogged (MICO::Logger::Error)) {
-	    MICOMT::AutoDebugLock __lock;
-	    MICO::Logger::Stream (MICO::Logger::Error)
-	      << "Error: unknown fallback wide char code set: "
-	      << cs_name << endl;
-	  }
-	  assert (0);
-	}
-	CORBA::Codeset::set_special_cs (CORBA::Codeset::FallbackWCS, cs);
-
-
-	// install code set info in ior template
-	if (!disable && !multi_comp_profile_disable) {
-	    MICO::MultiCompProfile *mcp =
-		new MICO::MultiCompProfile (CORBA::MultiComponent());
-
-	    mcp->components()->add_component (new MICO::CodesetComponent (
-		CORBA::Codeset::special_cs(CORBA::Codeset::NativeCS)->id(),
-		CORBA::Codeset::special_cs(CORBA::Codeset::NativeWCS)->id(),
-		vector<MICO::CodesetComponent::CodeSetId>(),
-		vector<MICO::CodesetComponent::CodeSetId>()));
-	    orb->ior_template()->add_profile (mcp);
-	}
-
-	return Interceptor::INVOKE_CONTINUE;
-    }
-} __cs_init;
-
 namespace MICO
 {
     class CodesetIORInterceptor_impl
@@ -2799,6 +2645,156 @@ void
 MICO::CodesetORBInitializer::pre_init
 (PortableInterceptor::ORBInitInfo_ptr info)
 {
+    CORBA::StringSeq_var info_args = info->arguments();
+    vector<string> args;
+    for (CORBA::ULong i = 0; i < info_args->length(); i++) {
+        args.push_back(info_args[i].in());
+    }
+    CORBA::ORB_var orb = CORBA::ORB_instance("mico-local-orb", FALSE);
+    assert(!CORBA::is_nil(orb));
+
+    MICOGetOpt::OptMap opts;
+    opts["-ORBNativeCS"]   = "arg-expected";
+    opts["-ORBNativeWCS"]  = "arg-expected";
+    opts["-ORBNoCodeSets"] = "";
+    opts["-ORBCodeSetsInIIOPProfile"] = "";
+    opts["-ORBNoCodeSetsInMultiCompProfile"] = "";
+
+    MICOGetOpt opt_parser (opts);
+    CORBA::Boolean r = opt_parser.parse (orb->rcfile(), TRUE);
+    assert (r);
+    r = opt_parser.parse (args, TRUE);
+    assert (r);
+
+    const char *cs_name = 0;
+    const char *wcs_name = 0;
+    CORBA::Boolean disable = FALSE;
+    CORBA::Boolean iiop_profile_enable = FALSE;
+    CORBA::Boolean multi_comp_profile_disable = FALSE;
+
+    const MICOGetOpt::OptVec &o = opt_parser.opts();
+    MICOGetOpt::OptVec parsed_opts = opt_parser.opts();
+    orb->register_options_for_removal(parsed_opts);
+
+    MICOGetOpt::OptVec::const_iterator i;
+    for (i = o.begin(); i != o.end(); ++i) {
+        const string &arg = (*i).first;
+        const string &val = (*i).second;
+        if (arg == "-ORBNativeCS") {
+            cs_name = val.c_str();
+        } else if (arg == "-ORBNativeWCS") {
+            wcs_name = val.c_str();
+        } else if (arg == "-ORBNoCodeSets") {
+            disable = TRUE;
+        } else if (arg == "-ORBCodeSetsInIIOPProfile") {
+            iiop_profile_enable = TRUE;
+        } else if (arg == "-ORBNoCodeSetsInMultiCompProfile") {
+            multi_comp_profile_disable = TRUE;
+        }
+    }
+
+    CORBA::Codeset::disable (disable);
+    CORBA::Codeset::enable_in_iiop_profile(iiop_profile_enable);
+
+    // native char code set
+    if (!cs_name)
+        cs_name = "*8859-1*";
+
+    CORBA::Codeset *cs = CORBA::Codeset::create (cs_name);
+    if (!cs) {
+        if (MICO::Logger::IsLogged (MICO::Logger::Error)) {
+	    MICOMT::AutoDebugLock __lock;
+	    MICO::Logger::Stream (MICO::Logger::Error)
+                << "Error: unknown native char code set: " << cs_name << endl;
+        }
+        assert (0);
+    }
+    CORBA::Codeset::set_special_cs (CORBA::Codeset::NativeCS, cs);
+
+    // native wide char code set
+    if (!wcs_name)
+        wcs_name = "*UTF-16*";
+
+    cs = CORBA::Codeset::create (wcs_name);
+    if (!cs) {
+        if (MICO::Logger::IsLogged (MICO::Logger::Error)) {
+	    MICOMT::AutoDebugLock __lock;
+	    MICO::Logger::Stream (MICO::Logger::Error)
+                << "Error: unknown native wide char code set: "
+                << wcs_name << endl;
+        }
+        assert (0);
+    }
+    CORBA::Codeset::set_special_cs (CORBA::Codeset::NativeWCS, cs);
+
+    // default char code set
+    cs_name = "*8859-1*";
+    cs = CORBA::Codeset::create (cs_name);
+    if (!cs) {
+        if (MICO::Logger::IsLogged (MICO::Logger::Error)) {
+	    MICOMT::AutoDebugLock __lock;
+	    MICO::Logger::Stream (MICO::Logger::Error)
+                << "Error: unknown default char code set: " << cs_name << endl;
+        }
+        assert (0);
+    }
+    CORBA::Codeset::set_special_cs (CORBA::Codeset::DefaultCS, cs);
+
+    // default wide char code set (spec says there is no default ...)
+    cs_name = "*UTF-16*";
+    cs = CORBA::Codeset::create (cs_name);
+    if (!cs) {
+        if (MICO::Logger::IsLogged (MICO::Logger::Error)) {
+	    MICOMT::AutoDebugLock __lock;
+	    MICO::Logger::Stream (MICO::Logger::Error)
+                << "Error: unknown default wide char code set: "
+                << cs_name << endl;
+        }
+        assert (0);
+    }
+    CORBA::Codeset::set_special_cs (CORBA::Codeset::DefaultWCS, cs);
+
+    // fallback char code set
+    cs_name = "*UTF-8*";
+    cs = CORBA::Codeset::create (cs_name);
+    if (!cs) {
+        if (MICO::Logger::IsLogged (MICO::Logger::Error)) {
+	    MICOMT::AutoDebugLock __lock;
+	    MICO::Logger::Stream (MICO::Logger::Error)
+                << "Error: unknown fallback char code set: "
+                << cs_name << endl;
+        }
+        assert (0);
+    }
+    CORBA::Codeset::set_special_cs (CORBA::Codeset::FallbackCS, cs);
+
+    // fallback wide char code set
+    cs_name = "*UTF-16*";
+    cs = CORBA::Codeset::create (cs_name);
+    if (!cs) {
+        if (MICO::Logger::IsLogged (MICO::Logger::Error)) {
+	    MICOMT::AutoDebugLock __lock;
+	    MICO::Logger::Stream (MICO::Logger::Error)
+                << "Error: unknown fallback wide char code set: "
+                << cs_name << endl;
+        }
+        assert (0);
+    }
+    CORBA::Codeset::set_special_cs (CORBA::Codeset::FallbackWCS, cs);
+
+    // install code set info in ior template
+    if (!disable && !multi_comp_profile_disable) {
+        MICO::MultiCompProfile *mcp =
+            new MICO::MultiCompProfile (CORBA::MultiComponent());
+
+        mcp->components()->add_component (new MICO::CodesetComponent (
+		CORBA::Codeset::special_cs(CORBA::Codeset::NativeCS)->id(),
+		CORBA::Codeset::special_cs(CORBA::Codeset::NativeWCS)->id(),
+		vector<MICO::CodesetComponent::CodeSetId>(),
+		vector<MICO::CodesetComponent::CodeSetId>()));
+        orb->ior_template()->add_profile (mcp);
+    }
+
     PortableInterceptor::IORInterceptor_var icept = new CodesetIORInterceptor_impl;
     info->add_ior_interceptor(icept);
 }

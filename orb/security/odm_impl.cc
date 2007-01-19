@@ -1,6 +1,6 @@
 //
 //  MICOsec --- a free CORBA Security implementation
-//  Copyright (C) 2000, 2001 ObjectSecurity Ltd.
+//  Copyright (C) 2000, 2001, 2007 ObjectSecurity Ltd.
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Library General Public
@@ -39,39 +39,46 @@ using namespace std;
 
 namespace MICOSODM {
     ODMOptions odmopts; // ConfigFilename = odmopts[-ODMConfig]
+    bool S_initialized_ = false;
 }
 
 // Options Initializing
-
-static class ODMInit
-    : public Interceptor::InitInterceptor
+namespace MICOSODM {
+class ORBInitializer
+    : virtual public PortableInterceptor::ORBInitializer,
+      virtual public CORBA::LocalObject
 {
 public:
-    ODMInit ()
-	: Interceptor::InitInterceptor(0)
+    ORBInitializer()
     {}
-    ~ODMInit () {
-	this->deactivate();
-    }
 
-    Interceptor::Status
-    initialize
-    (CORBA::ORB_ptr orb,
-     const char *orbid,
-     int& argc,
-     char* argv[])
+    virtual ~ORBInitializer()
+    {}
+
+    virtual void
+    pre_init(PortableInterceptor::ORBInitInfo_ptr info)
     {
-	if (!MICOSODM::odmopts.parse (orb, argc, argv))
-	    return Interceptor::INVOKE_ABORT;
+        CORBA::StringSeq_var info_args = info->arguments();
+        vector<string> args;
+        for (CORBA::ULong i = 0; i < info_args->length(); i++) {
+            args.push_back(info_args[i].in());
+        }
+        CORBA::ORB_var orb = CORBA::ORB_instance("mico-local-orb", FALSE);
+        assert(!CORBA::is_nil(orb));
+
+	if (!MICOSODM::odmopts.parse (orb, args)) {
+            // kcg: what to do on error?
+            return;
+        }
     
 	if (MICOSODM::odmopts["-ODMConfig"] == NULL)
-	    return Interceptor::INVOKE_CONTINUE;
+	    return;
       
 	MICOSODM::ODM_impl* odm = new MICOSODM::ODM_impl;
 	MICOSODM::Factory_impl* factory = dynamic_cast<MICOSODM::Factory_impl*>
 	    (odm->create());
 	if (!factory->load_config_file((const char *)MICOSODM::odmopts["-ODMConfig"]))
-	    return Interceptor::INVOKE_CONTINUE;
+	    return;
     
 	string defkey = "/";
 	MICOSODM::DomainMap::iterator it
@@ -87,14 +94,21 @@ public:
 	}
 	
 	orb->set_initial_reference ("ODM", odm);
-	return Interceptor::INVOKE_CONTINUE;
     }
-} InitODM;
+
+    virtual void
+    post_init(PortableInterceptor::ORBInitInfo_ptr info)
+    {}
+};
+}
 
 void
 MICOSODM::_init ()
 {
-    (void)InitODM;
+    if (!S_initialized_) {
+        PortableInterceptor::register_orb_initializer(new ORBInitializer());
+        S_initialized_ = true;
+    }
 }
 
 
@@ -103,8 +117,7 @@ MICOSODM::_init ()
 CORBA::Boolean
 MICOSODM::ODMOptions::parse
 (CORBA::ORB_ptr orb,
- int& argc,
- char* argv[])
+ const vector<string>& args)
 {
     MICOGetOpt::OptMap opts;
     opts["-ODMConfig"]  = "arg-expected";
@@ -113,10 +126,12 @@ MICOSODM::ODMOptions::parse
     CORBA::Boolean r = opt_parser.parse (orb->rcfile(), TRUE);
     if (!r)
 	return FALSE;
-    r = opt_parser.parse (argc, argv, TRUE);
+    r = opt_parser.parse (args, TRUE);
     if (!r)
 	return FALSE;
     const MICOGetOpt::OptVec &o = opt_parser.opts();
+    MICOGetOpt::OptVec parsed_args = opt_parser.opts();
+    orb->register_options_for_removal(parsed_args);
   
     for (MICOGetOpt::OptVec::const_iterator i = o.begin(); i != o.end(); ++i) {
 	string arg = (*i).first;
