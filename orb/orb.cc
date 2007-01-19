@@ -3116,6 +3116,18 @@ CORBA::ORB::register_option_for_removal(const char* opt, bool arg)
 }
 
 
+void
+CORBA::ORB::register_options_for_removal(OptionVec& options)
+{
+    for (OptionVec::iterator i = options.begin(); i != options.end(); i++) {
+        if ((*i).second == "")
+            this->register_option_for_removal((*i).first.c_str(), FALSE);
+        else
+            this->register_option_for_removal((*i).first.c_str(), TRUE);
+    }
+}
+
+
 /************************** PrincipalCurrent *************************/
 
 
