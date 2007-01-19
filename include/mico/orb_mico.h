@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2005 by The Mico Team
+ *  Copyright (c) 1997-2007 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -265,6 +265,7 @@ private:
 #endif
     typedef std::map<std::string, bool> OptionMap;
     OptionMap removal_option_map_;
+    typedef std::vector<std::pair<std::string, std::string> > OptionVec;
 
     CORBA::DispatcherFactory* dispatcher_factory_;
 
@@ -535,6 +536,7 @@ public:
     dispatcher_factory(CORBA::DispatcherFactory* fact);
 
     void register_option_for_removal(const char* opt, bool arg);
+    void register_options_for_removal(OptionVec& options);
     OptionMap options_for_removal()
     { return this->removal_option_map_; }
     // end-mico-extension
