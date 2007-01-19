@@ -1,7 +1,7 @@
 /*
  *  MICO --- an Open Source CORBA implementation
  *  Copyright (C) 1998 Frank Pilhofer
- *  Copyright (c) 1999-2006 by The Mico Team
+ *  Copyright (c) 1999-2007 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -60,6 +60,7 @@ using namespace std;
 
 namespace MICOPOA {
   POAOptions poaopts;
+  bool S_initialized_ = false;
 }
 
 MICOPOA::POA_impl::POAMap MICOPOA::POA_impl::AllPOAs;
@@ -82,31 +83,47 @@ MICOMT::Mutex MICOPOA::POA_impl::S_servant_manager_lock;
  * ----------------------------------------------------------------------
  */
 
-static class POAInit : public Interceptor::InitInterceptor {
+namespace MICOPOA {
+class ORBInitializer
+    : virtual public PortableInterceptor::ORBInitializer,
+      virtual public CORBA::LocalObject
+{
 public:
-  POAInit ()
-    : Interceptor::InitInterceptor(0)
-  {
-  }
+    ORBInitializer()
+    {}
 
-  ~POAInit ()
-  {
-    deactivate ();
-  }
+    virtual ~ORBInitializer()
+    {}
 
-  Interceptor::Status initialize (CORBA::ORB_ptr orb, const char *orbid,
-				  int &argc, char *argv[])
-  {
-    if (!MICOPOA::poaopts.parse (orb, argc, argv))
-      return Interceptor::INVOKE_ABORT;
-    return Interceptor::INVOKE_CONTINUE;
-  }
-} InitPOA;
+    virtual void
+    pre_init(PortableInterceptor::ORBInitInfo_ptr info)
+    {
+        CORBA::StringSeq_var info_args = info->arguments();
+        vector<string> args;
+        for (CORBA::ULong i = 0; i < info_args->length(); i++) {
+            args.push_back(info_args[i].in());
+        }
+        CORBA::ORB_var orb = CORBA::ORB_instance("mico-local-orb", FALSE);
+        assert(!CORBA::is_nil(orb));
+        if (!MICOPOA::poaopts.parse (orb, args)) {
+            // kcg: what to do in case of error?
+        }
+    }
+
+    virtual void
+    post_init(PortableInterceptor::ORBInitInfo_ptr info)
+    {}
+};
+}
 
 void
 MICOPOA::_init ()
 {
-  (void) InitPOA;
+//   (void) InitPOA;
+    if (!S_initialized_) {
+        PortableInterceptor::register_orb_initializer(new ORBInitializer());
+        S_initialized_ = true;
+    }
 }
 
 /*
@@ -114,7 +131,7 @@ MICOPOA::_init ()
  */
 
 CORBA::Boolean
-MICOPOA::POAOptions::parse (CORBA::ORB_ptr orb, int &argc, char *argv[])
+MICOPOA::POAOptions::parse (CORBA::ORB_ptr orb, const vector<string>& args)
 {
   MICOGetOpt::OptMap opts;
   opts["-POARemoteIOR"]  = "arg-expected";
@@ -124,9 +141,11 @@ MICOPOA::POAOptions::parse (CORBA::ORB_ptr orb, int &argc, char *argv[])
   MICOGetOpt opt_parser (opts);
   CORBA::Boolean r = opt_parser.parse (orb->rcfile(), TRUE);
   if (!r) return FALSE;
-  r = opt_parser.parse (argc, argv, TRUE);
+  r = opt_parser.parse (args, TRUE);
   if (!r) return FALSE;
   const MICOGetOpt::OptVec &o = opt_parser.opts();
+  MICOGetOpt::OptVec parsed_args = opt_parser.opts();
+  orb->register_options_for_removal(parsed_args);
 
   for (MICOGetOpt::OptVec::const_iterator i = o.begin(); i != o.end(); ++i) {
     string arg = (*i).first;

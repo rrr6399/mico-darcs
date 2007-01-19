@@ -44,7 +44,6 @@
 #endif
 #include <mico/util.h>
 #include <mico/impl.h>
-#include <mico/intercept.h>
 #include <mico/ssl.h>
 #include <mico/template_impl.h>
 
@@ -90,6 +89,9 @@ using namespace std;
 
 // -ORBSSL* options
 static MICOGetOpt::OptVec SSL_options;
+namespace MICOSSL {
+    static bool S_initialized_ = false;
+}
 
 #ifdef USE_SL3
 TransportSecurity::OwnCredentials_var
@@ -2010,17 +2012,28 @@ static MICOSSL::SSLComponentDecoder ssl_component_decoder;
 
 /***************************** Initialization **************************/
 
-
-static class SSLInit : public Interceptor::InitInterceptor {
+namespace MICOSSL {
+class ORBInitializer
+    : virtual public PortableInterceptor::ORBInitializer,
+      virtual public CORBA::LocalObject
+{
 public:
-    SSLInit ()
-        : Interceptor::InitInterceptor(0)
+    ORBInitializer()
+    {}
+
+    virtual ~ORBInitializer()
+    {}
+
+    virtual void
+    pre_init(PortableInterceptor::ORBInitInfo_ptr info)
     {
-    }
-    Interceptor::Status initialize (CORBA::ORB_ptr orb,
-				    const char *orbid,
-				    int &argc, char *argv[])
-    {
+        CORBA::StringSeq_var info_args = info->arguments();
+        vector<string> args;
+        for (CORBA::ULong i = 0; i < info_args->length(); i++) {
+            args.push_back(info_args[i].in());
+        }
+        CORBA::ORB_var orb = CORBA::ORB_instance("mico-local-orb", FALSE);
+        assert(!CORBA::is_nil(orb));
 	MICOGetOpt::OptMap opts;
 	opts["-ORBSSLverify"]     = "arg-expected";
 	opts["-ORBSSLcert"]       = "arg-expected";
@@ -2032,13 +2045,17 @@ public:
 	MICOGetOpt opt_parser (opts);
 	CORBA::Boolean r = opt_parser.parse (orb->rcfile(), TRUE);
 	assert (r);
-	r = opt_parser.parse (argc, argv, TRUE);
+	r = opt_parser.parse (args, TRUE);
 	assert (r);
 	SSL_options = opt_parser.opts ();
-
-	return Interceptor::INVOKE_CONTINUE;
+        orb->register_options_for_removal(SSL_options);
     }
-} ssl_init;
+
+    virtual void
+    post_init(PortableInterceptor::ORBInitInfo_ptr info)
+    {}
+};
+}
 
 void
 MICOSSL::_init ()
@@ -2056,6 +2073,10 @@ MICOSSL::_init ()
       CRYPTO_set_id_callback((unsigned long (*)())micomt_ssl_thread_id_callback);
   }
 #endif // USE_OPENSSL_THREAD_FUNCTIONS
+  if (!S_initialized_) {
+      PortableInterceptor::register_orb_initializer(new ORBInitializer());
+      S_initialized_ = true;
+  }
 }
 
 #endif // HAVE_SSL
