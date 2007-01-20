@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2003 by The Mico Team
+ *  Copyright (c) 1997-2007 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -39,7 +39,6 @@
 #include <mico/throw.h>
 #include <mico/util.h>
 #include <mico/impl.h>
-#include <mico/intercept.h>
 #include <mico/template_impl.h>
 #include <mico/pi_impl.h>
 

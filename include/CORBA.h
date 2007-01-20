@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2004 by The Mico Team
+ *  Copyright (c) 1997-2007 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -263,7 +263,6 @@ namespace ObjectDomainMapping
 #endif
 
 #ifndef MICO_CONF_NO_INTERCEPT
-#include <mico/intercept.h>
 #include <mico/pi.h>
 namespace PortableInterceptor
 {
