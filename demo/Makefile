@@ -1,6 +1,7 @@
 #
 # MICO --- a free CORBA implementation
 # Copyright (C) 1997 Kay Roemer & Arno Puder
+# Copyright (c) 1999-2007 by The Mico Team
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,10 +23,10 @@
 
 include ../MakeVars
 
-DIRS = bench dynany interop henning interceptor \
+DIRS = bench dynany interop henning \
   codesets poa random obv services dispatcher mcast generic pi
 
-RUNDIRS = bench dynany interceptor codesets poa obv mcast generic pi
+RUNDIRS = bench dynany codesets poa obv mcast generic pi
 
 INST_DIRS = $(DIRS) shlib ssl
 
