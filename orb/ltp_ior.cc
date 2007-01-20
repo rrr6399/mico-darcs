@@ -40,7 +40,6 @@
 #include <iostream>
 #include <mico/util.h>
 #include <mico/impl.h>
-#include <mico/intercept.h>
 #include <mico/ssl.h>
 #include <mico/template_impl.h>
 #include <mico/os-misc.h>

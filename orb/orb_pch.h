@@ -41,7 +41,6 @@
 #include <mico/os-math.h>
 #include <mico/os-misc.h>
 #include <mico/template_impl.h>
-#include <mico/intercept.h>
 #include <mico/basic_seq.h>
 #include <mico/ssl.h>
 #include <mico/poa_impl.h>

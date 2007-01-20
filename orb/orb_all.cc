@@ -26,7 +26,6 @@
 #include "codeset.cc"
 #include "queue.cc"
 #include "static.cc"
-#include "intercept.cc"
 #include "os-unix.cc"
 #include "ssl.cc"
 #include "current.cc"
