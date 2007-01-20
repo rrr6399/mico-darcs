@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2001 by The Mico Team
+ *  Copyright (c) 1997-2007 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -76,7 +76,6 @@ class ServerRequest : public ServerRequestBase {
     Context_ptr _context;
     Any_var _res;
     Environment _env;
-    ServerlessObject_ptr _iceptreq;
     CORBA::Boolean _aborted;
 public:
     // begin-mico-extension
