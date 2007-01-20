@@ -134,7 +134,7 @@ SRCS := $(SRCS) dii.cc typecode.cc any.cc codec.cc buffer.cc context.cc \
   except.cc dispatch.cc string.cc object.cc address.cc ior.cc \
   orb.cc dsi.cc transport.cc transport/tcp.cc transport/udp.cc transport/unix.cc \
   iop.cc util.cc basic_seq.cc fast_array.cc \
-  ssl.cc fixed.cc intercept.cc codeset.cc queue.cc static.cc \
+  ssl.cc fixed.cc codeset.cc queue.cc static.cc \
   current.cc policy_impl.cc service_info.cc ioptypes.cc ssliop.cc \
   value.cc valuetype.cc valuetype_impl.cc dynany_impl.cc \
   policy2.cc tckind.cc orb_excepts.cc policy.cc poa.cc poa_base.cc \
