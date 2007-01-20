@@ -1,6 +1,7 @@
 /*
  *  MICO --- a free CORBA implementation
  *  Copyright (C) 1997-98 Kay Roemer & Arno Puder
+ *  Copyright (c) 1999-2007 by The Mico Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -82,13 +83,31 @@ public:
 /*
  * a simple access checker using interceptors.
  */
-class AccessChecker : public Interceptor::ServerInterceptor {
+class AccessChecker
+    : virtual public PortableInterceptor::ServerRequestInterceptor,
+      virtual public CORBA::LocalObject
+{
+    string name_;
 public:
-    Interceptor::Status
-    initialize_request (Interceptor::LWServerRequest_ptr req,
-			CORBA::Environment_ptr env)
+    AccessChecker()
+        : name_("AccessChecker")
+    {}
+
+    virtual char*
+    name()
+    { return CORBA::string_dup(name_.c_str()); }
+
+    virtual void
+    destroy()
+    {}
+
+    virtual void
+    receive_request_service_contexts(PortableInterceptor::ServerRequestInfo_ptr ri)
+    {}
+
+    virtual void
+    receive_request(PortableInterceptor::ServerRequestInfo_ptr ri)
     {
-	CORBA::Object_var obj = req->target ();
         CORBA::Object_var o =
             the_orb->resolve_initial_references ("PrincipalCurrent");
         CORBA::PrincipalCurrent_var pc =
@@ -104,20 +123,52 @@ public:
 	 */
 	if (!(a >>= name) || strcmp (name, "Roemer")) {
 	    // permission denied ...
-	    env->exception (new CORBA::NO_PERMISSION);
-	    return Interceptor::INVOKE_ABORT;
+            mico_throw(CORBA::NO_PERMISSION());
 	}
-	// ok ...
-	return Interceptor::INVOKE_CONTINUE;
     }
+
+    virtual void
+    send_reply(PortableInterceptor::ServerRequestInfo_ptr ri)
+    {}
+
+    virtual void
+    send_exception(PortableInterceptor::ServerRequestInfo_ptr ri)
+    {}
+
+    virtual void
+    send_other(PortableInterceptor::ServerRequestInfo_ptr ri)
+    {}
 };
+
+class AccessCheckerInitializer
+    : virtual public PortableInterceptor::ORBInitializer,
+      virtual public CORBA::LocalObject
+{
+public:
+    AccessCheckerInitializer()
+    {}
+
+    virtual ~AccessCheckerInitializer()
+    {}
+
+    virtual void
+    pre_init(PortableInterceptor::ORBInitInfo_ptr info)
+    {
+    	// register server interceptor
+    	AccessChecker* interceptor = new AccessChecker;
+    	info->add_server_request_interceptor(interceptor);
+    }
+
+    virtual void
+    post_init(PortableInterceptor::ORBInitInfo_ptr info )
+    {}
+};
+
 
 int
 main (int argc, char *argv[])
 {
-    AccessChecker ac;
-    ac.activate (0);
-
+    PortableInterceptor::register_orb_initializer(new AccessCheckerInitializer());
     the_orb = CORBA::ORB_init (argc, argv);
     CORBA::Object_var poaobj = the_orb->resolve_initial_references ("RootPOA");
     PortableServer::POA_var poa = PortableServer::POA::_narrow (poaobj);
