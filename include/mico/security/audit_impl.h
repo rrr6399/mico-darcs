@@ -1,7 +1,7 @@
 // -*- c++ -*-
 //
 //  MICOsec --- a free CORBA Security implementation
-//  Copyright (C) 2000 ObjectSecurity Ltd.
+//  Copyright (C) 2000, 2007 ObjectSecurity Ltd.
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Library General Public
@@ -25,7 +25,6 @@
 #define __AUDIT_IMPL_H__
 
 #include <mico/ssl.h>
-#include <mico/intercept.h>
 #include <mico/security/security.h>
 #include <mico/security/securitylevel2.h>
 #include <mico/security/SecurityAdmin_impl.h>
