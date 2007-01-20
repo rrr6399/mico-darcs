@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2003 by The Mico Team
+ *  Copyright (c) 1997-2007 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -252,7 +252,6 @@ class Request : public ServerlessObject, public ORBCallback {
     Boolean _invoke_pending;
     ORBRequest *_orbreq;
     RequestCallback *_cb;
-    ServerlessObject_ptr _iceptreq;
     // PI client interceptor request info
     PInterceptor::ClientRequestInfo_impl* _cri;
     CORBA::Boolean _invoke_flag;

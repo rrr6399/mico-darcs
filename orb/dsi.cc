@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2005 by The Mico Team
+ *  Copyright (c) 1997-2007 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -38,7 +38,6 @@
 #ifndef _WIN32
 #include <string.h>
 #endif
-#include <mico/intercept.h>
 #include <mico/template_impl.h>
 #include <mico/util.h>
 #include <mico/pi_impl.h>
@@ -71,8 +70,6 @@ CORBA::ServerRequest::ServerRequest (ORBRequest *r, Object_ptr o,
     _aborted = FALSE;
     _dir_params = NVList::_nil();
     _context = Context::_nil();
-    _iceptreq = Interceptor::ServerInterceptor::_create_request (
-	_obj, r->op_name(), *r->context(), this);
 }
 
 CORBA::ServerRequest::~ServerRequest ()
@@ -80,12 +77,6 @@ CORBA::ServerRequest::~ServerRequest ()
     if (!_canceled) {
         // clear service context list
         _req->context()->length (0);
-
-        if (!_aborted && !Interceptor::ServerInterceptor::
-            _exec_before_marshal ((Interceptor::LWServerRequest_ptr)_iceptreq,
-                                  &_env)) {
-            _aborted = TRUE;
-        }
 
         // copy back out args and result into ORBRequest
         set_out_args();
@@ -107,17 +98,10 @@ CORBA::ServerRequest::~ServerRequest ()
         
         //_oa->answer_invoke (_msgid, _obj, _req, stat);
         _oa->answer_invoke (_id, _obj, _req, stat);
-
-        if (!_aborted && !Interceptor::ServerInterceptor::
-            _exec_finish_request ((Interceptor::LWServerRequest_ptr)_iceptreq,
-                                  &_env)) {
-            // XXX how to abort the request here???
-        }
     }
 
     CORBA::release (_dir_params);
     CORBA::release (_context);
-    CORBA::release (_iceptreq);
     CORBA::release (_obj);
     CORBA::release (_req);
 }
@@ -184,13 +168,6 @@ CORBA::ServerRequest::params (NVList_ptr p)
     assert (CORBA::is_nil (_dir_params));
     _dir_params = p;
 
-    if (!Interceptor::ServerInterceptor::
-	_exec_initialize_request ((Interceptor::LWServerRequest_ptr)_iceptreq,
-				  &_env)) {
-	_aborted = TRUE;
-	return FALSE;
-    }
-
     if (!_req->get_in_args (_dir_params, _context)) {
       if (MICO::Logger::IsLogged (MICO::Logger::Warning)) {
 	MICOMT::AutoDebugLock __lock;
@@ -200,13 +177,6 @@ CORBA::ServerRequest::params (NVList_ptr p)
       exception (new CORBA::MARSHAL());
       _aborted = TRUE;
       return FALSE;
-    }
-
-    if (!Interceptor::ServerInterceptor::
-	_exec_after_unmarshal ((Interceptor::LWServerRequest_ptr)_iceptreq,
-			       &_env)) {
-	_aborted = TRUE;
-	return FALSE;
     }
 
     CORBA::ORB_ptr orb = _obj->_orbnc();

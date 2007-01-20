@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2004 by The Mico Team
+ *  Copyright (c) 1997-2007 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -41,7 +41,6 @@
 #include <ctype.h>
 #include <mico/throw.h>
 #include <mico/impl.h>
-#include <mico/intercept.h>
 #include <mico/util.h>
 #include <mico/template_impl.h>
 #include <mico/os-misc.h>
@@ -537,8 +536,6 @@ CORBA::Request::Request (Object_ptr o, Context_ptr c,
     orb->create_context_list (_clist);
     orb->create_exception_list (_elist);
     _orbreq = new MICO::LocalRequest (this);
-    _iceptreq = Interceptor::ClientInterceptor::_create_request
-	(_object, _opname, *_orbreq->context(), this);
     _cb = 0;
     _cri = PInterceptor::PI::_create_cri
 	(_object, _opname, 0, _args, _elist, _clist, _context, _res, TRUE);
@@ -587,8 +584,6 @@ CORBA::Request::Request (Object_ptr o,
     if (CORBA::is_nil (_elist))
 	orb->create_exception_list (_elist);
     _orbreq = new MICO::LocalRequest (this);
-    _iceptreq = Interceptor::ClientInterceptor::_create_request
-	(_object, _opname, *_orbreq->context(), this);
     _cb = 0;
     _cri = PInterceptor::PI::_create_cri
 	(_object, _opname, 0, _args, _elist, _clist, _context, _res, TRUE);
@@ -623,8 +618,6 @@ CORBA::Request::Request (Object_ptr o, const char *op)
     _orbid = 0;
     _flags = 0;
     _orbreq = new MICO::LocalRequest (this);
-    _iceptreq = Interceptor::ClientInterceptor::_create_request
-	(_object, _opname, *_orbreq->context(), this);
     _cb = 0;
     _cri = PInterceptor::PI::_create_cri
 	(_object, _opname, 0, _args, _elist, _clist, _context, _res, TRUE);
@@ -642,7 +635,6 @@ CORBA::Request::~Request ()
     CORBA::release (_clist);
     CORBA::release (_elist);
     CORBA::release (_orbreq);
-    CORBA::release (_iceptreq);
     CORBA::release (_cri);
 }
 
@@ -792,11 +784,6 @@ CORBA::Request::send_oneway ()
 {
     MICO_OBJ_CHECK (this);
 
-    if (!Interceptor::ClientInterceptor::
-	_exec_initialize_request ((Interceptor::LWRequest_ptr)_iceptreq,
-				  _environm)) {
-	return;
-    }
     ORB_ptr orb = _object->_orbnc();
     try {
 	PInterceptor::PI::_send_request_ip
@@ -833,8 +820,6 @@ CORBA::Request::send_oneway ()
 	    throw;
 	}
     }
-    Interceptor::ClientInterceptor::
-	_exec_after_marshal ((Interceptor::LWRequest_ptr)_iceptreq, _environm);
 }
 
 void
@@ -843,15 +828,6 @@ CORBA::Request::send_deferred (RequestCallback *cb)
     MICO_OBJ_CHECK (this);
 
     _cb = cb;
-
-    if (!Interceptor::ClientInterceptor::
-	_exec_initialize_request ((Interceptor::LWRequest_ptr)_iceptreq,
-				  _environm)) {
-	if (_cb)
-	    _cb->callback (this, RequestCallback::RequestDone);
-	_cb = 0;
-	return;
-    }
 
     ORB_ptr orb = _object->_orbnc();
     _orbid = orb->new_orbid();
@@ -872,17 +848,6 @@ CORBA::Request::send_deferred (RequestCallback *cb)
 
     orb->invoke_async(_object, _orbreq, Principal::_nil(),
 		      TRUE, _cb ? this : 0, _orbid);
-	
-    if (_invoke_pending && !Interceptor::ClientInterceptor::
-	_exec_after_marshal ((Interceptor::LWRequest_ptr)_iceptreq,
-			     _environm)) {
-	orb->cancel (_orbid);
-	_invoke_pending = FALSE;
-	if (_cb)
-	    _cb->callback (this, RequestCallback::RequestDone);
-	_cb = 0;
-	return;
-    }
 }
 
 void
@@ -909,14 +874,6 @@ CORBA::Request::get_response (Boolean block)
 	}
 
 	// XXX called multiple times in case of Forward
-	if (!Interceptor::ClientInterceptor::
-	    _exec_before_unmarshal ((Interceptor::LWRequest_ptr)_iceptreq,
-				    _environm)) {
-	    orb->cancel (_orbid);
-	    _invoke_pending = FALSE;
-	    _cb = 0;
-	    return;
-	}
 
 	GIOP::AddressingDisposition ad;
 	rs = orb->get_invoke_reply (_orbid, nobj, dummy, ad);
@@ -1072,13 +1029,6 @@ CORBA::Request::get_response (Boolean block)
 	default:
 	    assert (0);
 	}
-    }
-
-    if (!Interceptor::ClientInterceptor::
-	_exec_finish_request ((Interceptor::LWRequest_ptr)_iceptreq,
-			      _environm)) {
-	_cb = 0;
-	return;
     }
 
     _cb = 0;
