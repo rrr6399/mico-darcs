@@ -3780,14 +3780,6 @@ CORBA::ORB_init (int &argc, char **argv, const char *_id)
     orb_instance->set_initial_reference
 	("CSIv2SecurityManager", csiv2_manager);
 #endif // USE_CSIV2
-    CORBA::Boolean retval =
-	Interceptor::InitInterceptor::_exec_initialize (orb_instance,
-							"mico-local-orb",
-							argc, argv);
-    // XXX what to do on error ??
-    if (!retval)
-	mico_throw (CORBA::INITIALIZE());
-
     // PI: invoke pre_init here. post_init is invoked below after resolving
     // all references
     PInterceptor::ORBInitInfo_impl* info = NULL;
