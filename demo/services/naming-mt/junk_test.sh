@@ -2,7 +2,7 @@
 
 PATH=../../../daemon:../../../coss/naming:../../../imr:../../../ir:$PATH
 export PATH
-export LB_LIBRARY_PATH=../../../libs
+export LD_LIBRARY_PATH=../../../libs
 
 export MICORC=/dev/null
 
