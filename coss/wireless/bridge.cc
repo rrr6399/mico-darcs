@@ -77,6 +77,9 @@ WATMBridge::GIOPBridge::GIOPBridge (CORBA::ORB_ptr orb,
 	}
 
 	_orb->ior_template()->add_profile(prof);
+	if (i == 0) {
+	    _orb->ior_template()->active_profile(prof);
+	}
 
 	_tservers.push_back(tserv);
     }
