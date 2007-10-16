@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2001 by The Mico Team
+ *  Copyright (c) 1997-2007 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -1839,6 +1839,16 @@ MICO::CDRDecoder::get_ulonglongs (CORBA::ULongLong *p, CORBA::ULong l)
 CORBA::Boolean
 MICO::CDRDecoder::get_floats (CORBA::Float *p, CORBA::ULong l)
 {
+// Modified to get the sequence of values fast when using IEEE.
+#ifdef HAVE_IEEE_FP
+    if (!buf->ralign (4) || !check_chunk ()) {
+        return FALSE;
+    }
+
+    if (data_bo == mach_bo)
+	    return buf->get (p, 4*l);
+#endif // HAVE_IEEE_FP
+
     for (CORBA::Long i = l; --i >= 0; ++p) {
 	if (!get_float (*p))
 	    return FALSE;
@@ -1849,6 +1859,16 @@ MICO::CDRDecoder::get_floats (CORBA::Float *p, CORBA::ULong l)
 CORBA::Boolean
 MICO::CDRDecoder::get_doubles (CORBA::Double *p, CORBA::ULong l)
 {
+// Modified to get the sequence of values fast when using IEEE.
+#ifdef HAVE_IEEE_FP
+    if (!buf->ralign (8) || !check_chunk ()) {
+        return FALSE;
+    }
+
+    if (data_bo == mach_bo)
+	    return buf->get (p, 8*l);
+#endif // HAVE_IEEE_FP
+
     for (CORBA::Long i = l; --i >= 0; ++p) {
 	if (!get_double (*p))
 	    return FALSE;
@@ -1859,6 +1879,16 @@ MICO::CDRDecoder::get_doubles (CORBA::Double *p, CORBA::ULong l)
 CORBA::Boolean
 MICO::CDRDecoder::get_longdoubles (CORBA::LongDouble *p, CORBA::ULong l)
 {
+// Modified to get the sequence of values fast when using IEEE.
+#if defined(HAVE_IEEE_FP) && SIZEOF_LONG_DOUBLE == 16
+    if (!buf->ralign (8) || !check_chunk ()) {
+        return FALSE;
+    }
+
+    if (data_bo == mach_bo)
+	    return buf->get (p, 16*l);
+#endif // HAVE_IEEE_FP
+
     for (CORBA::Long i = l; --i >= 0; ++p) {
 	if (!get_longdouble (*p))
 	    return FALSE;
