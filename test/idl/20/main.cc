@@ -26,4 +26,5 @@ int main( int argc, char *argv[] )
   cout << c10 << endl;
   cout << foo::c11 << endl;
   cout << foo::c12 << endl;
+  cout << foo::msg << endl;
 }
