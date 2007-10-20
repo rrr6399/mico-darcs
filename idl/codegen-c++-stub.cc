@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2006 by The Mico Team
+ *  Copyright (c) 1997-2007 by The Mico Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -2820,12 +2820,16 @@ void CodeGenCPPStub::emit_Constant( CORBA::ConstantDef_ptr c )
     o.start_output (ostr);
 
     o << "const ";
-    emit_type_for_variable (type, manual);
 
-    if (tc->kind() == CORBA::tk_string
-	|| tc->kind() == CORBA::tk_wstring) {
-      // special handling of string constants
-      o << " const";
+    // special handling of string/wstring constants
+    if (tc->unalias()->kind() == CORBA::tk_string) {
+        o << "char* const";
+    }
+    else if (tc->unalias()->kind() == CORBA::tk_wstring) {
+        o << "CORBA::WChar* const";
+    }
+    else {
+        emit_type_for_variable (type, manual);
     }
 
     o.stop_output ();

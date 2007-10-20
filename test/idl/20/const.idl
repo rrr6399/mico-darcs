@@ -21,6 +21,8 @@ interface foo
   const char c12 = '\x30';
 
   typedef string ss[ c2 ];
+  typedef string MyString;
+  const MyString msg = "Hello";
 };
 
 
