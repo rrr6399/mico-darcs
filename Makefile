@@ -116,6 +116,7 @@ bootstrap:
 ifeq ($(USE_SL3), yes)
 ifeq ($(USE_CSL2), yes)
 ifeq ($(USE_CSIV2), yes)
+ifeq ($(USE_MESSAGING), yes)
 	@echo
 	@echo "Starting MICO bootstrap..."
 	@echo
@@ -132,6 +133,11 @@ endif
 	@echo
 	@echo "MICO bootstrap finished successfully"
 	@echo
+else
+	@echo
+	@echo "ERROR: you have to enable MICO Messaging for bootstrap (--enable-messaging configure option)"
+	@echo
+endif
 else
 	@echo
 	@echo "ERROR: you have to enable MICO CSIv2 for bootstrap (--enable-csiv2 configure option)"
