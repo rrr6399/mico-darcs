@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2001 by The Mico Team
+ *  Copyright (c) 1997-2007 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -40,6 +40,7 @@
 #include <mico/poa_impl.h>
 #include <mico/template_impl.h>
 #include <mico/pi_impl.h>
+#include <mico/messaging_impl.h>
 
 #endif // FAST_PCH
 
@@ -301,6 +302,12 @@ CORBA::ORB::create_policy (CORBA::PolicyType type, const CORBA::Any &any)
     if (!(any >>= val))
       mico_throw (CORBA::PolicyError (CORBA::BAD_POLICY_TYPE));
     return new MICO::BidirectionalPolicy_impl (val);
+  }
+  else if (type == Messaging::RELATIVE_RT_TIMEOUT_POLICY_TYPE) {
+    TimeBase::TimeT val;
+    if (!(any >>= val))
+      mico_throw(CORBA::PolicyError(CORBA::BAD_POLICY_TYPE));
+    return new MICO::RelativeRoundtripTimeoutPolicy_impl(val);
   }
   else if (PInterceptor::PI::S_pfmap_.find(type)
 	   != PInterceptor::PI::S_pfmap_.end()) {

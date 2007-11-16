@@ -22,7 +22,7 @@
 
 include ../MakeVars
 
-DIRS = dii idl ir pi poa obv orb object
+DIRS = dii idl ir pi poa obv orb object messaging
 
 ifeq ($(USE_SL3), yes)
 DIRS := $(DIRS) sl3
