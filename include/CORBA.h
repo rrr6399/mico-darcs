@@ -212,6 +212,8 @@ namespace PortableServer
 
 #include <mico/timebase.h>
 
+#include <mico/messaging.h>
+
 #ifdef USE_CSL2
 #  include <mico/service_info.h>
 #  include <mico/security/security.h>

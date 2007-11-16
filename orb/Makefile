@@ -1,6 +1,6 @@
 #
 #  MICO --- an Open Source CORBA implementation
-#  Copyright (c) 1997-2004 by The Mico Team
+#  Copyright (c) 1997-2007 by The Mico Team
 #
 #  This library is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Library General Public
@@ -139,7 +139,8 @@ SRCS := $(SRCS) dii.cc typecode.cc any.cc codec.cc buffer.cc context.cc \
   value.cc valuetype.cc valuetype_impl.cc dynany_impl.cc \
   policy2.cc tckind.cc orb_excepts.cc policy.cc poa.cc poa_base.cc \
   poa_impl.cc dynany.cc $(UNI_SRCS) $(EH_SRCS) $(PI_SRC) $(TIME_SRC) \
-  ir.cc ir_base.cc imr.cc mtdebug.cc reflection.cc
+  ir.cc ir_base.cc imr.cc mtdebug.cc reflection.cc messaging.cc \
+  messaging_impl.cc
 
 ifeq ($(USE_WIRELESS), yes)
 SRCS := $(SRCS) watm.cc
@@ -319,6 +320,9 @@ orbcore-generate:
 	$(IDL)  --name reflection --windows-dll mico --hh-prefix mico/ \
 		-B.. --any ../include/mico/reflection.idl
 	mv reflection.h ../include/mico/reflection.h
+	$(IDL)  --name messaging --windows-dll mico --mico-core \
+		-B.. --any ../include/mico/messaging.idl
+	mv messaging.h ../include/mico/messaging.h
 
 security-generate:
 	make -C security generate
