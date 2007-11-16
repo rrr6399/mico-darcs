@@ -8,6 +8,9 @@
 /* whether CSIv2 is used */
 #undef USE_CSIV2
 
+/* whether SL3 is used */
+#undef USE_SL3
+
 /* whether anything wireless is built */
 #undef USE_WIRELESS
 
