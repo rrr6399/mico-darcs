@@ -158,6 +158,9 @@
 /* whether to build CCM-specific parts */
 #undef USE_CCM
 
+/* whether to build CORBA messaging specific parts */
+#undef USE_MESSAGING
+
 /* path information */
 #undef ABSEXECDIR
 #undef ABSSHRDDIR

@@ -31,6 +31,10 @@ AC_ARG_ENABLE(ccm,
  [  --enable-ccm            build CCM-specific parts],
  use_ccm=$enableval, use_ccm=no)
 
+AC_ARG_ENABLE(messaging,
+ [  --enable-messaging      build CORBA messaging specific parts],
+ use_messaging=$enableval, use_messaging=no)
+
 AC_ARG_ENABLE(coss,
  [  --disable-coss,         do not use MICO COSS],
  use_coss=$enableval, use_coss=yes)
@@ -2173,6 +2177,12 @@ AC_SUBST(USE_CCM)
 USE_CCM=$use_ccm
 if test "x$USE_CCM" = "xyes" ; then
   AC_DEFINE(USE_CCM)
+fi
+
+AC_SUBST(USE_MESSAGING)
+USE_MESSAGING=$use_messaging
+if test "x$USE_MESSAGING" = "xyes" ; then
+  AC_DEFINE(USE_MESSAGING)
 fi
 
 AC_SUBST(USE_NAMING)

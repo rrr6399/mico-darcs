@@ -111,6 +111,8 @@ SL3_SRCS := $(SL3_SRCS) security/sl3ac.cc security/acext.cc
 endif
 endif
 
+MESSAGING_SRCS = messaging.cc messaging_impl.cc
+
 ifeq ($(HAVE_MEMCHECK), yes)
 SRCS = memcheck.cc
 ifeq ($(USE_MEMTRACE), yes)
@@ -139,8 +141,7 @@ SRCS := $(SRCS) dii.cc typecode.cc any.cc codec.cc buffer.cc context.cc \
   value.cc valuetype.cc valuetype_impl.cc dynany_impl.cc \
   policy2.cc tckind.cc orb_excepts.cc policy.cc poa.cc poa_base.cc \
   poa_impl.cc dynany.cc $(UNI_SRCS) $(EH_SRCS) $(PI_SRC) $(TIME_SRC) \
-  ir.cc ir_base.cc imr.cc mtdebug.cc reflection.cc messaging.cc \
-  messaging_impl.cc
+  ir.cc ir_base.cc imr.cc mtdebug.cc reflection.cc
 
 ifeq ($(USE_WIRELESS), yes)
 SRCS := $(SRCS) watm.cc
@@ -153,6 +154,11 @@ endif
 ifeq ($(HAVE_THREADS), yes)
 SRCS := $(SRCS) $(MT_SRCS)
 endif
+
+ifeq ($(USE_MESSAGING), yes)
+SRCS := $(SRCS) $(MESSAGING_SRCS)
+endif
+
 STATIC_OBJS = $(SRCS:.cc=.o)
 endif
 

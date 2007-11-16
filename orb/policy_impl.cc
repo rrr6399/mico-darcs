@@ -40,7 +40,9 @@
 #include <mico/poa_impl.h>
 #include <mico/template_impl.h>
 #include <mico/pi_impl.h>
+#ifdef USE_MESSAGING
 #include <mico/messaging_impl.h>
+#endif // USE_MESSAGING
 
 #endif // FAST_PCH
 
@@ -303,12 +305,14 @@ CORBA::ORB::create_policy (CORBA::PolicyType type, const CORBA::Any &any)
       mico_throw (CORBA::PolicyError (CORBA::BAD_POLICY_TYPE));
     return new MICO::BidirectionalPolicy_impl (val);
   }
+#ifdef USE_MESSAGING
   else if (type == Messaging::RELATIVE_RT_TIMEOUT_POLICY_TYPE) {
     TimeBase::TimeT val;
     if (!(any >>= val))
       mico_throw(CORBA::PolicyError(CORBA::BAD_POLICY_TYPE));
     return new MICO::RelativeRoundtripTimeoutPolicy_impl(val);
   }
+#endif // USE_MESSAGING
   else if (PInterceptor::PI::S_pfmap_.find(type)
 	   != PInterceptor::PI::S_pfmap_.end()) {
     return PInterceptor::PI::S_pfmap_[type]->create_policy
