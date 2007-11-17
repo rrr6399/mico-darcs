@@ -27,8 +27,8 @@ main (int argc, char *argv[])
     cout << "oops: could not locate HelloWorld server" << endl;
     exit (1);
   }
-  // 10 seconds timeout (1 == 100 nsec)
-  TimeBase::TimeT tout = 100000000;
+  // 2 seconds timeout (1 == 100 nsec)
+  TimeBase::TimeT tout = 20000000ULL;
   Any value;
   value <<= tout;
   PolicyList pl;
@@ -39,13 +39,13 @@ main (int argc, char *argv[])
   HelloWorld_var hello_tout = HelloWorld::_narrow(obj);
   assert(!is_nil(hello_tout));
   try {
-      hello_tout->hello_with_timeout(5);
+      hello_tout->hello_with_timeout(1);
   }
   catch (CORBA::TIMEOUT& ex) {
       cout << "ERROR: TIMEOUT exception thrown too fast" << endl;
   }
   try {
-      hello_tout->hello_with_timeout(11);
+      hello_tout->hello_with_timeout(3);
       cout << "ERROR: TIMEOUT exception not thrown" << endl;
   }
   catch (CORBA::TIMEOUT& ex) {
