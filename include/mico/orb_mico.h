@@ -72,6 +72,10 @@ private:
     GIOP::AddressingDisposition _ad;
     PInterceptor::ServerRequestInfo_impl* _sri;
 
+#ifdef USE_MESSAGING
+    ULong relative_roundtrip_timeout_;
+    Boolean timedout_;
+#endif // USE_MESSAGING
 public:
     ORBInvokeRec (MsgId);
     virtual ~ORBInvokeRec ();
@@ -151,6 +155,16 @@ public:
     Boolean get_answer_bind (LocateStatus &, Object_ptr &);
     Boolean get_answer_locate (LocateStatus &, Object_ptr &,
 			       GIOP::AddressingDisposition &);
+
+#ifdef USE_MESSAGING
+    ULong relative_roundtrip_timeout()
+    { return relative_roundtrip_timeout_; }
+
+    Boolean timedout()
+    { return timedout_; }
+
+    void timedout(Boolean);
+#endif // USE_MESSAGING
 };
 
 

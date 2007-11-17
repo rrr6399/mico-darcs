@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2001 by The Mico Team
+ *  Copyright (c) 1997-2007 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -101,6 +101,9 @@ class Object : public ServerlessObject {
     IOR *fwd_ior;
     ORB_ptr orb;
     std::string ident;
+#ifdef USE_MESSAGING
+    ULong relative_roundtrip_timeout_;
+#endif // USE_MESSAGING
 protected:
     DomainManagerList _managers;
     PolicyList _policies;
@@ -166,6 +169,12 @@ public:
 
     const char *_ident ();
     virtual void *_narrow_helper (const char *repoid);
+
+#ifdef USE_MESSAGING
+    ULong
+    relative_roundtrip_timeout()
+    { return relative_roundtrip_timeout_; }
+#endif // USE_MESSAGING
     // end-mico-extension
 
     static Object_ptr _duplicate (Object_ptr o)
