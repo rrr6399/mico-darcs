@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2005 by The Mico Team
+ *  Copyright (c) 1997-2007 by The Mico Team
  * 
  *  OSThread: An abstract Thread class for MICO
  *  Copyright (C) 1999 Andy Kersting & Andreas Schultz
@@ -274,6 +274,7 @@ public:
     MICO_Boolean timedwait(MICO_ULong tmout)
     { 
 	timespec timeout;
+        OSMisc::TimeVal now = OSMisc::gettime();
 #ifdef MTDEBUG
 	if (MICO::Logger::IsLogged (MICO::Logger::Thread)) {
 	    __mtdebug_lock();
@@ -282,9 +283,13 @@ public:
 	    __mtdebug_unlock();
 	}
 #endif // MTDEBUG
-	timeout.tv_sec  = 0;
-	timeout.tv_nsec = tmout * 1000;
-	return (pthread_cond_timedwait(&_cond, &_mutex->_mutex, &timeout)  == 0);
+        int addsec = tmout / 1000;
+        int addusec = (tmout % 1000) * 1000;
+	timeout.tv_sec  = now.tv_sec + addsec;
+	timeout.tv_nsec = (now.tv_usec + addusec) * 1000;
+        int result;
+        assert((result = pthread_cond_timedwait(&_cond, &_mutex->_mutex, &timeout)) != EINVAL);
+	return (result == ETIMEDOUT);
     };
     
     /*!
