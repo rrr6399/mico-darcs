@@ -201,6 +201,8 @@ namespace PInterceptor
 #include <mico/policy.h>
 #include <mico/current.h>
 
+#include <mico/timebase.h>
+
 #ifndef MICO_CONF_NO_POA
 namespace PortableServer
 {
@@ -211,8 +213,6 @@ namespace PortableServer
 #if (defined(USE_CSL2)) || (defined(USE_CSIV2))
 #include <mico/security/csi_base.h>
 #endif // USE_CSL2 or USE_CSIV2
-
-#include <mico/timebase.h>
 
 #ifdef USE_MESSAGING
 #include <mico/messaging.h>

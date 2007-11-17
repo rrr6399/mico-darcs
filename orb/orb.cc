@@ -123,8 +123,13 @@ CORBA::ORBAsyncCallback::waitfor (CORBA::ORB_ptr orb,
     MICOMT::AutoLock l(cond_mutex);
 
     if (notified) return TRUE;
-    if ( tmout != -1 ) {
-	cond.timedwait(tmout);
+    if (tmout > 0) {
+        if (cond.timedwait(tmout)) {
+#ifdef USE_MESSAGING
+            msgid->timedout(TRUE);
+            notified = TRUE;
+#endif // USE_MESSAGING
+        }
     } else {
 	cond.wait();
     }
@@ -166,6 +171,10 @@ CORBA::ORBInvokeRec::ORBInvokeRec (MsgId id)
     _inv_hint = 0;
     _active = TRUE;
     _sri = 0;
+#ifdef USE_MESSAGING
+    relative_roundtrip_timeout_ = 0;
+    timedout_ = FALSE;
+#endif // USE_MESSAGING
 }
 
 void
@@ -188,6 +197,9 @@ CORBA::ORBInvokeRec::init_invoke (ORB_ptr orb,
     _adapter = oa;
     _cb = callback;
     _active = TRUE;
+#ifdef USE_MESSAGING
+    relative_roundtrip_timeout_ = o->relative_roundtrip_timeout();
+#endif // USE_MESSAGING
     //
     // kcg: we need to create server request info only when object's oa
     // is local - so it's either BOA or POA. Otherwise (IIOPServer) we have
@@ -593,6 +605,20 @@ CORBA::ORBInvokeRec::get_answer_locate (LocateStatus &state, Object_ptr &o,
     ad = _ad;
     return TRUE;
 }
+
+#ifdef USE_MESSAGING
+void
+CORBA::ORBInvokeRec::timedout(Boolean val)
+{
+    timedout_ = val;
+    if (timedout_) {
+        TIMEOUT ex;
+        _req->set_out_args(ex);
+        //_orb->answer_invoke(this, CORBA::InvokeSysEx, _obj, _req, 0);
+	this->set_answer_invoke(CORBA::InvokeSysEx, _obj, _req, 0);
+    }
+}
+#endif // USE_MESSAGING
 
 
 /**************************** ORB *********************************/
@@ -2747,7 +2773,10 @@ CORBA::ORB::wait (ORBMsgId id, Long tmout)
 	    << "ORB::wait for " << id << endl;
     }
     ORBInvokeRec *rec = get_invoke (id);
-
+#ifdef USE_MESSAGING
+    if (id->relative_roundtrip_timeout() > 0)
+        tmout = id->relative_roundtrip_timeout();
+#endif // USE_MESSAGING
     //FIXME: this is still not right - but OK for the moment
     //       we have to behave the old way, when the ORB thread calls us !!!
 #ifdef HAVE_THREADS
@@ -2806,8 +2835,16 @@ CORBA::ORB::wait (ORBMsgId id, Long tmout)
     while (42) {
       if (!rec || rec->completed())
 	return TRUE;
+#ifdef USE_MESSAGING
+      if (t.done()) {
+        assert(rec != NULL);
+        rec->timedout(TRUE);
+	return TRUE;
+      }
+#else // USE_MESSAGING
       if (t.done())
-	return FALSE;
+        return FALSE;
+#endif // USE_MESSAGING
       disp_for_waiting->run (FALSE);
       rec = get_invoke (id);
     }

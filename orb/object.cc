@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2001 by The Mico Team
+ *  Copyright (c) 1997-2007 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -46,6 +46,9 @@
 #else // HAVE_ANSI_CPLUSPLUS_HEADERS
 #include <strstream.h>
 #endif // HAVE_ANSI_CPLUSPLUS_HEADERS
+#ifdef USE_MESSAGING
+#include <mico/messaging.h>
+#endif // USE_MESSAGING
 
 #endif // FAST_PCH
 
@@ -135,6 +138,9 @@ CORBA::Object::Object (IOR *i)
     orb = CORBA::ORB_instance ("mico-local-orb", FALSE);
     if (!CORBA::is_nil(orb) && !orb->plugged() && ior)
 	ior->addressing_disposition (GIOP::ReferenceAddr);
+#ifdef USE_MESSAGING
+    relative_roundtrip_timeout_ = 0;
+#endif // USE_MESSAGING
 }
 
 CORBA::Object::Object (const Object &o)
@@ -144,6 +150,9 @@ CORBA::Object::Object (const Object &o)
     orb = CORBA::ORB::_duplicate (o.orb);
     _managers = o._managers;
     _policies = o._policies;
+#ifdef USE_MESSAGING
+    relative_roundtrip_timeout_ = o.relative_roundtrip_timeout_;
+#endif // USE_MESSAGING
 }
 
 CORBA::Object &
@@ -162,6 +171,9 @@ CORBA::Object::operator= (const Object &o)
 	orb = CORBA::ORB::_duplicate (o.orb);
 	_managers = o._managers;
 	_policies = o._policies;
+#ifdef USE_MESSAGING
+        relative_roundtrip_timeout_ = o.relative_roundtrip_timeout_;
+#endif // USE_MESSAGING
     }
     return *this;
 }
@@ -363,6 +375,20 @@ CORBA::Object::_set_policy_overrides (const PolicyList &policies,
     default:
 	assert (0);
     }
+#ifdef USE_MESSAGING
+    // set object timeout if available
+    for (CORBA::ULong i = 0; i < policies.length(); i++) {
+        if (policies[i]->policy_type() == Messaging::RELATIVE_RT_TIMEOUT_POLICY_TYPE) {
+            Messaging::RelativeRoundtripTimeoutPolicy_var tpol
+                = Messaging::RelativeRoundtripTimeoutPolicy::_narrow(policies[i]);
+            assert(!is_nil(tpol));
+            // needs to convert TimeBase::TimeT which is in 0.1us (100 ns)
+            // into ms
+            // There is an assumption that max timeout is 2^31 ms
+            nobj->relative_roundtrip_timeout_ = tpol->relative_expiry() / 10000;
+        }
+    }
+#endif // USE_MESSAGING
     return nobj;
 }
 
