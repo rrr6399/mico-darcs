@@ -78,6 +78,8 @@ SL3_SRCS = security/atlas.cc \
   security/sl3aqargs_impl.cc security/sl3utils.cc security/sl3csi_impl.cc \
   security/sl3tls_impl.cc security/sl3ipc_impl.cc security/sl3cmdext.cc
 
+MESSAGING_SRCS = messaging.cc messaging_impl.cc
+
 !ifdef HAVE_MEMCHECK
 SRCS = $(SRCS) memcheck.cc memleaks.cc
 
@@ -103,6 +105,10 @@ SRCS = $(SRCS) os-windows.cc dii.cc typecode.cc any.cc codec.cc buffer.cc contex
 
 !ifdef HAVE_THREADS
 SRCS = $(SRCS) $(MT_SRCS)
+!endif
+
+!ifdef USE_MESSAGING
+SRCS = $(SRCS) $(MESSAGING_SRCS)
 !endif
 
 !ifdef USE_CSL2
