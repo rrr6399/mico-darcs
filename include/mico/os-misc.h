@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2001 by The Mico Team
+ *  Copyright (c) 1997-2007 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -25,6 +25,12 @@
 #define __mico_os_misc_h__
 
 #if defined(_WIN32) && !defined(__MINGW32__)
+
+#if defined(_MSC_VER) && _MSC_VER > 1300
+// VS 2005 produces warning:
+// ..\..\include\mico/os-misc.h(72) : warning C4244: '=' : conversion from '__time64_t' to 'long', possible loss of data
+#pragma warning(disable: 4244)
+#endif // _MSC_VER && _MSC_VER > 1300
 
 #include <winsock2.h>
 #include <windows.h>
