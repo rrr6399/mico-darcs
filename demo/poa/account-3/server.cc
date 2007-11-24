@@ -32,10 +32,12 @@ ServantMap svmap;
  * Implementation of the Account
  */
 
-class Account_impl : virtual public POA_Account
+class Account_impl : virtual public POA_Account,
+    virtual public PortableServer::RefCountServantBase
 {
 public:
   Account_impl ();
+  virtual ~Account_impl();
 
   void deposit (CORBA::ULong);
   void withdraw (CORBA::ULong);
@@ -47,7 +49,13 @@ private:
 
 Account_impl::Account_impl ()
 {
+  //cerr << "ACC CTOR: " << this << endl;
   bal = 0;
+}
+
+Account_impl::~Account_impl()
+{
+  //cerr << "ACC DTOR: " << this << endl;
 }
 
 void
@@ -193,7 +201,8 @@ AccountManager::etherealize (const PortableServer::ObjectId & oid,
      */
 
     svmap.erase (it);
-    delete serv;
+    //delete serv;
+    serv->_remove_ref();
   }
 }
 
