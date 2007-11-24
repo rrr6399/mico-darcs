@@ -53,14 +53,13 @@ pthreadsystem:
 
 
 LIBDIRS = orb idl 
-PRGDIRS = orb cpp idl ir coss tools
+PRGDIRS = orb cpp idl ir daemon coss tools
 !if defined(USE_CCM)
 PRGDIRS = $(PRGDIRS) ccm
 !endif
 
-TOINSTALLDIRS=ir coss tools
-ALLDIRS = orb cpp idl ir coss tools
-# daemon - is not compilable yet in Windows
+TOINSTALLDIRS=ir daemon coss tools
+ALLDIRS = orb cpp idl ir daemon coss tools
 
 
 demo: demo/Makefile.win32 
@@ -110,7 +109,7 @@ install: system
 	for %i in ( $(TOINSTALLDIRS) ) ; do cmd /c "cd %%i & $(MAKE)  /f Makefile.win32 install"
 
 clean:
-	@for %i in ( $(PRGDIRS) demo daemon ) ; do cmd /c "cd %%i & $(MAKE)  /f Makefile.win32 clean"
+	@for %i in ( $(PRGDIRS) demo ) ; do cmd /c "cd %%i & $(MAKE)  /f Makefile.win32 clean"
 !ifdef HAVE_THREADS
 	@cd contrib\pthreads
 	@$(MAKE) clean
