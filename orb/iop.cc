@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2006 by The Mico Team
+ *  Copyright (c) 1997-2007 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -1537,7 +1537,8 @@ MICO::GIOPCodec::get_bind_request (GIOPInContext &in, CORBA::String_out repoid,
 	CORBA::ULong l;
 	check (dc->seq_begin (l));
 	oid.length (l);
-	check (dc->get_octets (&oid[0], oid.length()));
+	if (oid.length() > 0)
+	  check (dc->get_octets (&oid[0], oid.length()));
 	check (dc->seq_end ());
     }
     check (dc->struct_end ());
