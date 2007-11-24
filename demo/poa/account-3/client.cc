@@ -67,6 +67,7 @@ main (int argc, char *argv[])
   cout << "Balance is " << account->balance() << endl;
   bank->shutdown ();
 
-  orb->destroy();
+  orb->shutdown(TRUE);
+  //orb->destroy();
   return 0;
 }
