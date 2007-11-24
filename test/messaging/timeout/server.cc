@@ -32,7 +32,11 @@ HelloWorld_impl::hello ()
 void
 HelloWorld_impl::hello_with_timeout(CORBA::Long sec)
 {
+#ifndef WIN32
   assert(sleep(sec) == 0);
+#else // WIN32
+  Sleep(sec * 1000);
+#endif // WIN32
   cout << "Hello " << sec << " seconds sleeping world" << endl;
 }
 
