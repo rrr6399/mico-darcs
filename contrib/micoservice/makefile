@@ -7,22 +7,28 @@ debug = 1
 # set release variable to 1 if you want release
 # release = 1
 
+!include ..\..\vstudio.win32
+
 all: micoservice 
 
 !ifdef release
-CXXFLAGS        = /I.\  /Ge /GS /Gm /nologo /DNDEBUG /GX /GR /TP /Zi  
+CXXFLAGS        = /I.\  /GS /Gm /nologo /DNDEBUG /EHsc /GR /TP /Zi  
 LINKFLAGS       =  /subsystem:console /incremental:yes advapi32.lib
 !endif
 
 !ifdef debug
-CXXFLAGS        = /I.\  /Ge /GS /Gm /nologo /D_DEBUG /MD /GX /GR /TP /Zi  
+CXXFLAGS        = /I.\  /GS /Gm /nologo /D_DEBUG /MD /EHsc /GR /TP /Zi  
 LINKFLAGS       =  /debug /subsystem:console /incremental:yes advapi32.lib
+!endif
+
+!ifndef VC8
+CXXFLAGS		= $(CXXFLAGS) /Ge
 !endif
 
 .SUFFIXES: .cpp .obj
 
 .cpp.obj:
-	cl.exe /c $(CXXFLAGS) /YX"include.h" $< /Fo$*.obj
+	cl.exe /c $(CXXFLAGS) /Yu"include.h" $< /Fo$*.obj
 
 
 SRCS = include.obj  NTServMsg.res trace.obj util.obj  criticalsection.obj  service_jobs.obj NtService.obj  MyService.obj  NTServApp.obj 
