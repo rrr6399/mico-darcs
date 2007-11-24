@@ -37,7 +37,7 @@
 
 !ifdef HAVE_SSL
 SSL_PATH=$(RELATIVE)\contrib\openssl
-SSL_FLAGS=/W3 /G5 /Gs0 /GF /Gy /nologo \
+SSL_FLAGS=/W3 /Gs0 /GF /Gy /nologo \
                -DMONOLITH -DWIN32 -DWIN32_LEAN_AND_MEAN -DL_ENDIAN \
                /DHAVE_SSL /DHAVE_OPENSSL_SSL_H -I$(SSL_PATH) 
 SSL_LIBS=/LIBPATH:$(RELATIVE)\win32-bin\lib ssleay32.lib libeay32.lib
