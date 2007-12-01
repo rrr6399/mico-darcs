@@ -245,6 +245,34 @@ CORBA::Object::_setup_domains (CORBA::Object_ptr parent)
 	    }
 	}
     }
+#ifdef USE_MESSAGING
+    // propagate possible timeout value
+    TimeBase::TimeT minimum_timeout = 0;
+    CORBA::Boolean minimum_timeout_initialized = FALSE;
+    for (CORBA::ULong i = 0; i < _managers.length(); i++) {
+        try {
+            CORBA::Policy_var tmpol = _managers[i]->get_domain_policy
+                (Messaging::RELATIVE_RT_TIMEOUT_POLICY_TYPE);
+            if (!CORBA::is_nil(tmpol)) {
+                Messaging::RelativeRoundtripTimeoutPolicy_var policy
+                    = Messaging::RelativeRoundtripTimeoutPolicy::_narrow(tmpol);
+                assert(!is_nil(policy));
+                if (!minimum_timeout_initialized) {
+                    minimum_timeout = policy->relative_expiry();
+                    minimum_timeout_initialized = TRUE;
+                }
+                if (minimum_timeout > policy->relative_expiry())
+                    minimum_timeout = policy->relative_expiry();
+            }
+        }
+        catch (const CORBA::INV_POLICY&) {
+        }
+    }
+    // needs to convert TimeBase::TimeT which is in 0.1us (100 ns)
+    // into ms
+    // There is an assumption that max timeout is 2^31 ms
+    relative_roundtrip_timeout_ = minimum_timeout / 10000;
+#endif // USE_MESSAGING
 }
 
 const char *
