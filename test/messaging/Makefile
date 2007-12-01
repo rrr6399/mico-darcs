@@ -1,7 +1,7 @@
 
 include ../../MakeVars
 
-DIRS = timeout
+DIRS = timeout timeout-with-manager
 
 all:
 	for i in $(DIRS); do $(MAKE) -C $$i || exit 1; done
