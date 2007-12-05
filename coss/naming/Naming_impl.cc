@@ -597,6 +597,7 @@ NamingContext_impl::RestoreNamingService (const char * dbfile)
 
       int nc_count;
       in >> nc_count;
+      in.getline(buf, 256);   // clear the end-of-line
       for ( int i = 0; i < nc_count; i++) {
         if (!in.good() || in.eof()) {
           cerr << "oops: " << dbfile << " appears to be corrupted" << endl;
