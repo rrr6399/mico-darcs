@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2005 by The Mico Team
+ *  Copyright (c) 1997-2007 by The Mico Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -137,7 +137,8 @@ OutputStream &OutputStream::operator<<( int i )
 OutputStream &OutputStream::operator<<( CORBA::LongDouble ld )
 {
   checkBofL();
-#if (defined(__hpux) && !defined(__GNUG__)) || (defined(__linux__) && defined(__COMO__) && defined(_STLPORT_VERSION))
+#if (defined(__hpux) && !defined(__GNUG__)) || (defined(__linux__) && defined(__COMO__) && defined(_STLPORT_VERSION)) \
+  || (defined(__linux__) && defined(__s390x__) && defined(_STLPORT_VERSION))
   // XXX
   *_ostr << double(ld);
 #else
