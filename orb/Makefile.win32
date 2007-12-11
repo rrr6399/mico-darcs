@@ -26,7 +26,7 @@ RELATIVE = ..
 
 PCH =
 !ifdef FAST_PCH
-PCH = /DFAST_PCH /YX"orb_pch.h"
+PCH = /DFAST_PCH /Yu"orb_pch.h"
 !endif
 
 all: install
@@ -140,7 +140,7 @@ install: mico$(VERSION).lib mico$(VERSION).dll
 
 !ifdef FAST_PCH
 orb_pch.pch: orb_pch.cc orb_pch.h
-	$(CXX) $(INC) /DFAST_PCH /GS /nologo /GX /GR /TP /Zi /MDd /Yc"orb_pch.h" $(SSL_FLAGS) $(CSIV2_FLAGS) $(PTHREADS_FLAGS) /c orb_pch.cc
+	$(CXX) $(INC) /DFAST_PCH /GS /nologo /EHsc /GR /TP /Zi /MDd /Yc"orb_pch.h" $(SSL_FLAGS) $(CSIV2_FLAGS) $(PTHREADS_FLAGS) /c orb_pch.cc
 
 mico$(VERSION).lib mico$(VERSION).dll : orb_pch.pch mico$(VERSION).def 
 !else
