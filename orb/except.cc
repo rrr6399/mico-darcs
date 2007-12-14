@@ -48,12 +48,12 @@
 #if defined(HAVE_BACKTRACE) && defined(HAVE_BACKTRACE_SYMBOLS)
 #include <execinfo.h>
 #endif // HAVE_BACKTRACE && HAVE_BACKTRACE_SYMBOLS
-#if defined(HAVE_CXXABI_H) && defined(HAVE___CXA_DEMANGLE)
+#if defined(HAVE_CXXABI_H) && defined(HAVE___CXA_DEMANGLE) && !defined(__ICC)
 namespace __cxxabiv1 {
         class __class_type_info;
 };
 #include <cxxabi.h>
-#endif // HAVE_CXXABI_H && HAVE___CXA_DEMANGLE
+#endif // HAVE_CXXABI_H && HAVE___CXA_DEMANGLE && !__ICC
 
 #endif // FAST_PCH
 
@@ -139,7 +139,7 @@ CORBA::Exception::_print_stack_trace (ostream& os) const
     if (this->stack_trace_.size() > 0) {
         os << "Exception stack trace:" << endl;
     }
-#if defined(HAVE_CXXABI_H) && defined(HAVE___CXA_DEMANGLE)
+#if defined(HAVE_CXXABI_H) && defined(HAVE___CXA_DEMANGLE) && !defined(__ICC)
     int status = 0;
     for (unsigned int i = 0; i < this->stack_trace_.size(); i++) {
         string stack_line = this->stack_trace_[i];
