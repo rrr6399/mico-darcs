@@ -950,27 +950,8 @@ else
       if test X"$use_threads" = Xyes; then
         CXXFLAGS="$CXXFLAGS -D_REENTRANT -D_GNU_SOURCE"
       fi
-    elif test ! -z "`echo $cxxversion|grep Intel|grep \"Version 8.0\"`"; then
-      # Intel C++ 8 (icc) configuration
-      CONF_SHARED_CC="$CXX -shared"
-      CONF_PICFLAGS=-fPIC
-      CONF_LDSOFLAGS=-fPIC
-      CXXFLAGS="$CXXFLAGS -tpp5"
-      #CFLAGS="$CFLAGS -tpp5"
-      if test X"$use_opt" != Xyes; then
-        # by default Intel uses -O so we need to disable it
-        CONF_OPT_FLAGS=-O0
-        use_opt=yes
-      fi
-      if test X"$use_compiled_headers" = Xyes; then
-        PCHFLAGS="$PCHFLAGS -pch -pch_dir $ABSSRCDIR/pch -DFAST_PCH"
-        USE_PCH_DIR=yes
-      fi
-      if test X"$use_threads" = Xyes; then
-        CXXFLAGS="$CXXFLAGS -D_REENTRANT -D_GNU_SOURCE"
-      fi
-    elif test ! -z "`echo $cxxversion|grep Intel|grep \"Version 9.0\"`"; then
-      # Intel C++ 9 (icc) configuration
+    elif test ! -z "`echo $cxxversion|grep Intel|grep \"Version\"`"; then
+      # Intel C++ (icpc) configuration
       CONF_SHARED_CC="$CXX -shared"
       CONF_PICFLAGS=-fPIC
       CONF_LDSOFLAGS=-fPIC
