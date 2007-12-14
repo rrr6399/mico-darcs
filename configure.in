@@ -967,6 +967,17 @@ else
       if test X"$use_threads" = Xyes; then
         CXXFLAGS="$CXXFLAGS -D_REENTRANT -D_GNU_SOURCE"
       fi
+    elif test ! -z "`echo $cxxversion|grep Sun|grep C++`"; then
+      # Sun C++ (CC) configuration
+      CONF_OPT_FLAGS=-xO2
+      CONF_SHARED_CC="$CXX -G"
+      CONF_PICFLAGS=-KPIC
+      CONF_LDSOFLAGS=-KPIC
+      # disable anachronism warnings
+      CXXFLAGS="$CXXFLAGS -erroff=badargtype2w"
+      if test X"$use_threads" = Xyes; then
+        CXXFLAGS="$CXXFLAGS -D_REENTRANT -D_GNU_SOURCE"
+      fi
     else
       echo
       echo
