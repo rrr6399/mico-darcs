@@ -2,6 +2,7 @@
 /*
  *  MICO --- an Open Source CORBA implementation
  *  Copyright (C) 1998 Frank Pilhofer
+ *  Copyright (c) 1999-2005 by The Mico Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -117,6 +118,9 @@ public:
   void answer_invoke (CORBA::ORBMsgId, CORBA::Object_ptr,
 		      CORBA::ORBRequest *,
 		      CORBA::InvokeStatus);
+
+  virtual CORBA::Boolean
+  validate_connection(CORBA::Object_ptr, CORBA::PolicyList_out);
 
   /*
    * Callbacks (ORB, Process)

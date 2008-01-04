@@ -4194,6 +4194,20 @@ MICOPOA::POA_impl::answer_invoke (CORBA::ORBMsgId id,
   //  orb->answer_invoke (msgid, stat, CORBA::Object::_nil(), oreq, 0);
 }
 
+CORBA::Boolean
+MICOPOA::POA_impl::validate_connection
+(CORBA::Object_ptr obj,
+ CORBA::PolicyList_out inconsistent_policies)
+{
+    // in case of collocated calls, connection is
+    // always OK
+    // kcg: TODO: but shouldn't we fail here in case
+    // of unregistred or deactivated object?
+    inconsistent_policies = new CORBA::PolicyList;
+    inconsistent_policies->length(0);
+    return TRUE;
+}
+
 #ifdef USE_CSL2
 // ODM
 void

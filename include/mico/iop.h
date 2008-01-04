@@ -819,7 +819,10 @@ public:
     void answer_invoke (CORBA::ORBMsgId, CORBA::Object_ptr,
     			CORBA::ORBRequest *,
     			CORBA::InvokeStatus);
-    
+
+    virtual CORBA::Boolean
+    validate_connection(CORBA::Object_ptr, CORBA::PolicyList_out);
+
     CORBA::Boolean callback (GIOPConn *, GIOPConnCallback::Event);
     CORBA::Boolean input_callback (GIOPConn *, CORBA::Buffer *);
 
@@ -965,6 +968,9 @@ public:
     void answer_invoke (CORBA::ORBMsgId, CORBA::Object_ptr,
     			CORBA::ORBRequest *,
     			CORBA::InvokeStatus);
+
+    virtual CORBA::Boolean
+    validate_connection(CORBA::Object_ptr, CORBA::PolicyList_out);
 
     // ORBCallback interface
     CORBA::Boolean waitfor (CORBA::ORB_ptr, CORBA::ORBMsgId,  CORBA::ORBCallback::Event, CORBA::Long);

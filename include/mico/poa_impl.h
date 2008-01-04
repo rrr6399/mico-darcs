@@ -657,6 +657,8 @@ public:
 		      CORBA::ORBRequest *,
 		      CORBA::InvokeStatus);
 
+  virtual CORBA::Boolean
+  validate_connection(CORBA::Object_ptr, CORBA::PolicyList_out);
 #ifdef USE_CSL2
   // ODM stuff ###ras
   virtual void register_ODM_factory(ObjectDomainMapping::Factory_ptr fry);

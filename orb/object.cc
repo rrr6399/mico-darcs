@@ -421,6 +421,12 @@ CORBA::Object::_set_policy_overrides (const PolicyList &policies,
 }
 
 CORBA::Boolean
+CORBA::Object::_validate_connection(CORBA::PolicyList_out inconsistent_policies)
+{
+    return this->_orbnc()->validate_connection(this, inconsistent_policies);
+}
+
+CORBA::Boolean
 CORBA::Object::_is_a (const char *repoid)
 {
     MICO_OBJ_CHECK2 (this, CORBA::OBJECT_NOT_EXIST());

@@ -1,6 +1,7 @@
 /*
  *  MICO --- an Open Source CORBA implementation
  *  Copyright (C) 1998 Frank Pilhofer
+ *  Copyright (c) 1999-2005 by The Mico Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -832,6 +833,15 @@ POAMediatorImpl::answer_invoke (CORBA::ORBMsgId, CORBA::Object_ptr,
 				CORBA::ORBRequest *, CORBA::InvokeStatus)
 {
   assert (0);
+}
+
+CORBA::Boolean
+POAMediatorImpl::validate_connection
+(CORBA::Object_ptr obj,
+ CORBA::PolicyList_out inconsistent_policies)
+{
+    // shouldn't be called
+    assert(0);
 }
 
 /*
