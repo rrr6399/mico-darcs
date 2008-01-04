@@ -2152,6 +2152,14 @@ CORBA::ORB::create_abstract_interface_tc (const char *rep_id,
     return TypeCode::create_abstract_interface_tc (rep_id, name);
 }
 
+CORBA::TypeCode_ptr
+CORBA::ORB::create_local_interface_tc
+(const char* repo_id,
+ const char* name)
+{
+    return TypeCode::create_local_interface_tc(repo_id, name);
+}
+
 CORBA::ORB::MsgId
 CORBA::ORB::new_msgid ()
 {
