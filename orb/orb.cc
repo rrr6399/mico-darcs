@@ -3173,6 +3173,17 @@ CORBA::ORB::register_options_for_removal(OptionVec& options)
 }
 
 
+CORBA::Boolean
+CORBA::ORB::validate_connection
+(CORBA::Object_ptr obj,
+ CORBA::PolicyList_out inconsistent_policies)
+{
+    ObjectAdapter* oa = this->get_oa(obj);
+    assert(oa != NULL);
+    return oa->validate_connection(obj, inconsistent_policies);
+}
+
+
 /************************** PrincipalCurrent *************************/
 
 

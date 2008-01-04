@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2001 by The Mico Team
+ *  Copyright (c) 1997-2005 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -100,6 +100,9 @@ class DataDecoder;
 class ValueBase;
 class AbstractBase;
 
+// needed by Object::validate_connection (CORBA 2.4)
+class Policy;
+
 typedef Environment *Environment_ptr;
 typedef ObjOut<Environment> Environment_out;  // needed in orb.h
 typedef Environment *EnvironmentRef;
@@ -138,6 +141,11 @@ typedef StaticServerRequest *StaticServerRequest_ptr;
 typedef Object *Object_ptr;
 typedef ObjOut<Object> Object_out;  // needed in any.h
 typedef Object *ObjectRef;
+
+// needed by Object::validate_connection (CORBA 2.4)
+typedef Policy *Policy_ptr;
+typedef ObjVar< Policy > Policy_var;
+typedef TSeqOut< IfaceSequenceTmpl< Policy_var,Policy_ptr> > PolicyList_out;
 
 }
 

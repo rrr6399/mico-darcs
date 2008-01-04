@@ -4510,6 +4510,31 @@ MICO::IIOPProxy::answer_invoke (CORBA::ORBMsgId, CORBA::Object_ptr,
     assert (0);
 }
 
+CORBA::Boolean
+MICO::IIOPProxy::validate_connection
+(CORBA::Object_ptr obj,
+ CORBA::PolicyList_out inconsistent_policies)
+{
+    // kcg: we'll probably need to pass inconsistent_policies
+    // into make_conn -- when make_conn starts to throw
+    // INV_POLICY -- just to get list of call incompatible
+    // policies
+    inconsistent_policies = new CORBA::PolicyList;
+    inconsistent_policies->length(0);
+    try {
+        GIOPConn* conn = this->make_conn(obj);
+        if (conn == NULL) {
+            // it's not possible to open/get the connection
+            // the same exception will be thrown on next requets
+            throw CORBA::COMM_FAILURE();
+        }
+    }
+    catch (const CORBA::INV_POLICY&) {
+        return FALSE;
+    }
+    return TRUE;
+}
+
 void
 MICO::IIOPProxy::exec_invoke_reply (GIOPInContext &in, CORBA::ORBMsgId id,
 				    GIOP::ReplyStatusType stat,
@@ -6003,6 +6028,15 @@ MICO::IIOPServer::answer_invoke (CORBA::ORBMsgId, CORBA::Object_ptr,
 				 CORBA::ORBRequest *, CORBA::InvokeStatus)
 {
     assert (0);
+}
+
+CORBA::Boolean
+MICO::IIOPServer::validate_connection
+(CORBA::Object_ptr obj,
+ CORBA::PolicyList_out inconsistent_policies)
+{
+    // shouldn't be called
+    assert(0);
 }
 
 CORBA::Boolean

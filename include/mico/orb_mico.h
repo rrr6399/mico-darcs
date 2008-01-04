@@ -554,6 +554,11 @@ public:
     void register_options_for_removal(OptionVec& options);
     OptionMap options_for_removal()
     { return this->removal_option_map_; }
+
+    Boolean
+    validate_connection
+    (CORBA::Object_ptr obj,
+     CORBA::PolicyList_out inconsistent_policies);
     // end-mico-extension
 
     static ORB_ptr _duplicate (ORB_ptr o)
@@ -604,6 +609,10 @@ public:
     virtual void answer_invoke (ORBMsgId, CORBA::Object_ptr,
 				CORBA::ORBRequest *,
 				CORBA::InvokeStatus) = 0;
+    virtual Boolean
+    validate_connection
+    (CORBA::Object_ptr obj,
+     CORBA::PolicyList_out inconsistent_policies) = 0;
 
     virtual ~ObjectAdapter ();
 };

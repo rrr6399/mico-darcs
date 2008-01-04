@@ -135,6 +135,9 @@ public:
     Object_ptr _set_policy_overrides (const PolicyList &policies,
 				      SetOverrideType set_add);
 
+    CORBA::Boolean
+    _validate_connection(CORBA::PolicyList_out inconsistent_policies);
+
     // begin-not-in-appendix
     Boolean _is_a (const char *logical_type_id);
     Boolean _is_a_remote (const char *logical_type_id);

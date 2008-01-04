@@ -22,7 +22,7 @@
 
 include ../../MakeVars
 
-DIRS = var
+DIRS = var validate_connection
 
 all:
 	for i in $(DIRS); do $(MAKE) -C $$i || exit 1; done
@@ -31,16 +31,10 @@ clean:
 	for i in $(DIRS); do $(MAKE) -C $$i clean || exit 1; done
 
 check:
-	@for dir in $(DIRS); do \
-	  if test -x $$dir/main -a -f $$dir/expected-stdout; then \
-	    echo Testing $$dir...; \
-	    cd $$dir; \
-	    if ./main | cmp expected-stdout - >/dev/null; then :; \
-	    else \
-	      echo ==== test $$dir failed =====================; \
-	      ./main | diff -c expected-stdout -; \
-	      echo ========================================; \
-	    fi; \
-	    cd ..; \
-	  fi; \
+	@for i in `find . -name 'run' -exec dirname \{} \;` ; \
+		do echo "Testing $$i..."; CWD=`pwd`; cd $$i; ./run > log; \
+		if cmp expected-output log >/dev/null; then :; else \
+		echo "FAILED:"; echo "==============================="; \
+		diff -c expected-output log; echo "==============================="; \
+		fi; rm log; cd $$CWD; \
 	done
