@@ -428,7 +428,8 @@ public:
     virtual TypeCode_ptr create_recursive_tc (const char *rep_id);
     virtual TypeCode_ptr create_abstract_interface_tc (const char *rep_id,
 						       const char *name);
-
+    virtual TypeCode_ptr create_local_interface_tc(const char* repo_id,
+                                                   const char* name);
     // begin-value
     ValueFactory register_value_factory (const char *repoid,
 					 ValueFactory factory);
