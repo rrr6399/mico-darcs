@@ -842,6 +842,7 @@ POAMediatorImpl::validate_connection
 {
     // shouldn't be called
     assert(0);
+    return FALSE;
 }
 
 /*
