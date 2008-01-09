@@ -6037,6 +6037,7 @@ MICO::IIOPServer::validate_connection
 {
     // shouldn't be called
     assert(0);
+    return FALSE;
 }
 
 CORBA::Boolean
