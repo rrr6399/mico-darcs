@@ -22,10 +22,14 @@
 
 include ../MakeVars
 
-DIRS = dii idl ir pi poa obv orb object messaging
+DIRS = dii idl ir pi poa obv orb object
 
 ifeq ($(USE_SL3), yes)
 DIRS := $(DIRS) sl3
+endif
+
+ifeq ($(USE_MESSAGING), yes)
+DIRS := $(DIRS) messaging
 endif
 
 all: prg
