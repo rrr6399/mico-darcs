@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2005 by The Mico Team
+ *  Copyright (c) 1997-2007 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -102,7 +102,7 @@ public:
     virtual void wselect (Dispatcher *, TransportCallback *) = 0;
 
     virtual Boolean bind (const Address *) = 0;
-    virtual Boolean connect (const Address *) = 0;
+    virtual Boolean connect (const Address *, ULong timeout, Boolean& timedout) = 0;
     virtual void open (CORBA::Long fd = -1) = 0;
     virtual void close () = 0;
     virtual void block (Boolean doblock = TRUE) = 0;

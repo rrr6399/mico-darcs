@@ -118,7 +118,7 @@ MICO::UDPTransport::collect_replies (CORBA::Long tmout)
 }
 
 CORBA::Boolean
-MICO::UDPTransport::connect (const CORBA::Address *a)
+MICO::UDPTransport::connect (const CORBA::Address *a, CORBA::ULong timeout, CORBA::Boolean& timedout)
 {
     assert (state == Open);
     assert (!strcmp (a->proto(), "inet-dgram"));
