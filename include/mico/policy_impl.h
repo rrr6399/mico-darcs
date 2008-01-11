@@ -2,6 +2,7 @@
 /*
  *  MICO --- an Open Source CORBA implementation
  *  Copyright (C) 1998 Kay Roemer & Arno Puder
+ *  Copyright (c) 1999-2008 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -38,6 +39,55 @@ public:
     virtual ~Policy_impl ();
     CORBA::PolicyType policy_type ();
     void destroy ();
+};
+
+class PolicyManager_impl
+    : virtual public CORBA::PolicyManager,
+      virtual public CORBA::LocalObject
+{
+public:
+    PolicyManager_impl();
+
+    virtual
+    ~PolicyManager_impl()
+    {}
+
+    virtual CORBA::PolicyList*
+    get_policy_overrides(const CORBA::PolicyTypeSeq& ts);
+
+    virtual void
+    set_policy_overrides(const CORBA::PolicyList& policies, CORBA::SetOverrideType set_add);
+private:
+    CORBA::PolicyList policies_;
+    MICOMT::Mutex policies_mutex_;
+};
+
+class PolicyCurrent_impl
+    : virtual public CORBA::PolicyCurrent,
+      virtual public CORBA::LocalObject
+{
+public:
+    PolicyCurrent_impl();
+
+    virtual
+    ~PolicyCurrent_impl();
+
+    virtual CORBA::PolicyList*
+    get_policy_overrides(const CORBA::PolicyTypeSeq& ts);
+
+    virtual void
+    set_policy_overrides(const CORBA::PolicyList& policies, CORBA::SetOverrideType set_add);
+private:
+    PolicyManager_impl*
+    get_current_manager(CORBA::Boolean create);
+
+private:
+    CORBA::ORB_var orb_;
+#ifndef HAVE_THREADS
+    PolicyManager_impl* manager_;
+#else // HAVE_THREADS
+    MICOMT::Thread::ThreadKey policy_current_key_;
+#endif // HAVE_THREADS
 };
 
 class DomainManager_impl : virtual public CORBA::DomainManager {

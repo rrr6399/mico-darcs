@@ -1939,6 +1939,10 @@ CORBA::ORB::_resolve_initial_references (const char *id)
 	    _init_refs[id] = new PICodec::CodecFactory_impl;
 	} else if (!strcmp (id, "PICurrent")) {
 	    _init_refs[id] = new PInterceptor::Current_impl;
+        } else if (!strcmp (id, "ORBPolicyManager")) {
+            _init_refs[id] = new MICO::PolicyManager_impl;
+        } else if (!strcmp (id, "PolicyCurrent")) {
+            _init_refs[id] = new MICO::PolicyCurrent_impl;
 	} else {
 	  if (MICO::Logger::IsLogged (MICO::Logger::Warning)) {
 	    MICOMT::AutoDebugLock lock;

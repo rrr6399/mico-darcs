@@ -33,6 +33,18 @@ typedef Policy_ptr PolicyRef;
 //typedef ObjVar< Policy > Policy_var;
 //typedef ObjOut< Policy > Policy_out;
 
+class PolicyManager;
+typedef PolicyManager *PolicyManager_ptr;
+typedef PolicyManager_ptr PolicyManagerRef;
+typedef ObjVar< PolicyManager > PolicyManager_var;
+typedef ObjOut< PolicyManager > PolicyManager_out;
+
+class PolicyCurrent;
+typedef PolicyCurrent *PolicyCurrent_ptr;
+typedef PolicyCurrent_ptr PolicyCurrentRef;
+typedef ObjVar< PolicyCurrent > PolicyCurrent_var;
+typedef ObjOut< PolicyCurrent > PolicyCurrent_out;
+
 class DomainManager;
 //typedef DomainManager *DomainManager_ptr;
 typedef DomainManager_ptr DomainManagerRef;
@@ -101,9 +113,50 @@ class Policy :
 };
 
 
-//typedef IfaceSequenceTmpl< Policy_var,Policy_ptr> PolicyList;
+  //typedef IfaceSequenceTmpl< Policy_var,Policy_ptr> PolicyList;
 typedef TSeqVar< IfaceSequenceTmpl< Policy_var,Policy_ptr> > PolicyList_var;
 typedef TSeqOut< IfaceSequenceTmpl< Policy_var,Policy_ptr> > PolicyList_out;
+
+// typedef SequenceTmpl< PolicyType,MICO_TID_DEF> PolicyTypeSeq;
+typedef TSeqVar< SequenceTmpl< PolicyType,MICO_TID_DEF> > PolicyTypeSeq_var;
+typedef TSeqOut< SequenceTmpl< PolicyType,MICO_TID_DEF> > PolicyTypeSeq_out;
+
+struct InvalidPolicies : public CORBA::UserException {
+  #ifdef HAVE_EXPLICIT_STRUCT_OPS
+  InvalidPolicies();
+  ~InvalidPolicies();
+  InvalidPolicies( const InvalidPolicies& s );
+  InvalidPolicies& operator=( const InvalidPolicies& s );
+  #endif //HAVE_EXPLICIT_STRUCT_OPS
+
+  #ifndef HAVE_EXPLICIT_STRUCT_OPS
+  InvalidPolicies();
+  #endif //HAVE_EXPLICIT_STRUCT_OPS
+  InvalidPolicies( SequenceTmpl< CORBA::UShort,MICO_TID_DEF> _m0 );
+
+  #ifdef HAVE_STD_EH
+  InvalidPolicies *operator->() { return this; }
+  InvalidPolicies& operator*() { return *this; }
+  operator InvalidPolicies*() { return this; }
+  #endif // HAVE_STD_EH
+
+  void _throwit() const;
+  const char *_repoid() const;
+  void _encode( CORBA::DataEncoder &en ) const;
+  void _encode_any( CORBA::Any &a ) const;
+  CORBA::Exception *_clone() const;
+  static InvalidPolicies *_downcast( CORBA::Exception *ex );
+  static const InvalidPolicies *_downcast( const CORBA::Exception *ex );
+  SequenceTmpl< CORBA::UShort,MICO_TID_DEF> indices;
+};
+
+#ifdef HAVE_STD_EH
+typedef InvalidPolicies InvalidPolicies_catch;
+#else
+typedef ExceptVar< InvalidPolicies > InvalidPolicies_var;
+typedef TVarOut< InvalidPolicies > InvalidPolicies_out;
+typedef InvalidPolicies_var InvalidPolicies_catch;
+#endif // HAVE_STD_EH
 
 //enum SetOverrideType {
 //  SET_OVERRIDE = 0,
@@ -111,6 +164,88 @@ typedef TSeqOut< IfaceSequenceTmpl< Policy_var,Policy_ptr> > PolicyList_out;
 //};
 
 typedef SetOverrideType& SetOverrideType_out;
+
+
+/*
+ * Base class and common definitions for local interface PolicyManager
+ */
+
+class PolicyManager : 
+  virtual public CORBA::Object
+{
+  public:
+    virtual ~PolicyManager();
+
+    #ifdef HAVE_TYPEDEF_OVERLOAD
+    typedef PolicyManager_ptr _ptr_type;
+    typedef PolicyManager_var _var_type;
+    #endif
+
+    static PolicyManager_ptr _narrow( CORBA::Object_ptr obj );
+    static PolicyManager_ptr _narrow( CORBA::AbstractBase_ptr obj );
+    static PolicyManager_ptr _duplicate( PolicyManager_ptr _obj )
+    {
+      CORBA::Object::_duplicate (_obj);
+      return _obj;
+    }
+
+    static PolicyManager_ptr _nil()
+    {
+      return 0;
+    }
+
+    virtual void *_narrow_helper( const char *repoid );
+
+    virtual ::CORBA::PolicyList* get_policy_overrides( const ::CORBA::PolicyTypeSeq& ts ) = 0;
+    virtual void set_policy_overrides( const ::CORBA::PolicyList& policies, ::CORBA::SetOverrideType set_add ) = 0;
+
+  protected:
+    PolicyManager() {};
+  private:
+    PolicyManager( const PolicyManager& );
+    void operator=( const PolicyManager& );
+};
+
+
+
+/*
+ * Base class and common definitions for local interface PolicyCurrent
+ */
+
+class PolicyCurrent : 
+  virtual public ::CORBA::PolicyManager,
+  virtual public ::CORBA::Current
+{
+  public:
+    virtual ~PolicyCurrent();
+
+    #ifdef HAVE_TYPEDEF_OVERLOAD
+    typedef PolicyCurrent_ptr _ptr_type;
+    typedef PolicyCurrent_var _var_type;
+    #endif
+
+    static PolicyCurrent_ptr _narrow( CORBA::Object_ptr obj );
+    static PolicyCurrent_ptr _narrow( CORBA::AbstractBase_ptr obj );
+    static PolicyCurrent_ptr _duplicate( PolicyCurrent_ptr _obj )
+    {
+      CORBA::Object::_duplicate (_obj);
+      return _obj;
+    }
+
+    static PolicyCurrent_ptr _nil()
+    {
+      return 0;
+    }
+
+    virtual void *_narrow_helper( const char *repoid );
+
+  protected:
+    PolicyCurrent() {};
+  private:
+    PolicyCurrent( const PolicyCurrent& );
+    void operator=( const PolicyCurrent& );
+};
+
 
 
 /*
@@ -201,10 +336,6 @@ class ConstructionPolicy :
 //typedef IfaceSequenceTmpl< DomainManager_var,DomainManager_ptr> DomainManagerList;
 typedef TSeqVar< IfaceSequenceTmpl< DomainManager_var,DomainManager_ptr> > DomainManagerList_var;
 typedef TSeqOut< IfaceSequenceTmpl< DomainManager_var,DomainManager_ptr> > DomainManagerList_out;
-
-typedef SequenceTmpl< PolicyType,MICO_TID_DEF> PolicyTypeSeq;
-typedef TSeqVar< SequenceTmpl< PolicyType,MICO_TID_DEF> > PolicyTypeSeq_var;
-typedef TSeqOut< SequenceTmpl< PolicyType,MICO_TID_DEF> > PolicyTypeSeq_out;
 
 typedef CORBA::Short PolicyErrorCode;
 typedef PolicyErrorCode& PolicyErrorCode_out;

@@ -1,7 +1,7 @@
-*** policy.h.orig	Wed Mar  5 00:06:37 2003
---- policy.h	Wed Mar  5 00:09:12 2003
+*** ../../orb/orig/policy.h	2008-01-07 22:40:15.000000000 +0100
+--- policy.h	2008-01-07 21:29:45.000000000 +0100
 ***************
-*** 28,43 ****
+*** 28,37 ****
   {
   
   class Policy;
@@ -9,6 +9,23 @@
   typedef Policy_ptr PolicyRef;
 ! typedef ObjVar< Policy > Policy_var;
 ! typedef ObjOut< Policy > Policy_out;
+  
+  class PolicyManager;
+  typedef PolicyManager *PolicyManager_ptr;
+--- 28,37 ----
+  {
+  
+  class Policy;
+! //typedef Policy *Policy_ptr;
+  typedef Policy_ptr PolicyRef;
+! //typedef ObjVar< Policy > Policy_var;
+! //typedef ObjOut< Policy > Policy_out;
+  
+  class PolicyManager;
+  typedef PolicyManager *PolicyManager_ptr;
+***************
+*** 46,55 ****
+  typedef ObjOut< PolicyCurrent > PolicyCurrent_out;
   
   class DomainManager;
 ! typedef DomainManager *DomainManager_ptr;
@@ -18,14 +35,8 @@
   
   class ConstructionPolicy;
   typedef ConstructionPolicy *ConstructionPolicy_ptr;
---- 28,43 ----
-  {
-  
-  class Policy;
-! //typedef Policy *Policy_ptr;
-  typedef Policy_ptr PolicyRef;
-! //typedef ObjVar< Policy > Policy_var;
-! //typedef ObjOut< Policy > Policy_out;
+--- 46,55 ----
+  typedef ObjOut< PolicyCurrent > PolicyCurrent_out;
   
   class DomainManager;
 ! //typedef DomainManager *DomainManager_ptr;
@@ -36,7 +47,7 @@
   class ConstructionPolicy;
   typedef ConstructionPolicy *ConstructionPolicy_ptr;
 ***************
-*** 55,61 ****
+*** 67,73 ****
   namespace CORBA
   {
   
@@ -44,7 +55,7 @@
   typedef PolicyType& PolicyType_out;
   
   /*
---- 55,61 ----
+--- 67,73 ----
   namespace CORBA
   {
   
@@ -53,13 +64,34 @@
   
   /*
 ***************
-*** 101,114 ****
+*** 113,123 ****
   };
   
   
 ! typedef IfaceSequenceTmpl< Policy_var,Policy_ptr> PolicyList;
   typedef TSeqVar< IfaceSequenceTmpl< Policy_var,Policy_ptr> > PolicyList_var;
   typedef TSeqOut< IfaceSequenceTmpl< Policy_var,Policy_ptr> > PolicyList_out;
+  
+! typedef SequenceTmpl< PolicyType,MICO_TID_DEF> PolicyTypeSeq;
+  typedef TSeqVar< SequenceTmpl< PolicyType,MICO_TID_DEF> > PolicyTypeSeq_var;
+  typedef TSeqOut< SequenceTmpl< PolicyType,MICO_TID_DEF> > PolicyTypeSeq_out;
+  
+--- 113,123 ----
+  };
+  
+  
+!   //typedef IfaceSequenceTmpl< Policy_var,Policy_ptr> PolicyList;
+  typedef TSeqVar< IfaceSequenceTmpl< Policy_var,Policy_ptr> > PolicyList_var;
+  typedef TSeqOut< IfaceSequenceTmpl< Policy_var,Policy_ptr> > PolicyList_out;
+  
+! // typedef SequenceTmpl< PolicyType,MICO_TID_DEF> PolicyTypeSeq;
+  typedef TSeqVar< SequenceTmpl< PolicyType,MICO_TID_DEF> > PolicyTypeSeq_var;
+  typedef TSeqOut< SequenceTmpl< PolicyType,MICO_TID_DEF> > PolicyTypeSeq_out;
+  
+***************
+*** 158,167 ****
+  typedef InvalidPolicies_var InvalidPolicies_catch;
+  #endif // HAVE_STD_EH
   
 ! enum SetOverrideType {
 !   SET_OVERRIDE = 0,
@@ -68,13 +100,9 @@
   
   typedef SetOverrideType& SetOverrideType_out;
   
---- 101,114 ----
-  };
-  
-  
-! //typedef IfaceSequenceTmpl< Policy_var,Policy_ptr> PolicyList;
-  typedef TSeqVar< IfaceSequenceTmpl< Policy_var,Policy_ptr> > PolicyList_var;
-  typedef TSeqOut< IfaceSequenceTmpl< Policy_var,Policy_ptr> > PolicyList_out;
+--- 158,167 ----
+  typedef InvalidPolicies_var InvalidPolicies_catch;
+  #endif // HAVE_STD_EH
   
 ! //enum SetOverrideType {
 ! //  SET_OVERRIDE = 0,
@@ -84,7 +112,7 @@
   typedef SetOverrideType& SetOverrideType_out;
   
 ***************
-*** 198,204 ****
+*** 333,339 ****
   };
   
   
@@ -92,7 +120,7 @@
   typedef TSeqVar< IfaceSequenceTmpl< DomainManager_var,DomainManager_ptr> > DomainManagerList_var;
   typedef TSeqOut< IfaceSequenceTmpl< DomainManager_var,DomainManager_ptr> > DomainManagerList_out;
   
---- 198,204 ----
+--- 333,339 ----
   };
   
   

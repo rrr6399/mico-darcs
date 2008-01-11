@@ -6,6 +6,7 @@
 #include "config.idl"
 
 #include <mico/ir.idl>
+#include <mico/current.idl>
 
 #pragma prefix "omg.org"
 
@@ -20,12 +21,27 @@ module CORBA {
   };
 
   typedef sequence<Policy> PolicyList;
+  typedef sequence<PolicyType> PolicyTypeSeq;
+
+  exception InvalidPolicies {
+    sequence <unsigned short> indices;
+  };
 
   enum SetOverrideType {
       SET_OVERRIDE,
       ADD_OVERIDE
   };
-  
+
+  local interface PolicyManager {
+    PolicyList get_policy_overrides(in PolicyTypeSeq ts);
+    void set_policy_overrides(in PolicyList policies,
+                              in SetOverrideType set_add)
+      raises (InvalidPolicies);
+  };
+
+  local interface PolicyCurrent : PolicyManager, Current {
+  };
+
   interface DomainManager {
     Policy get_domain_policy (in PolicyType policy_type);
     void set_domain_policy (in Policy policy);
@@ -41,11 +57,6 @@ module CORBA {
   };
 
   typedef sequence<DomainManager> DomainManagerList;
-
-#ifdef USE_CSL2
-  // for ODM
-  typedef sequence<PolicyType> PolicyTypeSeq;
-#endif /* USE_CSL2  */
 
   typedef short PolicyErrorCode;
   const PolicyErrorCode BAD_POLICY = 0;
