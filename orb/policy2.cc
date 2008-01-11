@@ -158,6 +158,50 @@ operator>>=( const CORBA::Any &_a, MICOPolicy::TransportPrefPolicy_ptr &_obj )
 }
 
 
+
+/*
+ * Base interface for class RelativeConnectionBindingTimeoutPolicy
+ */
+
+MICOPolicy::RelativeConnectionBindingTimeoutPolicy::~RelativeConnectionBindingTimeoutPolicy()
+{
+}
+
+void *
+MICOPolicy::RelativeConnectionBindingTimeoutPolicy::_narrow_helper( const char *_repoid )
+{
+  if( strcmp( _repoid, "IDL:omg.org/MICOPolicy/RelativeConnectionBindingTimeoutPolicy:1.0" ) == 0 )
+    return (void *)this;
+  {
+    void *_p;
+    if ((_p = CORBA::Policy::_narrow_helper( _repoid )))
+      return _p;
+  }
+  return NULL;
+}
+
+MICOPolicy::RelativeConnectionBindingTimeoutPolicy_ptr
+MICOPolicy::RelativeConnectionBindingTimeoutPolicy::_narrow( CORBA::Object_ptr _obj )
+{
+  if( !CORBA::is_nil( _obj ) ) {
+    void *_p;
+    if( (_p = _obj->_narrow_helper( "IDL:omg.org/MICOPolicy/RelativeConnectionBindingTimeoutPolicy:1.0" )))
+      return _duplicate( (MICOPolicy::RelativeConnectionBindingTimeoutPolicy_ptr) _p );
+  }
+  return _nil();
+}
+
+MICOPolicy::RelativeConnectionBindingTimeoutPolicy_ptr
+MICOPolicy::RelativeConnectionBindingTimeoutPolicy::_narrow( CORBA::AbstractBase_ptr _obj )
+{
+  return _narrow (_obj->_to_object());
+}
+
+namespace MICOPolicy
+{
+CORBA::TypeCodeConst _tc_RelativeConnectionBindingTimeoutPolicy;
+}
+
 namespace BiDirPolicy
 {
 CORBA::TypeCodeConst _tc_BidirectionalPolicyValue;
@@ -319,6 +363,12 @@ struct __tc_init_POLICY2 {
     "63793a312e300000140000005472616e73706f727450726566506f6c6963"
     "7900";
     _marshaller_MICOPolicy_TransportPrefPolicy = new _Marshaller_MICOPolicy_TransportPrefPolicy;
+    MICOPolicy::_tc_RelativeConnectionBindingTimeoutPolicy = 
+    "010000000e00000077000000010000004200000049444c3a6f6d672e6f72"
+    "672f4d49434f506f6c6963792f52656c6174697665436f6e6e656374696f"
+    "6e42696e64696e6754696d656f7574506f6c6963793a312e300000002700"
+    "000052656c6174697665436f6e6e656374696f6e42696e64696e6754696d"
+    "656f7574506f6c69637900";
     BiDirPolicy::_tc_BidirectionalPolicyValue = 
     "010000001500000064000000010000003500000049444c3a6f6d672e6f72"
     "672f4269446972506f6c6963792f4269646972656374696f6e616c506f6c"

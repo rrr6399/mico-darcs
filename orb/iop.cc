@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2007 by The Mico Team
+ *  Copyright (c) 1997-2008 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -3440,20 +3440,18 @@ MICO::IIOPProxy::redo_invoke (CORBA::ORBMsgId id)
     _orb->redo_request (id);
 }
 
-#ifndef USE_SL3
 MICO::GIOPConn *
 MICO::IIOPProxy::make_conn (const CORBA::Address *addr,
+			    CORBA::ULong timeout,
+			    CORBA::Boolean& timedout,
 			    CORBA::Boolean docreate,
-			    CORBA::UShort version)
-#else // USE_SL3
-MICO::GIOPConn*
-MICO::IIOPProxy::make_conn
-(const CORBA::Address *addr,
- CORBA::Boolean docreate,
- CORBA::UShort version,
- const char* tcpip_creds_id,
- const char* tls_creds_id)
+			    CORBA::UShort version
+#ifdef USE_SL3
+			    ,
+			    const char* tcpip_creds_id,
+			    const char* tls_creds_id
 #endif // USE_SL3
+			    )
 {
     //cerr << "IIOPProxy::make_conn: " << addr->stringify() << endl;
     if (MICO::Logger::IsLogged(MICO::Logger::Security)) {
@@ -3666,7 +3664,7 @@ MICO::IIOPProxy::make_conn
 	    return NULL;
     }
 #endif // USE_SL3
-    if (!t->connect (addr)) {
+    if (!t->connect (addr, timeout, timedout)) {
       if (MICO::Logger::IsLogged (MICO::Logger::GIOP)) {
 	MICOMT::AutoDebugLock __lock;
 	MICO::Logger::Stream (MICO::Logger::GIOP)
@@ -3753,7 +3751,7 @@ MICO::IIOPProxy::make_conn
 }
 
 MICO::GIOPConn *
-MICO::IIOPProxy::make_conn (CORBA::Object_ptr obj)
+MICO::IIOPProxy::make_conn (CORBA::Object_ptr obj, CORBA::Boolean& timedout)
 {
     //cerr << "make_conn: " << obj << endl;
     CORBA::IORProfile *prof;
@@ -4045,13 +4043,27 @@ MICO::IIOPProxy::make_conn (CORBA::Object_ptr obj)
                 if (!_orb->plugged() && version < 0x0102)
                     version = 0x0102;
             }
-
-#ifndef USE_SL3
-	    GIOPConn *conn = make_conn (addr, 1, version);
-#else // USE_SL3
-	    GIOPConn* conn = this->make_conn
-		(addr, 1, version, tcpip_creds_id, tls_creds_id);
+            CORBA::ULong timeout = 0;
+#ifdef USE_MESSAGING
+            try {
+                CORBA::Policy_var pol
+                    = obj->_get_policy(MICOPolicy::RELATIVE_CB_TIMEOUT_POLICY_TYPE);
+                MICOPolicy::RelativeConnectionBindingTimeoutPolicy_var tpol
+                    = MICOPolicy::RelativeConnectionBindingTimeoutPolicy::_narrow(pol);
+                assert(!is_nil(tpol));
+                // needs to convert TimeBase::TimeT which is in 0.1us (100 ns)
+                // into ms
+                // There is an assumption that max timeout is 2^31 ms
+                timeout = tpol->relative_expiry() / 10000;
+            }
+            catch (const CORBA::INV_POLICY&) {
+            }
+#endif // USE_MESSAGING
+	    GIOPConn *conn = make_conn (addr, timeout, timedout, 1, version
+#ifdef USE_SL3
+					, tcpip_creds_id, tls_creds_id
 #endif // USE_SL3
+					);
 	    if (conn) {
 	      obj->_ior_fwd()->active_profile (prof);
 #ifdef HAVE_THREADS
@@ -4246,7 +4258,8 @@ MICO::IIOPProxy::is_local () const
 #ifdef USE_CSL2
 CORBA::Principal_ptr
 MICO::IIOPProxy::get_principal (CORBA::Object_ptr obj){
-    GIOPConn *conn = make_conn (obj);
+    CORBA::Boolean timedout = FALSE;
+    GIOPConn *conn = make_conn (obj, timedout);
     // WARNING: This assertion is raised if a cipher is not supported!!!
     assert(conn);
     CORBA::Principal_ptr server_pr = conn->transport()->get_principal();
@@ -4261,12 +4274,21 @@ MICO::IIOPProxy::invoke (CORBA::ORBMsgId id, CORBA::Object_ptr obj,
 			 CORBA::ORBRequest *req,
 			 CORBA::Principal_ptr pr, CORBA::Boolean response_exp)
 {
-    GIOPConn *conn = make_conn (obj);
+    CORBA::Boolean timedout = false;
+    GIOPConn *conn = make_conn (obj, timedout);
     if (!conn) {
-        CORBA::COMM_FAILURE ex;
-	req->set_out_args (&ex);
-	_orb->answer_invoke (id, CORBA::InvokeSysEx, CORBA::Object::_nil(),
-			     req, 0);
+        if (timedout) {
+            CORBA::TIMEOUT ex;
+            req->set_out_args (&ex);
+            _orb->answer_invoke (id, CORBA::InvokeSysEx, CORBA::Object::_nil(),
+                                 req, 0);
+        }
+	else {
+	    CORBA::COMM_FAILURE ex;
+	    req->set_out_args (&ex);
+	    _orb->answer_invoke (id, CORBA::InvokeSysEx, CORBA::Object::_nil(),
+				 req, 0);
+	}
 	return FALSE;
     }
 #ifdef HAVE_THREADS
@@ -4364,7 +4386,13 @@ MICO::IIOPProxy::bind (CORBA::ORBMsgId id, const char *repoid,
     if (!addr || addr->is_local())
 	return FALSE;
 
-    GIOPConn *conn = make_conn (addr);
+    CORBA::Boolean timedout = false;
+    CORBA::ULong timeout = 0;
+#ifdef USE_MESSAGING
+    // kcg: TBD
+    MICO_NOT_IMPLEMENTED;
+#endif // USE_MESSAGING
+    GIOPConn *conn = make_conn (addr, 0, timedout);
     if (!conn) {
         _orb->answer_bind (id, CORBA::LocateUnknown, CORBA::Object::_nil());
         return TRUE;
@@ -4400,7 +4428,8 @@ MICO::IIOPProxy::bind (CORBA::ORBMsgId id, const char *repoid,
 CORBA::Boolean
 MICO::IIOPProxy::locate (CORBA::ORBMsgId id, CORBA::Object_ptr obj)
 {
-    GIOPConn *conn = make_conn (obj);
+    CORBA::Boolean timedout = false;
+    GIOPConn *conn = make_conn (obj, timedout);
     if (!conn) {
 	_orb->answer_locate (id, CORBA::LocateUnknown,
 			     CORBA::Object::_nil(), 0);
@@ -4522,7 +4551,13 @@ MICO::IIOPProxy::validate_connection
     inconsistent_policies = new CORBA::PolicyList;
     inconsistent_policies->length(0);
     try {
-        GIOPConn* conn = this->make_conn(obj);
+        CORBA::Boolean timedout = FALSE;
+        GIOPConn* conn = this->make_conn(obj, timedout);
+        if (timedout) {
+            throw CORBA::TIMEOUT();
+            // it's not possible to open/get the connection
+            // the same exception will be thrown on next requets
+        }
         if (conn == NULL) {
             // it's not possible to open/get the connection
             // the same exception will be thrown on next requets

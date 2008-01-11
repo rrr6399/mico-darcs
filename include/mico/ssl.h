@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2005 by The Mico Team
+ *  Copyright (c) 1997-2007 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -256,7 +256,7 @@ public:
     void wselect (CORBA::Dispatcher *, CORBA::TransportCallback *);
     
     CORBA::Boolean bind (const CORBA::Address *);
-    CORBA::Boolean connect (const CORBA::Address *);
+    CORBA::Boolean connect (const CORBA::Address *, CORBA::ULong, CORBA::Boolean&);
     void close ();
     void block (CORBA::Boolean doblock = TRUE);
     CORBA::Boolean isblocking ();

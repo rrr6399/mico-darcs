@@ -166,6 +166,28 @@ public:
     }
 };
 
+#ifdef USE_MESSAGING
+class RelativeConnectionBindingTimeoutPolicy_impl
+    : public virtual Policy_impl,
+      public virtual MICOPolicy::RelativeConnectionBindingTimeoutPolicy,
+      public virtual ::CORBA::LocalObject
+{
+public:
+    RelativeConnectionBindingTimeoutPolicy_impl(TimeBase::TimeT value);
+
+    virtual
+    ~RelativeConnectionBindingTimeoutPolicy_impl();
+
+    virtual ::CORBA::Policy_ptr
+    copy();
+
+    virtual ::TimeBase::TimeT
+    relative_expiry();
+private:
+    ::TimeBase::TimeT relative_expiry_;
+};
+#endif // USE_MESSAGING
+
 }
 
 #endif

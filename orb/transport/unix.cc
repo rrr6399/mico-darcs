@@ -55,7 +55,7 @@ MICO::UnixTransport::bind (const CORBA::Address *a)
 }
 
 CORBA::Boolean
-MICO::UnixTransport::connect (const CORBA::Address *a)
+MICO::UnixTransport::connect (const CORBA::Address *a, CORBA::ULong timeout, CORBA::Boolean& timedout)
 {
     assert (state == Open);
     assert (!strcmp (a->proto(), "unix"));

@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2006 by The Mico Team
+ *  Copyright (c) 1997-2007 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -764,17 +764,18 @@ class IIOPProxy : public CORBA::ObjectAdapter, public GIOPConnCallback, public G
     void abort_invoke (CORBA::ORBMsgId);
     void redo_invoke  (CORBA::ORBMsgId);
 
-    GIOPConn *make_conn (CORBA::Object_ptr);
-#ifndef USE_SL3
-    GIOPConn *make_conn (const CORBA::Address *, CORBA::Boolean create = TRUE,
-			 CORBA::UShort version = 0);
-#else //USE_SL3
+    GIOPConn *make_conn (CORBA::Object_ptr, CORBA::Boolean&);
     GIOPConn *make_conn (const CORBA::Address *,
+			 CORBA::ULong timeout,
+			 CORBA::Boolean& timedout,
 			 CORBA::Boolean create = TRUE,
-			 CORBA::UShort version = 0,
+			 CORBA::UShort version = 0
+#ifdef USE_SL3
+			 ,
 			 const char* tcpip_creds_id = 0,
-			 const char* tls_creds_id = 0);
+			 const char* tls_creds_id = 0
 #endif // USE_SL3
+			 );
     void conn_error (GIOPConn *, CORBA::Boolean send_error = TRUE);
 
     void deref_conn (GIOPConn *conn, CORBA::Boolean all = FALSE );

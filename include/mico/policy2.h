@@ -33,6 +33,12 @@ typedef TransportPrefPolicy_ptr TransportPrefPolicyRef;
 typedef ObjVar< TransportPrefPolicy > TransportPrefPolicy_var;
 typedef ObjOut< TransportPrefPolicy > TransportPrefPolicy_out;
 
+class RelativeConnectionBindingTimeoutPolicy;
+typedef RelativeConnectionBindingTimeoutPolicy *RelativeConnectionBindingTimeoutPolicy_ptr;
+typedef RelativeConnectionBindingTimeoutPolicy_ptr RelativeConnectionBindingTimeoutPolicyRef;
+typedef ObjVar< RelativeConnectionBindingTimeoutPolicy > RelativeConnectionBindingTimeoutPolicy_var;
+typedef ObjOut< RelativeConnectionBindingTimeoutPolicy > RelativeConnectionBindingTimeoutPolicy_out;
+
 }
 
 
@@ -106,6 +112,49 @@ class TransportPrefPolicy :
   private:
     TransportPrefPolicy( const TransportPrefPolicy& );
     void operator=( const TransportPrefPolicy& );
+};
+
+
+const ::CORBA::PolicyType RELATIVE_CB_TIMEOUT_POLICY_TYPE = 1001;
+
+/*
+ * Base class and common definitions for local interface RelativeConnectionBindingTimeoutPolicy
+ */
+
+class RelativeConnectionBindingTimeoutPolicy : 
+  virtual public CORBA::Object,
+  virtual public ::CORBA::Policy
+{
+  public:
+    virtual ~RelativeConnectionBindingTimeoutPolicy();
+
+    #ifdef HAVE_TYPEDEF_OVERLOAD
+    typedef RelativeConnectionBindingTimeoutPolicy_ptr _ptr_type;
+    typedef RelativeConnectionBindingTimeoutPolicy_var _var_type;
+    #endif
+
+    static RelativeConnectionBindingTimeoutPolicy_ptr _narrow( CORBA::Object_ptr obj );
+    static RelativeConnectionBindingTimeoutPolicy_ptr _narrow( CORBA::AbstractBase_ptr obj );
+    static RelativeConnectionBindingTimeoutPolicy_ptr _duplicate( RelativeConnectionBindingTimeoutPolicy_ptr _obj )
+    {
+      CORBA::Object::_duplicate (_obj);
+      return _obj;
+    }
+
+    static RelativeConnectionBindingTimeoutPolicy_ptr _nil()
+    {
+      return 0;
+    }
+
+    virtual void *_narrow_helper( const char *repoid );
+
+    virtual ::TimeBase::TimeT relative_expiry() = 0;
+
+  protected:
+    RelativeConnectionBindingTimeoutPolicy() {};
+  private:
+    RelativeConnectionBindingTimeoutPolicy( const RelativeConnectionBindingTimeoutPolicy& );
+    void operator=( const RelativeConnectionBindingTimeoutPolicy& );
 };
 
 

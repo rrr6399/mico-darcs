@@ -994,14 +994,14 @@ MICOSSL::SSLTransport::bind (const CORBA::Address *a)
 }
 
 CORBA::Boolean
-MICOSSL::SSLTransport::connect (const CORBA::Address *a)
+MICOSSL::SSLTransport::connect (const CORBA::Address *a, CORBA::ULong timeout, CORBA::Boolean& timedout)
 {
     assert (!strcmp (a->proto(), "ssl"));
     SSLAddress *sa = (SSLAddress *)a;
 
     CORBA::Boolean blocking = _transp->isblocking();
     _transp->block (TRUE);
-    CORBA::Boolean r = _transp->connect (sa->content());
+    CORBA::Boolean r = _transp->connect (sa->content(), timeout, timedout);
     if (!r) {
 	_err = _transp->errormsg();
         _transp->block (blocking);

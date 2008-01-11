@@ -379,6 +379,34 @@ MICO::BidirectionalPolicy_impl::copy ()
 
 //-------------------
 
+#ifdef USE_MESSAGING
+MICO::RelativeConnectionBindingTimeoutPolicy_impl::RelativeConnectionBindingTimeoutPolicy_impl
+(TimeBase::TimeT value)
+    : Policy_impl(MICOPolicy::RELATIVE_CB_TIMEOUT_POLICY_TYPE), relative_expiry_(value)
+{
+    CORBA::Object::increase_timeout_policy_instance_counter();
+}
+
+MICO::RelativeConnectionBindingTimeoutPolicy_impl::~RelativeConnectionBindingTimeoutPolicy_impl()
+{
+    CORBA::Object::decrease_timeout_policy_instance_counter();
+}
+
+::CORBA::Policy_ptr
+MICO::RelativeConnectionBindingTimeoutPolicy_impl::copy()
+{
+    return new RelativeConnectionBindingTimeoutPolicy_impl(this->relative_expiry_);
+}
+
+::TimeBase::TimeT
+MICO::RelativeConnectionBindingTimeoutPolicy_impl::relative_expiry()
+{
+    return relative_expiry_;
+}
+#endif // USE_MESSAGING
+
+//-------------------
+
 
 CORBA::Policy_ptr
 CORBA::ORB::create_policy (CORBA::PolicyType type, const CORBA::Any &any)
@@ -443,6 +471,12 @@ CORBA::ORB::create_policy (CORBA::PolicyType type, const CORBA::Any &any)
     if (!(any >>= val))
       mico_throw(CORBA::PolicyError(CORBA::BAD_POLICY_TYPE));
     return new MICO::RelativeRoundtripTimeoutPolicy_impl(val);
+  }
+  else if (type == MICOPolicy::RELATIVE_CB_TIMEOUT_POLICY_TYPE) {
+    TimeBase::TimeT val;
+    if (!(any >>= val))
+      mico_throw(CORBA::PolicyError(CORBA::BAD_POLICY_TYPE));
+    return new MICO::RelativeConnectionBindingTimeoutPolicy_impl(val);
   }
 #endif // USE_MESSAGING
   else if (PInterceptor::PI::S_pfmap_.find(type)

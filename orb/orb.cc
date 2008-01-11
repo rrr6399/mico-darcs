@@ -1262,7 +1262,8 @@ CORBA::ORB::http_to_object (const char * str)
 
   CORBA::Transport * trans = addr->make_transport ();
 
-  if (!trans || trans->bad() || !trans->connect(addr)) {
+  CORBA::Boolean timedout = false;
+  if (!trans || trans->bad() || !trans->connect(addr, 0, timedout)) {
     delete trans;
     delete addr;
     mico_throw (CORBA::BAD_PARAM (CORBA::OMGVMCID | 8, CORBA::COMPLETED_NO));
