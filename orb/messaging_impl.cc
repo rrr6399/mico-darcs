@@ -1,6 +1,6 @@
 //
 //  MICO --- an Open Source CORBA implementation
-//  Copyright (C) 2007 ObjectSecurity Ltd.
+//  Copyright (C) 2007, 2008 ObjectSecurity Ltd.
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Library General Public
@@ -50,15 +50,19 @@ MICO::RelativeRoundtripTimeoutPolicy_impl::RelativeRoundtripTimeoutPolicy_impl
 (TimeBase::TimeT value)
     : Policy_impl(Messaging::RELATIVE_RT_TIMEOUT_POLICY_TYPE), relative_expiry_(value)
 {
+    CORBA::Object::increase_timeout_policy_instance_counter();
 }
 
+MICO::RelativeRoundtripTimeoutPolicy_impl::~RelativeRoundtripTimeoutPolicy_impl()
+{
+    CORBA::Object::decrease_timeout_policy_instance_counter();
+}
 
 ::CORBA::Policy_ptr
 MICO::RelativeRoundtripTimeoutPolicy_impl::copy()
 {
     return new RelativeRoundtripTimeoutPolicy_impl(this->relative_expiry_);
 }
-
 
 ::TimeBase::TimeT
 MICO::RelativeRoundtripTimeoutPolicy_impl::relative_expiry()

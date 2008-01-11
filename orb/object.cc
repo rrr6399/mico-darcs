@@ -55,6 +55,13 @@
 
 using namespace std;
 
+#ifdef USE_MESSAGING
+CORBA::ULong
+CORBA::Object::S_timeout_policy_instance_counter_ = 0;
+MICOMT::RWLock
+CORBA::Object::S_timeout_policy_instance_counter_lock_;
+#endif // USE_MESSAGING
+
 /*************************** MagicChecker ****************************/
 
 
@@ -138,9 +145,6 @@ CORBA::Object::Object (IOR *i)
     orb = CORBA::ORB_instance ("mico-local-orb", FALSE);
     if (!CORBA::is_nil(orb) && !orb->plugged() && ior)
 	ior->addressing_disposition (GIOP::ReferenceAddr);
-#ifdef USE_MESSAGING
-    relative_roundtrip_timeout_ = 0;
-#endif // USE_MESSAGING
 }
 
 CORBA::Object::Object (const Object &o)
@@ -150,9 +154,6 @@ CORBA::Object::Object (const Object &o)
     orb = CORBA::ORB::_duplicate (o.orb);
     _managers = o._managers;
     _policies = o._policies;
-#ifdef USE_MESSAGING
-    relative_roundtrip_timeout_ = o.relative_roundtrip_timeout_;
-#endif // USE_MESSAGING
 }
 
 CORBA::Object &
@@ -171,9 +172,6 @@ CORBA::Object::operator= (const Object &o)
 	orb = CORBA::ORB::_duplicate (o.orb);
 	_managers = o._managers;
 	_policies = o._policies;
-#ifdef USE_MESSAGING
-        relative_roundtrip_timeout_ = o.relative_roundtrip_timeout_;
-#endif // USE_MESSAGING
     }
     return *this;
 }
@@ -245,34 +243,6 @@ CORBA::Object::_setup_domains (CORBA::Object_ptr parent)
 	    }
 	}
     }
-#ifdef USE_MESSAGING
-    // propagate possible timeout value
-    TimeBase::TimeT minimum_timeout = 0;
-    CORBA::Boolean minimum_timeout_initialized = FALSE;
-    for (CORBA::ULong i = 0; i < _managers.length(); i++) {
-        try {
-            CORBA::Policy_var tmpol = _managers[i]->get_domain_policy
-                (Messaging::RELATIVE_RT_TIMEOUT_POLICY_TYPE);
-            if (!CORBA::is_nil(tmpol)) {
-                Messaging::RelativeRoundtripTimeoutPolicy_var policy
-                    = Messaging::RelativeRoundtripTimeoutPolicy::_narrow(tmpol);
-                assert(!is_nil(policy));
-                if (!minimum_timeout_initialized) {
-                    minimum_timeout = policy->relative_expiry();
-                    minimum_timeout_initialized = TRUE;
-                }
-                if (minimum_timeout > policy->relative_expiry())
-                    minimum_timeout = policy->relative_expiry();
-            }
-        }
-        catch (const CORBA::INV_POLICY&) {
-        }
-    }
-    // needs to convert TimeBase::TimeT which is in 0.1us (100 ns)
-    // into ms
-    // There is an assumption that max timeout is 2^31 ms
-    relative_roundtrip_timeout_ = minimum_timeout / 10000;
-#endif // USE_MESSAGING
 }
 
 const char *
@@ -540,6 +510,43 @@ CORBA::Object::_orbnc()
 	orb = CORBA::ORB_instance ("mico-local-orb");
     return orb;
 }
+
+#ifdef USE_MESSAGING
+CORBA::ULong
+CORBA::Object::relative_roundtrip_timeout()
+{
+    MICOMT::AutoRDLock lock(S_timeout_policy_instance_counter_lock_);
+    if (S_timeout_policy_instance_counter_ > 0) {
+        try {
+            Policy_var pol = this->_get_policy(Messaging::RELATIVE_RT_TIMEOUT_POLICY_TYPE);
+            Messaging::RelativeRoundtripTimeoutPolicy_var tpol
+                = Messaging::RelativeRoundtripTimeoutPolicy::_narrow(pol);
+            assert(!is_nil(tpol));
+            // needs to convert TimeBase::TimeT which is in 0.1us (100 ns)
+            // into ms
+            // There is an assumption that max timeout is 2^31 ms
+            return tpol->relative_expiry() / 10000;
+        }
+        catch (const CORBA::INV_POLICY&) {
+        }
+    }
+    return 0;
+}
+
+void
+CORBA::Object::increase_timeout_policy_instance_counter()
+{
+    MICOMT::AutoWRLock lock(S_timeout_policy_instance_counter_lock_);
+    S_timeout_policy_instance_counter_++;
+}
+
+void
+CORBA::Object::decrease_timeout_policy_instance_counter()
+{
+    MICOMT::AutoWRLock lock(S_timeout_policy_instance_counter_lock_);
+    S_timeout_policy_instance_counter_--;
+}
+#endif // USE_MESSAGING
 
 // ref-counting added in ptc/03-03-09
 

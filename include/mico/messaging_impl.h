@@ -1,7 +1,7 @@
 // -*- c++ -*-
 //
 //  MICO --- an Open Source CORBA implementation
-//  Copyright (C) 2007 ObjectSecurity Ltd.
+//  Copyright (C) 2007, 2008 ObjectSecurity Ltd.
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Library General Public
@@ -33,8 +33,15 @@ class RelativeRoundtripTimeoutPolicy_impl
       public virtual Policy_impl,
       public virtual ::CORBA::LocalObject
 {
+protected:
+    RelativeRoundtripTimeoutPolicy_impl()
+        : Policy_impl(Messaging::RELATIVE_RT_TIMEOUT_POLICY_TYPE)
+    {}
 public:
     RelativeRoundtripTimeoutPolicy_impl(TimeBase::TimeT value);
+
+    virtual
+    ~RelativeRoundtripTimeoutPolicy_impl();
 
     virtual ::CORBA::Policy_ptr
     copy();

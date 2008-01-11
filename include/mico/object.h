@@ -104,7 +104,13 @@ class Object : public ServerlessObject {
     ORB_ptr orb;
     std::string ident;
 #ifdef USE_MESSAGING
-    ULong relative_roundtrip_timeout_;
+private:
+    // following members are for simple optimization: if there is no
+    // timeout policy instance in the system, we might go faster route
+    // and not check for it in order to obtain timeout value for every
+    // remote call
+    static ULong S_timeout_policy_instance_counter_;
+    static MICOMT::RWLock S_timeout_policy_instance_counter_lock_;
 #endif // USE_MESSAGING
 protected:
     DomainManagerList _managers;
@@ -179,8 +185,13 @@ public:
 
 #ifdef USE_MESSAGING
     ULong
-    relative_roundtrip_timeout()
-    { return relative_roundtrip_timeout_; }
+    relative_roundtrip_timeout();
+
+    void
+    increase_timeout_policy_instance_counter();
+
+    void
+    decrease_timeout_policy_instance_counter();
 #endif // USE_MESSAGING
     // end-mico-extension
 
