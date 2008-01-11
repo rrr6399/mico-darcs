@@ -54,6 +54,170 @@ CORBA::Policy::_narrow( CORBA::AbstractBase_ptr _obj )
 
 
 
+#ifdef HAVE_EXPLICIT_STRUCT_OPS
+CORBA::InvalidPolicies::InvalidPolicies()
+{
+}
+
+CORBA::InvalidPolicies::InvalidPolicies( const InvalidPolicies& _s )
+{
+  indices = ((InvalidPolicies&)_s).indices;
+}
+
+CORBA::InvalidPolicies::~InvalidPolicies()
+{
+}
+
+CORBA::InvalidPolicies&
+CORBA::InvalidPolicies::operator=( const InvalidPolicies& _s )
+{
+  indices = ((InvalidPolicies&)_s).indices;
+  return *this;
+}
+#endif
+
+#ifndef HAVE_EXPLICIT_STRUCT_OPS
+CORBA::InvalidPolicies::InvalidPolicies()
+{
+}
+
+#endif
+
+CORBA::InvalidPolicies::InvalidPolicies( SequenceTmpl< CORBA::UShort,MICO_TID_DEF> _m0 )
+{
+  indices = _m0;
+}
+
+void CORBA::InvalidPolicies::_throwit() const
+{
+  #ifdef HAVE_EXCEPTIONS
+  #ifdef HAVE_STD_EH
+  throw *this;
+  #else
+  throw InvalidPolicies_var( (CORBA::InvalidPolicies*)_clone() );
+  #endif
+  #else
+  CORBA::Exception::_throw_failed( _clone() );
+  #endif
+}
+
+const char *CORBA::InvalidPolicies::_repoid() const
+{
+  return "IDL:omg.org/CORBA/InvalidPolicies:1.0";
+}
+
+void CORBA::InvalidPolicies::_encode( CORBA::DataEncoder & ) const
+{
+  assert(0);
+}
+
+void CORBA::InvalidPolicies::_encode_any( CORBA::Any & ) const
+{
+  // use --any to make this work!
+  assert(0);
+}
+
+CORBA::Exception *CORBA::InvalidPolicies::_clone() const
+{
+  return new InvalidPolicies( *this );
+}
+
+CORBA::InvalidPolicies *CORBA::InvalidPolicies::_downcast( CORBA::Exception *_ex )
+{
+  if( _ex && !strcmp( _ex->_repoid(), "IDL:omg.org/CORBA/InvalidPolicies:1.0" ) )
+    return (InvalidPolicies *) _ex;
+  return NULL;
+}
+
+const CORBA::InvalidPolicies *CORBA::InvalidPolicies::_downcast( const CORBA::Exception *_ex )
+{
+  if( _ex && !strcmp( _ex->_repoid(), "IDL:omg.org/CORBA/InvalidPolicies:1.0" ) )
+    return (InvalidPolicies *) _ex;
+  return NULL;
+}
+
+
+
+/*
+ * Base interface for class PolicyManager
+ */
+
+CORBA::PolicyManager::~PolicyManager()
+{
+}
+
+void *
+CORBA::PolicyManager::_narrow_helper( const char *_repoid )
+{
+  if( strcmp( _repoid, "IDL:omg.org/CORBA/PolicyManager:1.0" ) == 0 )
+    return (void *)this;
+  return NULL;
+}
+
+CORBA::PolicyManager_ptr
+CORBA::PolicyManager::_narrow( CORBA::Object_ptr _obj )
+{
+  if( !CORBA::is_nil( _obj ) ) {
+    void *_p;
+    if( (_p = _obj->_narrow_helper( "IDL:omg.org/CORBA/PolicyManager:1.0" )))
+      return _duplicate( (CORBA::PolicyManager_ptr) _p );
+  }
+  return _nil();
+}
+
+CORBA::PolicyManager_ptr
+CORBA::PolicyManager::_narrow( CORBA::AbstractBase_ptr _obj )
+{
+  return _narrow (_obj->_to_object());
+}
+
+
+
+/*
+ * Base interface for class PolicyCurrent
+ */
+
+CORBA::PolicyCurrent::~PolicyCurrent()
+{
+}
+
+void *
+CORBA::PolicyCurrent::_narrow_helper( const char *_repoid )
+{
+  if( strcmp( _repoid, "IDL:omg.org/CORBA/PolicyCurrent:1.0" ) == 0 )
+    return (void *)this;
+  {
+    void *_p;
+    if ((_p = CORBA::PolicyManager::_narrow_helper( _repoid )))
+      return _p;
+  }
+  {
+    void *_p;
+    if ((_p = CORBA::Current::_narrow_helper( _repoid )))
+      return _p;
+  }
+  return NULL;
+}
+
+CORBA::PolicyCurrent_ptr
+CORBA::PolicyCurrent::_narrow( CORBA::Object_ptr _obj )
+{
+  if( !CORBA::is_nil( _obj ) ) {
+    void *_p;
+    if( (_p = _obj->_narrow_helper( "IDL:omg.org/CORBA/PolicyCurrent:1.0" )))
+      return _duplicate( (CORBA::PolicyCurrent_ptr) _p );
+  }
+  return _nil();
+}
+
+CORBA::PolicyCurrent_ptr
+CORBA::PolicyCurrent::_narrow( CORBA::AbstractBase_ptr _obj )
+{
+  return _narrow (_obj->_to_object());
+}
+
+
+
 /*
  * Base interface for class DomainManager
  */
@@ -126,7 +290,6 @@ CORBA::ConstructionPolicy::_narrow( CORBA::AbstractBase_ptr _obj )
 {
   return _narrow (_obj->_to_object());
 }
-
 
 
 

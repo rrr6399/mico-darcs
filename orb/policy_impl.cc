@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2007 by The Mico Team
+ *  Copyright (c) 1997-2008 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -46,6 +46,9 @@
 
 #endif // FAST_PCH
 
+using namespace CORBA;
+
+
 MICO::Policy_impl::Policy_impl (CORBA::PolicyType _pt)
 {
     pt = _pt;
@@ -68,6 +71,135 @@ MICO::Policy_impl::destroy ()
     // nothing to do
 }
 
+
+//
+// PolicyManager (CORBA 3.0)
+//
+MICO::PolicyManager_impl::PolicyManager_impl()
+{
+    policies_.length(0);
+}
+
+PolicyList*
+MICO::PolicyManager_impl::get_policy_overrides(const CORBA::PolicyTypeSeq& ts)
+{
+    MICOMT::AutoLock lock(this->policies_mutex_);
+    if (ts.length() == 0)
+        return new PolicyList(this->policies_);
+
+    PolicyList_var retval = new PolicyList;
+    for (ULong i = 0; i < ts.length(); i++) {
+        for (ULong j = 0; j < this->policies_.length(); j++) {
+            if (this->policies_[j]->policy_type() == ts[i]) {
+                retval->length(retval->length() + 1);
+                retval[retval->length() - 1] = Policy::_duplicate(this->policies_[j]);
+            }
+        }
+    }
+    return retval._retn();
+}
+
+void
+MICO::PolicyManager_impl::set_policy_overrides(const PolicyList& policies, SetOverrideType set_add)
+{
+    MICOMT::AutoLock lock(this->policies_mutex_);
+    for (ULong i = 0; i < policies.length() - 1; i++) {
+        for (ULong j = i + 1; j < policies.length(); j++) {
+            if (policies[i]->policy_type() == policies[j]->policy_type()) {
+                throw BAD_PARAM(30, COMPLETED_NO);
+            }
+        }
+    }
+
+    if (set_add == SET_OVERRIDE) {
+        this->policies_ = policies;
+    }
+    else if (set_add == ADD_OVERRIDE) {
+        for (ULong i = 0; i < policies.length(); i++) {
+            Boolean set = FALSE;
+            for (ULong j = 0; j < this->policies_.length(); j++) {
+                if (policies[i]->policy_type() == this->policies_[j]->policy_type()) {
+                    this->policies_[j] = policies[i];
+                    set = TRUE;
+                    break;
+                }
+            }
+            if (!set) {
+                // we need to add
+                this->policies_.length(this->policies_.length() + 1);
+                this->policies_[this->policies_.length() - 1] = policies[i];
+            }
+        }
+    }
+    else {
+        // incorrect value
+        assert(0);
+    }
+}
+
+//
+// PolicyCurrent (CORBA 3.0)
+//
+#ifdef HAVE_THREADS
+static void
+__policy_current_cleanup(void* value)
+{
+    MICO::PolicyManager_impl* pm =
+        static_cast<MICO::PolicyManager_impl*>(value);
+    if (pm)
+        delete pm;
+}
+#endif
+
+MICO::PolicyCurrent_impl::PolicyCurrent_impl()
+{
+#ifdef HAVE_THREADS
+    MICOMT::Thread::create_key(policy_current_key_, &__policy_current_cleanup);
+#endif // HAVE_THREADS
+}
+
+MICO::PolicyCurrent_impl::~PolicyCurrent_impl()
+{
+#ifndef HAVE_THREADS
+    if (this->manager_) {
+        delete this->manager_;
+        this->manager_ = NULL;
+    }
+#endif // HAVE_THREADS
+}
+
+PolicyList*
+MICO::PolicyCurrent_impl::get_policy_overrides(const CORBA::PolicyTypeSeq& ts)
+{
+    PolicyManager_impl* pm = this->get_current_manager(FALSE);
+    if (pm != NULL)
+        return pm->get_policy_overrides(ts);
+    return new PolicyList;
+}
+
+void
+MICO::PolicyCurrent_impl::set_policy_overrides(const PolicyList& policies, SetOverrideType set_add)
+{
+    return this->get_current_manager(TRUE)->set_policy_overrides(policies, set_add);
+}
+
+MICO::PolicyManager_impl*
+MICO::PolicyCurrent_impl::get_current_manager(Boolean create)
+{
+#ifdef HAVE_THREADS
+    MICO::PolicyManager_impl* pm = static_cast<MICO::PolicyManager_impl*>
+        (MICOMT::Thread::get_specific(policy_current_key_));
+    if (pm == NULL && create) {
+        pm = new PolicyManager_impl;
+        MICOMT::Thread::set_specific(policy_current_key_, pm);
+    }
+    return pm;
+#else // HAVE_THREADS
+    if (this->manager_ == NULL && create)
+        this->manager_ = new MICO::PolicyManager_impl;
+    return this->manager_;
+#endif // HAVE_THREADS
+}
 
 //-------------------
 

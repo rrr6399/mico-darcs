@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2007 by The Mico Team
+ *  Copyright (c) 1997-2008 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -95,6 +95,8 @@ enum SetOverrideType {
     ADD_OVERRIDE
 };
 
+typedef SequenceTmpl< PolicyType,MICO_TID_DEF> PolicyTypeSeq;
+
 // object, base class for all serverbased objects
 class Object : public ServerlessObject {
     IOR *ior;
@@ -134,6 +136,8 @@ public:
     DomainManagerList *_get_domain_managers ();
     Object_ptr _set_policy_overrides (const PolicyList &policies,
 				      SetOverrideType set_add);
+    Policy_ptr _get_client_policy(PolicyType policy_type);
+    PolicyList* _get_policy_overrides(const PolicyTypeSeq& types);
 
     CORBA::Boolean
     _validate_connection(CORBA::PolicyList_out inconsistent_policies);

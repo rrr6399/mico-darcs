@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2007 by The Mico Team
+ *  Copyright (c) 1997-2008 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -351,10 +351,13 @@ CORBA::Object::_request (const char *op)
 CORBA::Policy_ptr
 CORBA::Object::_get_policy (PolicyType policy_type)
 {
-    // look at this objects's policies
-    for (CORBA::ULong i0 = 0; i0 < _policies.length(); ++i0) {
-	if (_policies[i0]->policy_type() == policy_type)
-	    return CORBA::Policy::_duplicate (_policies[i0]);
+    Policy_var client_policy = this->_get_client_policy(policy_type);
+    if (!CORBA::is_nil(client_policy)) {
+        // kcg: here we should do policy reconciliation, but
+        // currently MICO does not support such messaging related
+        // policies which would require it, so let's just return the
+        // obtained client policy
+        return client_policy._retn();
     }
     // look at domain manager policies
     for (CORBA::ULong i1 = 0; i1 < _managers.length(); ++i1) {
@@ -362,7 +365,7 @@ CORBA::Object::_get_policy (PolicyType policy_type)
 	if (!CORBA::is_nil (p))
 	    return p;
     }
-    mico_throw (CORBA::BAD_PARAM());
+    mico_throw (CORBA::INV_POLICY());
     return CORBA::Policy::_nil();
 }
 
@@ -403,21 +406,55 @@ CORBA::Object::_set_policy_overrides (const PolicyList &policies,
     default:
 	assert (0);
     }
-#ifdef USE_MESSAGING
-    // set object timeout if available
-    for (CORBA::ULong i = 0; i < policies.length(); i++) {
-        if (policies[i]->policy_type() == Messaging::RELATIVE_RT_TIMEOUT_POLICY_TYPE) {
-            Messaging::RelativeRoundtripTimeoutPolicy_var tpol
-                = Messaging::RelativeRoundtripTimeoutPolicy::_narrow(policies[i]);
-            assert(!is_nil(tpol));
-            // needs to convert TimeBase::TimeT which is in 0.1us (100 ns)
-            // into ms
-            // There is an assumption that max timeout is 2^31 ms
-            nobj->relative_roundtrip_timeout_ = tpol->relative_expiry() / 10000;
+    return nobj;
+}
+
+CORBA::Policy_ptr
+CORBA::Object::_get_client_policy(PolicyType policy_type)
+{
+    // search object scope first
+    for (CORBA::ULong i0 = 0; i0 < _policies.length(); ++i0) {
+	if (_policies[i0]->policy_type() == policy_type)
+	    return CORBA::Policy::_duplicate (_policies[i0]);
+    }
+    // thread scope as a second
+    Object_var obj = this->_orbnc()->resolve_initial_references("PolicyCurrent");
+    PolicyCurrent_var current = PolicyCurrent::_narrow(obj);
+    assert(!CORBA::is_nil(current));
+    PolicyTypeSeq pts;
+    pts.length(1);
+    pts[0] = policy_type;
+    PolicyList_var pl = current->get_policy_overrides(pts);
+    assert(pl->length() == 0 || pl->length() == 1);
+    if (pl->length() == 1)
+        return Policy::_duplicate(pl[(CORBA::ULong)0]);
+    // global ORB scope as a third
+    obj = this->_orbnc()->resolve_initial_references("ORBPolicyManager");
+    PolicyManager_var manager = PolicyManager::_narrow(obj);
+    assert(!CORBA::is_nil(manager));
+    pl = manager->get_policy_overrides(pts);
+    assert(pl->length() == 0 || pl->length() == 1);
+    if (pl->length() == 1)
+        return Policy::_duplicate(pl[(CORBA::ULong)0]);
+    return Policy::_nil();
+}
+
+CORBA::PolicyList*
+CORBA::Object::_get_policy_overrides(const PolicyTypeSeq& types)
+{
+    if (types.length() == 0)
+        return new CORBA::PolicyList(_policies);
+    
+    PolicyList_var retval = new PolicyList;
+    for (ULong i = 0; i < types.length(); i++) {
+        for (ULong j = 0; j < this->_policies.length(); j++) {
+            if (this->_policies[j]->policy_type() == types[i]) {
+                retval->length(retval->length() + 1);
+                retval[retval->length() - 1] = Policy::_duplicate(this->_policies[j]);
+            }
         }
     }
-#endif // USE_MESSAGING
-    return nobj;
+    return retval._retn();
 }
 
 CORBA::Boolean
