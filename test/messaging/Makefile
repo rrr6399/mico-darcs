@@ -1,7 +1,11 @@
 
 include ../../MakeVars
 
-DIRS = timeout timeout-with-manager
+DIRS = request-timeout request-timeout-with-manager \
+	request-timeout-with-policy-manager \
+	request-timeout-with-policy-current \
+	connection-timeout connection-timeout-with-policy-manager \
+	connection-timeout-with-policy-current
 
 all:
 	for i in $(DIRS); do $(MAKE) -C $$i || exit 1; done
