@@ -62,7 +62,7 @@ main (int argc, char *argv[])
   }
 
   hello->hello ();
-  sleep(1);
+  sleep(3);
   // here, server should be already down
   // but our connection does not know it
   // we will receice CORBA::COMM_FAILURE

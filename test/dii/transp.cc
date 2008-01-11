@@ -20,7 +20,8 @@ struct Sender : public CORBA::TransportCallback {
 	MICO::CDREncoder ec (&buf, FALSE);
 	((CORBA::DataEncoder &)ec).put_string (s);
         CORBA::Transport *t = addr->make_transport();
-        if (!t->connect (addr)) {
+        CORBA::Boolean timedout = FALSE;
+        if (!t->connect (addr, 0, timedout)) {
 	    cerr << "connect: " << t->errormsg() << endl;
 	    exit (1);
 	}
