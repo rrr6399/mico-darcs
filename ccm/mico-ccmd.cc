@@ -1347,7 +1347,8 @@ ComponentInstallation_impl::download_http (const char * localname,
 
   CORBA::Transport * trans = addr->make_transport ();
 
-  if (!trans || trans->bad() || !trans->connect(addr)) {
+  CORBA::Boolean timedout = FALSE;
+  if (!trans || trans->bad() || !trans->connect(addr, 0, timedout)) {
     if (verbose) {
       cout << "ComponentInstallation: cannot connect to " << host << endl;
     }
