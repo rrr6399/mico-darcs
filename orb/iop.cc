@@ -4389,11 +4389,41 @@ MICO::IIOPProxy::bind (CORBA::ORBMsgId id, const char *repoid,
     CORBA::Boolean timedout = false;
     CORBA::ULong timeout = 0;
 #ifdef USE_MESSAGING
-    // kcg: TBD
-    MICO_NOT_IMPLEMENTED;
+    // we don't use target object for getting the rountrip timeout
+    // policy value since in case of bind this is not possible. We
+    // start with PolicyCurrent and continue with the PolicyManager to
+    // get the policy from the ORB global scope
+    CORBA::Object_var obj = _orb->resolve_initial_references("PolicyCurrent");
+    CORBA::PolicyCurrent_var current = CORBA::PolicyCurrent::_narrow(obj);
+    assert(!CORBA::is_nil(current));
+    Messaging::RelativeRoundtripTimeoutPolicy_var timeout_policy
+        = Messaging::RelativeRoundtripTimeoutPolicy::_nil();
+    CORBA::PolicyTypeSeq pts;
+    pts.length(1);
+    pts[0] = Messaging::RELATIVE_RT_TIMEOUT_POLICY_TYPE;
+    CORBA::PolicyList_var pl = current->get_policy_overrides(pts);
+    assert(pl->length() == 0 || pl->length() == 1);
+    if (pl->length() == 1) {
+        timeout_policy = Messaging::RelativeRoundtripTimeoutPolicy::_narrow(pl[(CORBA::ULong)0]);
+    }
+    else {
+        // global ORB scope as a third
+        _orb->resolve_initial_references("ORBPolicyManager");
+        CORBA::PolicyManager_var manager = CORBA::PolicyManager::_narrow(obj);
+        assert(!CORBA::is_nil(manager));
+        pl = manager->get_policy_overrides(pts);
+        assert(pl->length() == 0 || pl->length() == 1);
+        if (pl->length() == 1) {
+            timeout_policy = Messaging::RelativeRoundtripTimeoutPolicy::_narrow(pl[(CORBA::ULong)0]);
+        }
+    }
+    if (!CORBA::is_nil(timeout_policy)) {
+        timeout = timeout_policy->relative_expiry() / 10000;
+    }
 #endif // USE_MESSAGING
-    GIOPConn *conn = make_conn (addr, 0, timedout);
+    GIOPConn *conn = make_conn (addr, timeout, timedout);
     if (!conn) {
+        // even in case of timeout we just return LocateUnknown
         _orb->answer_bind (id, CORBA::LocateUnknown, CORBA::Object::_nil());
         return TRUE;
     }
