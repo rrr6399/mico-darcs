@@ -155,6 +155,8 @@ MICO::PolicyCurrent_impl::PolicyCurrent_impl()
 {
 #ifdef HAVE_THREADS
     MICOMT::Thread::create_key(policy_current_key_, &__policy_current_cleanup);
+#else // HAVE_THREADS
+    this->manager_ = NULL;
 #endif // HAVE_THREADS
 }
 
