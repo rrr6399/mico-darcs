@@ -3,9 +3,12 @@ include ../../MakeVars
 
 DIRS = request-timeout request-timeout-with-manager \
 	request-timeout-with-policy-manager \
-	request-timeout-with-policy-current \
 	connection-timeout connection-timeout-with-policy-manager \
+
+ifeq ($(HAVE_THREADS), yes)
+DIRS := $(DIRS)	request-timeout-with-policy-current \
 	connection-timeout-with-policy-current
+endif
 
 all:
 	for i in $(DIRS); do $(MAKE) -C $$i || exit 1; done
