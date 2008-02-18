@@ -1,7 +1,7 @@
 // -*- c++ -*-
 //
 //  MICO SL3 --- an Open Source SL3 implementation
-//  Copyright (C) 2002, 2003, 2004, 2005, 2006 ObjectSecurity Ltd.
+//  Copyright (C) 2002, 2003, 2004, 2005, 2006, 2008 ObjectSecurity Ltd.
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Library General Public
@@ -469,10 +469,14 @@ namespace MICOSL3_TransportSecurity
 
 	// extension
 	void
-	client_credentials(TransportSecurity::ClientCredentials_ptr creds);
+	push_client_credentials(TransportSecurity::ClientCredentials_ptr creds);
+
+        void
+        pop_client_credentials();
     private:
+        typedef std::stack<TransportSecurity::ClientCredentials_var> CCStack;
 #ifndef HAVE_THREADS
-	TransportSecurity::ClientCredentials_var client_credentials_;
+        CCStack client_credentials_stack_;
 #else // HAVE_THREADS
 	MICOMT::Thread::ThreadKey thread_key_;
 #endif // HAVE_THREADS
