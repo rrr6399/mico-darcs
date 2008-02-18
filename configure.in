@@ -875,6 +875,8 @@ else
       CXXFLAGS="$CXXFLAGS -pto"
       HAVE_REPO=yes
     fi
+    # disable anachronism warnings
+    CXXFLAGS="$CXXFLAGS -erroff=badargtype2w"
     CONF_PICFLAGS=-KPIC
     CONF_LDSOFLAGS=-KPIC
     if test X"$use_threads" = Xyes; then
