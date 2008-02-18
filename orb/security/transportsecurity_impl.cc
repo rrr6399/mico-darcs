@@ -1,6 +1,6 @@
 //
 //  MICO SL3 --- an Open Source SL3 implementation
-//  Copyright (C) 2002, 2003, 2004, 2005 ObjectSecurity Ltd.
+//  Copyright (C) 2002, 2003, 2004, 2005, 2008 ObjectSecurity Ltd.
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Library General Public
@@ -1146,37 +1146,62 @@ ClientCredentials_ptr
 MICOSL3_TransportSecurity::SecurityCurrent_impl::client_credentials()
 {
 #ifndef HAVE_THREADS
-    return TransportSecurity::ClientCredentials::_duplicate(client_credentials_);
+    if (!client_credentials_stack_.empty())
+        return TransportSecurity::ClientCredentials::_duplicate(client_credentials_stack_.top());
+    else
+        return TransportSecurity::ClientCredentials::_nil();        
 #else // HAVE_THREADS
-    TransportSecurity::ClientCredentials_ptr creds
-	= static_cast<TransportSecurity::ClientCredentials*>
-	(MICOMT::Thread::get_specific(thread_key_));
-    return TransportSecurity::ClientCredentials::_duplicate(creds);
+    CCStack* stack = static_cast<CCStack*>(MICOMT::Thread::get_specific(thread_key_));
+    if (stack != NULL && !stack->empty())
+        return TransportSecurity::ClientCredentials::_duplicate(stack->top());
+    else
+        return TransportSecurity::ClientCredentials::_nil();
 #endif // HAVE_THREADS
 }
 
 
 void
-MICOSL3_TransportSecurity::SecurityCurrent_impl::client_credentials
+MICOSL3_TransportSecurity::SecurityCurrent_impl::push_client_credentials
 (TransportSecurity::ClientCredentials_ptr creds)
 {
     if (MICO::Logger::IsLogged(MICO::Logger::Security)) {
 	MICOMT::AutoDebugLock lock;
 	MICO::Logger::Stream(MICO::Logger::Security)
-	    << "SL3TS: SecurityCurrent_impl::client_credentials: " << creds << endl;
+	    << "SL3TS: SecurityCurrent_impl::push_client_credentials: " << creds << endl;
     }
 #ifndef HAVE_THREADS
-    client_credentials_
-	= TransportSecurity::ClientCredentials::_duplicate(creds);
+    client_credentials_stack_.push
+        (TransportSecurity::ClientCredentials::_duplicate(creds));
 #else // HAVE_THREADS
-    TransportSecurity::ClientCredentials_ptr prev_creds
-	= static_cast<TransportSecurity::ClientCredentials*>
-	(MICOMT::Thread::get_specific(thread_key_));
-    if (!CORBA::is_nil(prev_creds)) {
-	CORBA::release(prev_creds);
+    CCStack* stack = static_cast<CCStack*>(MICOMT::Thread::get_specific(thread_key_));
+    if (stack == NULL) {
+        stack = new CCStack;
+        MICOMT::Thread::set_specific(thread_key_, stack);
     }
-    MICOMT::Thread::set_specific
-	(thread_key_, TransportSecurity::ClientCredentials::_duplicate(creds));
+    stack->push(TransportSecurity::ClientCredentials::_duplicate(creds));
+#endif // HAVE_THREADS
+}
+
+
+void
+MICOSL3_TransportSecurity::SecurityCurrent_impl::pop_client_credentials()
+{
+    if (MICO::Logger::IsLogged(MICO::Logger::Security)) {
+	MICOMT::AutoDebugLock lock;
+	MICO::Logger::Stream(MICO::Logger::Security)
+	    << "SL3TS: SecurityCurrent_impl::pop_client_credentials" << endl;
+    }
+#ifndef HAVE_THREADS
+    if (!client_credentials_stack_.empty())
+        client_credentials_stack_.pop();
+#else // HAVE_THREADS
+    CCStack* stack = static_cast<CCStack*>(MICOMT::Thread::get_specific(thread_key_));
+    if (stack == NULL) {
+        stack = new CCStack;
+        MICOMT::Thread::set_specific(thread_key_, stack);
+    }
+    if (!stack->empty())
+        stack->pop();
 #endif // HAVE_THREADS
 }
 
@@ -1882,7 +1907,7 @@ MICOSL3_TransportSecurity::TSServerRequestInterceptor::receive_request
 	    CORBA::Object_var ctx = rec->conn()->accepting_context();
 	    TransportSecurity::ClientCredentials_var creds
 		= TransportSecurity::ClientCredentials::_narrow(ctx);
-	    current_->client_credentials(creds);
+	    current_->push_client_credentials(creds);
 	}
 	else {
 	    // hint == NULL means that we do in process call
@@ -1913,7 +1938,7 @@ MICOSL3_TransportSecurity::TSServerRequestInterceptor::receive_request
 		    (ipc_creds, res);
 	    }
 	    assert(!CORBA::is_nil(res));
-	    current_->client_credentials(res);
+	    current_->push_client_credentials(res);
 	}
     }
 }
@@ -1927,7 +1952,7 @@ MICOSL3_TransportSecurity::TSServerRequestInterceptor::send_reply
     // this is required for credentials cleanup, since otherwise
     // we would hold one reference in SecurityCurrent perfectly
     // prohibitting theirs cleanup
-    current_->client_credentials(ClientCredentials::_nil());
+    current_->pop_client_credentials();
 }
 
 
@@ -1939,7 +1964,7 @@ MICOSL3_TransportSecurity::TSServerRequestInterceptor::send_exception
     // this is required for credentials cleanup, since otherwise
     // we would hold one reference in SecurityCurrent perfectly
     // prohibitting theirs cleanup
-    current_->client_credentials(ClientCredentials::_nil());
+    current_->pop_client_credentials();
 }
 
 
@@ -1951,7 +1976,7 @@ MICOSL3_TransportSecurity::TSServerRequestInterceptor::send_other
     // this is required for credentials cleanup, since otherwise
     // we would hold one reference in SecurityCurrent perfectly
     // prohibitting theirs cleanup
-    current_->client_credentials(ClientCredentials::_nil());
+    current_->pop_client_credentials();
 }
 
 
