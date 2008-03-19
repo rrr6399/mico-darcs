@@ -1,7 +1,7 @@
 // -*- c++ -*-
 //
 //  MICO PI --- an Open Source Portable Interceptor implementation
-//  Copyright (C) 2001, 2002, 2003, 2004, 2005 ObjectSecurity Ltd.
+//  Copyright (C) 2001, 2002, 2003, 2004, 2005, 2008 ObjectSecurity Ltd.
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Library General Public
@@ -582,8 +582,12 @@ namespace PInterceptor
     };
 
     struct PI {
-	static std::vector<PortableInterceptor::ORBInitializer_var> S_initializers_;
-	static std::vector<PortableInterceptor::ORBInitializer_var> S_initializers_backup_;
+        static std::vector<PortableInterceptor::ORBInitializer_var>&
+        initializers();
+
+        static std::vector<PortableInterceptor::ORBInitializer_var>&
+        initializers_backup();
+
 	static PortableInterceptor::SlotId S_max_slot_id_;
 	typedef std::list<PortableInterceptor::IORInterceptor_var> IORList;
 	typedef std::map<CORBA::PolicyType, PortableInterceptor::PolicyFactory_ptr,

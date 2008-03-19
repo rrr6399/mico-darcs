@@ -1,6 +1,6 @@
 //
 //  MICO PI --- an Open Source Portable Interceptor implementation
-//  Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 ObjectSecurity Ltd.
+//  Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2008 ObjectSecurity Ltd.
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Library General Public
@@ -47,10 +47,6 @@ using namespace std;
 //
 
 PInterceptor::Current_impl* PInterceptor::Current_impl::S_current_ = NULL;
-vector<PortableInterceptor::ORBInitializer_var>
-PInterceptor::PI::S_initializers_;
-vector<PortableInterceptor::ORBInitializer_var>
-PInterceptor::PI::S_initializers_backup_;
 PortableInterceptor::SlotId PInterceptor::PI::S_max_slot_id_ = 0;
 PInterceptor::PI::PolicyFactoryMap PInterceptor::PI::S_pfmap_;
 MICOMT::Mutex PInterceptor::PI::S_client_lock_(FALSE, MICOMT::Mutex::Recursive);
@@ -74,7 +70,7 @@ void
 PortableInterceptor::register_orb_initializer
 (PortableInterceptor::ORBInitializer_ptr init)
 {
-    PInterceptor::PI::S_initializers_.push_back
+    PInterceptor::PI::initializers().push_back
 	(PortableInterceptor::ORBInitializer::_duplicate(init));
 }
 
@@ -116,14 +112,14 @@ PortableInterceptor::destroy_all_interceptors()
 void
 PortableInterceptor::backup_initializers()
 {
-    PInterceptor::PI::S_initializers_backup_ = PInterceptor::PI::S_initializers_;
+    PInterceptor::PI::initializers_backup() = PInterceptor::PI::initializers();
 }
 
 
 void
 PortableInterceptor::restore_initializers()
 {
-    PInterceptor::PI::S_initializers_ = PInterceptor::PI::S_initializers_backup_;
+    PInterceptor::PI::initializers() = PInterceptor::PI::initializers_backup();
 }
 
 
@@ -1908,6 +1904,23 @@ void
 PInterceptor::PI::_init()
 {
 }
+
+
+vector<PortableInterceptor::ORBInitializer_var>&
+PInterceptor::PI::initializers()
+{
+    static vector<PortableInterceptor::ORBInitializer_var> inits;
+    return inits;
+}
+
+
+vector<PortableInterceptor::ORBInitializer_var>&
+PInterceptor::PI::initializers_backup()
+{
+    static vector<PortableInterceptor::ORBInitializer_var> back_inits;
+    return back_inits;
+}
+
 
 void
 PInterceptor::PI::_exec_client

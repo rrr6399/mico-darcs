@@ -3237,7 +3237,7 @@ void __mtdebug_init();
 CORBA::ORB_ptr
 CORBA::ORB_init (int &argc, char **argv, const char *_id)
 {
-    CORBA::ULong pi_init_size = PInterceptor::PI::S_initializers_.size();
+    CORBA::ULong pi_init_size = PInterceptor::PI::initializers().size();
     PortableInterceptor::backup_initializers();
 #ifdef HAVE_THREADS
     MICOMT::_init();
@@ -3851,19 +3851,19 @@ CORBA::ORB_init (int &argc, char **argv, const char *_id)
     // PI: invoke pre_init here. post_init is invoked below after resolving
     // all references
     PInterceptor::ORBInitInfo_impl* info = NULL;
-    if (PInterceptor::PI::S_initializers_.size() != 0) {
+    if (PInterceptor::PI::initializers().size() != 0) {
 	info = new PInterceptor::ORBInitInfo_impl(orb_instance, id.c_str(),
 						  argc, argv);
 	// kcg: we ``prioritize'' initializers registered during ORB_init
 	// call here, so they are called first and then all other initializers
 	// registered before ORB_init call
 	for (CORBA::ULong i = pi_init_size;
-	     i < PInterceptor::PI::S_initializers_.size();
+	     i < PInterceptor::PI::initializers().size();
 	     i++) {
-	    PInterceptor::PI::S_initializers_[i]->pre_init(info);
+	    PInterceptor::PI::initializers()[i]->pre_init(info);
 	}
 	for (CORBA::ULong i = 0; i < pi_init_size; i++) {
-	    PInterceptor::PI::S_initializers_[i]->pre_init(info);
+	    PInterceptor::PI::initializers()[i]->pre_init(info);
 	}
     }
 #ifdef USE_CSL2
@@ -4177,12 +4177,12 @@ CORBA::ORB_init (int &argc, char **argv, const char *_id)
 	// call here, so they are called first and then all other initializers
 	// registered before ORB_init call
 	for (CORBA::ULong i = pi_init_size;
-	     i < PInterceptor::PI::S_initializers_.size();
+	     i < PInterceptor::PI::initializers().size();
 	     i++) {
-	    PInterceptor::PI::S_initializers_[i]->post_init(info);
+	    PInterceptor::PI::initializers()[i]->post_init(info);
 	}
 	for (CORBA::ULong i = 0; i < pi_init_size; i++) {
-	    PInterceptor::PI::S_initializers_[i]->post_init(info);
+	    PInterceptor::PI::initializers()[i]->post_init(info);
 	}
 	// now we can safely remove options registered for removal
 	MICOGetOpt::OptMap opts;
