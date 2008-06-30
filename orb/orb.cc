@@ -612,7 +612,7 @@ CORBA::ORBInvokeRec::timedout(Boolean val)
 {
     timedout_ = val;
     if (timedout_) {
-        TIMEOUT ex;
+        TIMEOUT ex(0, COMPLETED_MAYBE);
         _req->set_out_args(ex);
         //_orb->answer_invoke(this, CORBA::InvokeSysEx, _obj, _req, 0);
 	this->set_answer_invoke(CORBA::InvokeSysEx, _obj, _req, 0);
