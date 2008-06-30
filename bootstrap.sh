@@ -15,7 +15,7 @@ do
     esac
   fi
 done
-if [ ! $AUTOCONF ] ; then
+if [ ! "$AUTOCONF" ] ; then
   "ERROR: autoconf 2.13 not detected. Tested names are: $NAMES"
   exit 1
 fi
