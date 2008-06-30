@@ -880,9 +880,12 @@ else
     CONF_PICFLAGS=-KPIC
     CONF_LDSOFLAGS=-KPIC
     if test X"$use_threads" = Xyes; then
-      CXXFLAGS="$CXXFLAGS -D_THREAD_SAFE -D_REENTRANT"
-      SHLIBS="$SHLIBS -lthread -lrt"
+      CXXFLAGS="$CXXFLAGS -mt"
+      LDFLAGS="$LDFLAGS -mt"
+      SHLIBS="$SHLIBS -lrt"
     fi
+    CONF_AR="CC"
+    CONF_ARFLAGS="-xar -o"
     ;;
   *aix*)
     AC_PATH_PROG(AIXLINKER, makeC++SharedLib, makeC++SharedLib, $PATH:/usr/lpp/xlC/bin)
