@@ -375,7 +375,7 @@ MICO::TCPTransportServer::accept ()
     ::pollfd pfd;
 
     pfd.fd = fd;
-    pfd.events = POLLIN | POLLOUT | POLLRDNORM | POLLRDBAND | POLLPRI | POLLHUP | POLLERR | POLLNVAL;
+    pfd.events = POLLIN | POLLOUT | POLLPRI | POLLHUP | POLLERR | POLLNVAL;
 
     if (poll (&pfd, 1, -1) < 0) {
 	if (MICO::Logger::IsLogged (MICO::Logger::Transport)) {
