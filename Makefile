@@ -78,7 +78,7 @@ install:
 		$(IDIRCMD) $(SHARED_INSTDIR)/doc/mico; \
 		$(IMANCMD) doc/doc.ps $(SHARED_INSTDIR)/doc/mico/manual.ps; \
 	fi
-	-ldconfig
+	$(LDCONFIG)
 
 install-cd:
 	for i in $(INSTALLDIRS); do $(MAKE) -C $$i install-cd || exit 1; done

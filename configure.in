@@ -635,6 +635,9 @@ else
   AC_SUBST(HAVE_THREADS)
 fi
 
+AC_SUBST(LDCONFIG)
+LDCONFIG=ldconfig
+
 AC_SUBST(SHLIBS)
 
 #
@@ -816,6 +819,7 @@ if test X"$GXX" = Xyes; then
     CONF_PICFLAGS=
     CONF_LDSOFLAGS=
     CXXFLAGS="$CXXFLAGS -Wno-long-double"
+    LDCONFIG="echo ldconfig not run on darwin"
     ;;
   esac
 else
