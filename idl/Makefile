@@ -72,7 +72,7 @@ endif
 	$(RANLIB) $@
 
 idl: libidl.a main.o ../orb/$(LIBMICO) ../ir/$(LIBMICOIR) $(IR_OBJS)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) main.o $(IR_OBJS) -lidl $(LDLIBS) -o idl
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) main.o $(IR_OBJS) $(LDLIBS) libidl.a -o idl
 	$(POSTLD) $@
 
 main.o:
