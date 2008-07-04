@@ -83,6 +83,7 @@ SHELL           = /bin/sh
 RANLIB          = @RANLIB@
 AR              = @AR@
 ARFLAGS		= @ARFLAGS@
+LDCONFIG    = @LDCONFIG@
 FLEX            = @LEX@
 BISON           = @YACC@
 TCLSH		= @TCLSH@
