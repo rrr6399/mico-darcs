@@ -609,7 +609,7 @@ dnl
 AC_DEFUN(AC_CXX_DYNAMIC_CAST,
 [AC_MSG_CHECKING(for dynamic_cast support)
 AC_CACHE_VAL(ac_cv_cxx_dynamic_cast,
-[AC_TRY_COMPILE(,[
+[AC_TRY_COMPILE([
   class A {
   public:
     virtual int f() = 0;
@@ -628,8 +628,7 @@ AC_CACHE_VAL(ac_cv_cxx_dynamic_cast,
   class D : virtual public B, virtual public C {
   public:
     int f() { return 3; }
-  };
-
+  };],[
   B * b = new D;
   C * c = dynamic_cast<C*> (b);
 ],
