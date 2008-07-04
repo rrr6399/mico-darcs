@@ -80,7 +80,7 @@ lib: .depend libmicoir$(VERSION).a
 endif
 
 ird: main.o ../idl/libidl.a ../orb/$(LIBMICO) $(LIBMICOIR)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) main.o -L. $(LDLIBS) -o ird
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) main.o -L. $(LDLIBS) ../idl/libidl.a -o ird
 	$(POSTLD) $@
 
 libmicoir$(VERSION).$(SOEXT): $(SHARED_OBJS)
