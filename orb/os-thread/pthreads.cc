@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2005 by The Mico Team
+ *  Copyright (c) 1997-2008 by The Mico Team
  * 
  *  OSThread: An abstract Thread class for MICO
  *  Copyright (C) 1999 Andy Kersting & Andreas Schultz
@@ -31,7 +31,7 @@
 
 #include <pthread.h>
 #include <CORBA-SMALL.h>
-
+#include <mico/os-misc.h>
 
 using namespace std;
 
@@ -95,6 +95,30 @@ void MICOMT::_init ()
     }
 #endif // MTDEBUG
 }
+
+
+MICO_Boolean
+MICOMT::CondVar::timedwait(MICO_ULong tmout)
+{
+    timespec timeout;
+    OSMisc::TimeVal now = OSMisc::gettime();
+#ifdef MTDEBUG
+    if (MICO::Logger::IsLogged (MICO::Logger::Thread)) {
+        __mtdebug_lock();
+        MICO::Logger::Stream (MICO::Logger::Thread)
+            __NAME(<< name ()) << ": CondVar::timedwait ()" << endl;
+        __mtdebug_unlock();
+    }
+#endif // MTDEBUG
+    int addsec = tmout / 1000;
+    int addusec = (tmout % 1000) * 1000;
+    timeout.tv_sec  = now.tv_sec + addsec;
+    timeout.tv_nsec = (now.tv_usec + addusec) * 1000;
+    int result;
+    assert((result = pthread_cond_timedwait(&_cond, &_mutex->_mutex, &timeout)) != EINVAL);
+    return (result == ETIMEDOUT);
+}
+
 
 //
 // Thread::ThreadWrapper is a static member function that
