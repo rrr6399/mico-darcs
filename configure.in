@@ -811,7 +811,7 @@ if test X"$GXX" = Xyes; then
     ;;
   *apple-darwin*)
     # generated code is PIC by default
-    CONF_SHARED_CC="$CXX -dynamiclib"
+    CONF_SHARED_CC="$CXX -dynamiclib -dylib -Wl,-flat_namespace -Wl,-undefined -Wl,suppress"
     CONF_SOEXT="dylib"
     CONF_PICFLAGS=
     CONF_LDSOFLAGS=
