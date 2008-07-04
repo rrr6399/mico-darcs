@@ -155,8 +155,6 @@ typedef std::vector<int>::size_type mico_vec_size_type;
 // MICOMT needs MICO::Logger from utils
 //#include <mico/util.h>
 
-// required by os-thread.h
-#include <mico/os-misc.h>
 /*************************** module MICOMT **************************/
 // we already need to include os-thread even for ST build
 #include <mico/os-thread.h>
