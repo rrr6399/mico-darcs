@@ -5,7 +5,7 @@ typedef string S1;
 
 typedef struct SS_ {
           octet a, b;
-        } SS;
+        } SSx;
 
 interface foo {
   typedef long L;
