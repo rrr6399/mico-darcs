@@ -30,12 +30,12 @@ typedef long long_arr[ 10 ];
 interface foo;
 typedef foo foo_arr[6];
 
-// Note: SS is an array of variable data
-typedef string SS[ 5 ][ 4 ];
+// Note: SSx is an array of variable data
+typedef string SSx[ 5 ][ 4 ];
 
 struct S2 {
   long x;
-  SS ss;
+  SSx ss;
 };
 
 
@@ -49,7 +49,7 @@ typedef sequence<S1_arr> S1_seq;
 
 
 interface foo {
-  SS bar( in SS x, inout SS y, out SS z, out long_arr w );
+  SSx bar( in SSx x, inout SSx y, out SSx z, out long_arr w );
   long_arr baz();
 };
 

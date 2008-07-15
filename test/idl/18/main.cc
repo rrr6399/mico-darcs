@@ -11,7 +11,7 @@
 
 using namespace std;
 
-void fill_SS( SS ss )
+void fill_SSx( SSx ss )
 {
   char buf[ 2 ];
   buf[ 1 ] = '\0';
@@ -24,7 +24,7 @@ void fill_SS( SS ss )
   }
 }
 
-void print_SS( const SS ss )
+void print_SSx( const SSx ss )
 {
   for( int i = 0; i < 5; i++ )
     for( int j = 0; j < 4; j++ )
@@ -53,16 +53,16 @@ public:
   foo_impl()
   {
   };
-  SS_slice* bar( const SS ss1, SS ss2, SS_out ss3, long_arr_out arr )
+  SSx_slice* bar( const SSx ss1, SSx ss2, SSx_out ss3, long_arr_out arr )
   {
-    print_SS( ss1 );
-    print_SS( ss2 );
+    print_SSx( ss1 );
+    print_SSx( ss2 );
     ss2[ 0 ][ 0 ] = (const char*) "Hello";
-    ss3 = SS_alloc();
-    fill_SS( ss3 );
+    ss3 = SSx_alloc();
+    fill_SSx( ss3 );
     fill_long_arr( arr );
-    SS_slice *res = SS_alloc();
-    fill_SS( res );
+    SSx_slice *res = SSx_alloc();
+    fill_SSx( res );
     return res;
   };
   // fixed size arrays as return values are handled as if they were var length!
@@ -100,18 +100,18 @@ int main( int argc, char *argv[] )
 #endif
   foo_var foo_client = foo::_narrow( obj );
 
-  SS ss1;
-  fill_SS( ss1 );
-  SS ss2;
-  fill_SS( ss2 );
-  SS_slice* ss3;
+  SSx ss1;
+  fill_SSx( ss1 );
+  SSx ss2;
+  fill_SSx( ss2 );
+  SSx_slice* ss3;
   long_arr arr;
-  SS_slice *res = foo_client->bar( ss1, ss2, ss3, arr );
+  SSx_slice *res = foo_client->bar( ss1, ss2, ss3, arr );
   cout << "Result: " << ss2[0][0].in() << endl;
-  print_SS( ss3 );
-  SS_free( ss3 );
-  print_SS( res );
-  SS_free( res );
+  print_SSx( ss3 );
+  SSx_free( ss3 );
+  print_SSx( res );
+  SSx_free( res );
   print_long_arr( arr );
 
   long_arr_slice *la = foo_client->baz();
@@ -119,13 +119,13 @@ int main( int argc, char *argv[] )
   long_arr_free (la);
 
   CORBA::Any a;
-  a <<= SS_forany( ss1 );
+  a <<= SSx_forany( ss1 );
 
-  SS_forany ss_forany;
+  SSx_forany ss_forany;
   CORBA::Boolean r = ( a >>= ss_forany );
   assert (r);
 
-  print_SS( ss_forany );
+  print_SSx( ss_forany );
 
   CORBA::release( foo_obj );
 
