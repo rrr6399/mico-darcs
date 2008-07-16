@@ -1,6 +1,6 @@
 #
 #  MICO --- an Open Source CORBA implementation
-#  Copyright (c) 1997-2001 by The Mico Team
+#  Copyright (c) 1997-2008 by The Mico Team
 #
 #  This library is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Library General Public
@@ -28,10 +28,10 @@
 !include vstudio.win32
 
 # QoS stuff
-# uncomment the following line to enable compilation
+# comment out the following line to disable compilation
 # of MICO messaging part
 #
-# USE_MESSAGING = 1
+USE_MESSAGING = 1
 
 # Adapted by Sorin Mustaca <sorinm@home.ro>
 # Download and compile the OpenSSL sources. Install the DLLs into win32-bin
@@ -51,18 +51,15 @@ MPATH= $(RELATIVE)\win32-bin
 !endif
 
 
-# CSIv2 stuff
-#
-# NOTE: MICO CSIv2 implementation depends on MICO SSL support, so
-# please don't enable CSIv2 build if you don't have properly set SSL
-# build variables above, otherwise your build will fail.
-#
-# uncomment the following section to enable CSIv2 MICO build
-
 !ifdef HAVE_SSL
+# comment out following line to disable compilation of CSIv2
 USE_CSIV2 = 1
-# ncomment if you would like to compile SL3
-# USE_SL3 = 1
+!if defined(USE_CSIV2)
+
+# comment out following line to disable compilation of SL3
+USE_SL3 = 1
+
+!endif
 
 !if defined(USE_CSIV2)
 CSIV2_FLAGS = /DUSE_CSIV2

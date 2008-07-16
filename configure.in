@@ -1,6 +1,6 @@
 #
 #  MICO --- an Open Source CORBA implementation
-#  Copyright (c) 1997-2007 by The Mico Team
+#  Copyright (c) 1997-2008 by The Mico Team
 #
 #  This library is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Library General Public
@@ -32,8 +32,8 @@ AC_ARG_ENABLE(ccm,
  use_ccm=$enableval, use_ccm=no)
 
 AC_ARG_ENABLE(messaging,
- [  --enable-messaging      build CORBA messaging specific parts],
- use_messaging=$enableval, use_messaging=no)
+ [  --disable-messaging     disable CORBA messaging specific parts],
+ use_messaging=$enableval, use_messaging=yes)
 
 AC_ARG_ENABLE(coss,
  [  --disable-coss,         do not use MICO COSS],
@@ -48,8 +48,8 @@ AC_ARG_ENABLE(csiv2,
  use_csiv2=$enableval, use_csiv2=yes)
 
 AC_ARG_ENABLE(sl3,
- [  --enable-sl3            enable SL3],
- use_sl3=$enableval, use_sl3=no)
+ [  --disable-sl3           disable SL3],
+ use_sl3=$enableval, use_sl3=yes)
 
 AC_ARG_ENABLE(naming,
  [  --disable-naming,       do not use MICO Naming Service],
@@ -290,19 +290,6 @@ AC_DEFINE_UNQUOTED(ABSEXECDIR, "$myexec")
 AC_DEFINE_UNQUOTED(ABSSHRDDIR, "$myprefix")
 AC_SUBST(ABSEXECDIR)
 AC_SUBST(ABSSHRDDIR)
-
-if test X"$use_sl3" != Xno; then
-  AC_DEFINE(USE_SL3)
-  if test X"$use_csiv2" != Xyes; then
-    echo ""
-    echo ""
-    echo "MICO SL3 requires MICO CSIv2."
-    echo "Force to enable CSIv2. CSIv2 is enabled now."
-    echo ""
-    echo ""
-    use_csiv2=yes
-  fi
-fi
 
 if test X"$use_csl2" != Xno; then
   AC_DEFINE(USE_CSL2)
@@ -2206,6 +2193,13 @@ if test X"$use_csiv2" != Xno -a X"$HAVE_SSL" != Xno; then
 else
   # we need to disable CSIv2
   use_csiv2=no
+fi
+
+if test X"$use_sl3" != Xno -a X"$HAVE_SSL" != Xno -a X"$use_csiv2" != Xno; then
+  AC_DEFINE(USE_SL3)
+else
+  # we need to disable SL3
+  use_sl3=no
 fi
 
 AC_SUBST(USE_CSIV2)
