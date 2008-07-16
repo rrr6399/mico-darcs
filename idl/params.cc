@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2006 by The Mico Team
+ *  Copyright (c) 1997-2008 by The Mico Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -650,6 +650,14 @@ IDLParam::config()
   cout << "system supplied" << endl;
 #endif
 
+  cout << "Messaging support......: ";
+#ifdef USE_MESSAGING
+  cout << "yes";
+#else // USE_MESSAGING
+  cout << "no";
+#endif // USE_MESSAGING
+  cout << endl;
+
   cout << "Security support.......: ";
 #ifdef HAVE_SSL
   cout << "TLS/SSL";
@@ -659,6 +667,9 @@ IDLParam::config()
 #ifdef USE_CSL2
   cout << ", CSL2";
 #endif // USE_CSL2
+#ifdef USE_SL3
+  cout << ", SL3";
+#endif // USE_SL3
 #else // HAVE_SSL
   cout << "no";
 #endif
