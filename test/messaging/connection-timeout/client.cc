@@ -1,4 +1,5 @@
 #include "hello.h"
+#include <mico/os-misc.h>
 
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
