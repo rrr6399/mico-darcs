@@ -8,5 +8,6 @@
 @rem appropriate environment variables (i.e. vsvars32.bat)
 @rem Other parameters are then sent to nmake directly
 @rem
+@echo setup script is %1
 call %1
 nmake /f Makefile.win32 %2 %3 %4 %5 %6 %7
