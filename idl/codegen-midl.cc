@@ -1604,7 +1604,7 @@ char *CodeGenMIDL::recursive_container(CORBA::IDLType_ptr memb)
 
 void CodeGenMIDL::insert_guid()
 {
-  char* szGUID = CORBA::string_dup("(XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX)");
+  char szGUID[39] = "(XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX)";
 
 #if defined(_WIN32) && !defined(__MINGW32__)
   GUID g;
