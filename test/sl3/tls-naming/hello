@@ -6,7 +6,7 @@ export MICORC
 rm -f NameService-root.inf
 
 echo "starting Naming Service daemon ..."
-nsd -ORBIIOPAddr inet:localhost:12456 &
+../../../coss/naming/nsd -ORBIIOPAddr inet:localhost:12456 &
 nsd_pid=$!
 
 sleep 3
