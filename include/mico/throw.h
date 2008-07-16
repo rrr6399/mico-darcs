@@ -25,7 +25,7 @@
 #define __mico_throw_h__
 
 #include <stdarg.h>
-
+#include <string.h>
 
 #ifdef HAVE_EXCEPTIONS
 #define MICO_CATCHANY(x) try { x; } catch (...) {}
