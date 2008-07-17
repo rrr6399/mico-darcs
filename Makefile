@@ -1,6 +1,7 @@
 #
 # MICO --- a free CORBA implementation
 # Copyright (C) 1997 Kay Roemer & Arno Puder
+# Copyright (c) 1998-2008 by The Mico Team
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -107,10 +108,10 @@ dep:
 	for i in $(PRGDIRS); do $(MAKE) -C $$i .depend || exit 1; done
 
 generate:
-	make -C orb generate
-	make -C ir generate
-	make -C daemon generate
-	make -C ccm generate
+	$(MAKE) -C orb generate
+	$(MAKE) -C ir generate
+	$(MAKE) -C daemon generate
+	$(MAKE) -C ccm generate
 
 bootstrap:
 ifeq ($(USE_SL3), yes)
@@ -126,9 +127,9 @@ endif
 	for i in $(ADMDIRS); do $(MAKE) -C $$i adm || exit 1; done
 	for i in $(MINLIBDIRS); do $(MAKE) -C $$i lib || exit 1; done
 	for i in $(MINPRGDIRS); do $(MAKE) -C $$i prg || exit 1; done
-	make generate
-	make clean
-	make all
+	$(MAKE) generate
+	$(MAKE) clean
+	$(MAKE) all
 	find . -name '*.backup' -exec rm \{} \;
 	@echo
 	@echo "MICO bootstrap finished successfully"
