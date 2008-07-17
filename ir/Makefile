@@ -1,6 +1,6 @@
 #
 #  MICO --- an Open Source CORBA implementation
-#  Copyright (c) 1997-2006 by The Mico Team
+#  Copyright (c) 1997-2008 by The Mico Team
 #
 #  This library is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Library General Public
@@ -124,7 +124,7 @@ generate:
 	$(IDL) --no-poa-ties --c++-skel --any --name ir3 -B.. \
 		--hh-prefix mico ../include/mico/ir3.idl
 	sleep 1
-	patch < ir.cc.diffs
+	$(PATCH) < ir.cc.diffs
 	$(RM) ir.*.orig ir_base.*.orig
 	mv ir.h ir_base.h ir3.h ../include/mico
 	mv ir.cc ir_base.cc ../orb

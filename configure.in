@@ -2265,6 +2265,17 @@ else
   CPPPATH=$MICODIR/bin
 fi
 
+AC_SUBST(PATCHPROG)
+patch_version=`patch --version 2>&1`
+gpatch_version=`gpatch --version 2>&1`
+if test ! -z "`echo $patch_version|grep GNU`"; then
+   PATCHPROG=patch
+else
+if test ! -z "`echo $gpatch_version|grep GNU`"; then
+   PATCHPROG=gpatch
+fi
+fi
+
 AC_SUBST(MICO_VERSION)
 MICO_VERSION=`cat $srcdir/VERSION`
 

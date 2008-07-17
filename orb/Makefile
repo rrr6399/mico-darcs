@@ -1,6 +1,6 @@
 #
 #  MICO --- an Open Source CORBA implementation
-#  Copyright (c) 1997-2007 by The Mico Team
+#  Copyright (c) 1997-2008 by The Mico Team
 #
 #  This library is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Library General Public
@@ -278,7 +278,7 @@ orbcore-generate:
 	$(IDL) --name policy --windows-dll mico -B.. \
 		--no-poa --pseudo --mico-core \
 		../include/mico/policy.idl
-	patch < policy.cc.diffs
+	$(PATCH) < policy.cc.diffs
 	$(RM) policy.*.orig
 	mv policy.h ../include/mico/policy.h
 	$(IDL) --name policy2 --any --windows-dll mico --no-poa \
@@ -288,8 +288,8 @@ orbcore-generate:
 	$(IDL) --any --name poa --windows-dll mico --no-poa \
 		-B.. --pseudo --mico-core \
 		../include/mico/poa.idl
-	patch < poa.h.diffs
-	patch < poa.cc.diffs
+	$(PATCH) < poa.h.diffs
+	$(PATCH) < poa.cc.diffs
 	$(RM) poa.*.orig
 	mv poa.h ../include/mico/poa.h
 	$(IDL) --name service_info --windows-dll mico --pseudo --mico-core \
@@ -331,7 +331,7 @@ orbcore-generate:
 	mv messaging.h ../include/mico/messaging.h
 
 security-generate:
-	make -C security generate
+	$(MAKE) -C security generate
 
 csiv2-generate:
 	cd security

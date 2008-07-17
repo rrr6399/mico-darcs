@@ -1,7 +1,7 @@
 # -*- Makefile -*-
 #
 #  MICO --- an Open Source CORBA implementation
-#  Copyright (c) 1997-2004 by The Mico Team
+#  Copyright (c) 1997-2008 by The Mico Team
 #
 #  This library is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Library General Public
@@ -117,6 +117,7 @@ SOEXT		= @SOEXT@
 POSTLD		= @POSTLD@
 RM              = @RMPROG@
 LN		= @LNPROG@
+PATCH		= @PATCHPROG@
 MKDIR           = mkdir
 JAVAC           = javac
 JCUP            = java java_cup.Main
