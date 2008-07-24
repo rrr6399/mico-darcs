@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2005 by The Mico Team
+ *  Copyright (c) 1997-2008 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -445,6 +445,13 @@ MICO::SelectDispatcher::run (CORBA::Boolean infinite)
 			  (select_addr_t)&wset,
 			  (select_addr_t)&xset,
 			  &tm);
+#ifdef HAVE_THREADS
+        if (r == -1 && errno == EBADF) {
+            // worker thread already closed some fd
+            // let's loop and build fd set again
+            continue;
+        }
+#endif // HAVE_THREADS
 	assert (r >= 0 || errno == EINTR || errno == EAGAIN ||
                 errno == EWOULDBLOCK);
 
