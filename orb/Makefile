@@ -113,6 +113,8 @@ endif
 
 MESSAGING_SRCS = messaging.cc messaging_impl.cc
 
+THREADING_POLICIES_SRCS = mtpolicy.cc mtpolicy_impl.cc
+
 ifeq ($(HAVE_MEMCHECK), yes)
 SRCS = memcheck.cc
 ifeq ($(USE_MEMTRACE), yes)
@@ -141,7 +143,7 @@ SRCS := $(SRCS) dii.cc typecode.cc any.cc codec.cc buffer.cc context.cc \
   value.cc valuetype.cc valuetype_impl.cc dynany_impl.cc \
   policy2.cc tckind.cc orb_excepts.cc policy.cc poa.cc poa_base.cc \
   poa_impl.cc dynany.cc $(UNI_SRCS) $(EH_SRCS) $(PI_SRC) $(TIME_SRC) \
-  ir.cc ir_base.cc imr.cc mtdebug.cc reflection.cc
+  ir.cc ir_base.cc imr.cc mtdebug.cc reflection.cc mttypes.cc
 
 ifeq ($(USE_WIRELESS), yes)
 SRCS := $(SRCS) watm.cc
@@ -157,6 +159,10 @@ endif
 
 ifeq ($(USE_MESSAGING), yes)
 SRCS := $(SRCS) $(MESSAGING_SRCS)
+endif
+
+ifeq ($(THREADING_POLICIES), yes)
+SRCS := $(SRCS) $(THREADING_POLICIES_SRCS)
 endif
 
 STATIC_OBJS = $(SRCS:.cc=.o)
@@ -329,6 +335,12 @@ orbcore-generate:
 	$(IDL)  --name messaging --windows-dll mico --mico-core \
 		-B.. --any ../include/mico/messaging.idl
 	mv messaging.h ../include/mico/messaging.h
+	$(IDL)  --name mtpolicy --windows-dll mico --mico-core \
+		-B.. --any ../include/mico/mtpolicy.idl
+	mv mtpolicy.h ../include/mico/mtpolicy.h
+	$(IDL)  --name mttypes --windows-dll mico --mico-core \
+		-B.. --any ../include/mico/mttypes.idl
+	mv mttypes.h ../include/mico/mttypes.h
 
 security-generate:
 	$(MAKE) -C security generate

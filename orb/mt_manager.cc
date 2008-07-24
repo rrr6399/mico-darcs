@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2005 by The Mico Team
+ *  Copyright (c) 2000-2008 by The Mico Team
  * 
  *  thread management
  *  Copyright (C) 1999 Andreas Schultz                                 
@@ -40,6 +40,7 @@
 #endif // FAST_PCH
 
 
+using namespace MICOMT;
 using namespace std;
 
 /********************************** ThreadPool **********************************/
@@ -52,7 +53,7 @@ using namespace std;
  */
 MICO::ThreadPool::ThreadPool( unsigned int _max,
 			      unsigned int _max_idle,
-			      unsigned int _min_idle): tp_lock(FALSE, MICOMT::Mutex::Recursive),
+			      unsigned int _min_idle): tp_lock(FALSE, Mutex::Recursive),
 						       tp_cond_(&tp_lock),
 						       tpm(NULL),
 						       idle_threads(_max),
@@ -78,7 +79,7 @@ MICO::ThreadPool::ThreadPool( unsigned int _max,
  */
 MICO::ThreadPool::~ThreadPool() {
     
-    MICOMT::AutoLock lock(tp_lock);
+    AutoLock lock(tp_lock);
     unsigned int i, cnt;
     // we need to call dtor with _all_ thread idle
     while (cnt_all != idle_threads.count()) {
@@ -130,7 +131,7 @@ MICO::ThreadPool::start_threads (void *arg) {
 MICO::WorkerThread *
 MICO::ThreadPool::get_idle_thread()
 {
-    MICOMT::AutoLock l(tp_lock);
+    AutoLock l(tp_lock);
     WorkerThread *kt;
     
     //no idle threads
@@ -139,7 +140,7 @@ MICO::ThreadPool::get_idle_thread()
 	// limit exhausted
 	if (cnt_all >= max) {
 	    if (MICO::Logger::IsLogged (MICO::Logger::Thread)) {
-	    MICOMT::AutoDebugLock __lock;
+	    AutoDebugLock __lock;
 	    MICO::Logger::Stream (MICO::Logger::Thread) 
 		<< "ThreadPool::get_idle_thread(): thread limit exhausted " << endl;
 	    }
@@ -173,7 +174,7 @@ MICO::ThreadPool::new_idle_thread()
     
     kt = new MICO::WorkerThread( this );
     {
-	MICOMT::AutoLock l(tp_lock);
+	AutoLock l(tp_lock);
 	
 	kt->no( idle_threads.insert( kt ) );
 	kt->state( MICO::WorkerThread::Idle );
@@ -197,7 +198,7 @@ MICO::ThreadPool::mark_idle( MICO::WorkerThread *kt )
 
     if ( kt->state() != MICO::WorkerThread::Idle )
     {
-	MICOMT::AutoLock l(tp_lock);
+	AutoLock l(tp_lock);
 	
 	kt->no( idle_threads.insert( kt ) );
 	kt->state( MICO::WorkerThread::Idle );
@@ -214,7 +215,7 @@ MICO::ThreadPool::mark_idle( MICO::WorkerThread *kt )
 void 
 MICO::ThreadPool::mark_busy( MICO::WorkerThread *kt )
 {
-    //    MICOMT::AutoLock l(tp_lock);
+    //    AutoLock l(tp_lock);
 
     assert ( kt->state() != MICO::WorkerThread::Idle);
 
@@ -229,7 +230,7 @@ MICO::ThreadPool::mark_busy( MICO::WorkerThread *kt )
 void 
 MICO::ThreadPool::remove_thread( MICO::WorkerThread *kt )
 {
-    MICOMT::AutoLock l(tp_lock);
+    AutoLock l(tp_lock);
 	
     if ( kt->state() == MICO::WorkerThread::Idle ) {
 	idle_threads.remove( kt->no() );
@@ -256,7 +257,7 @@ MICO::ThreadPool::put_msg( MICO::OP_id_type nextOP_id, MICO::msg_type *msg )
  * Initialize the worker thread.
  */
 MICO::WorkerThread::WorkerThread()
-    : op(NULL), op_critical(FALSE, MICOMT::Mutex::Recursive)
+    : op(NULL), op_critical(FALSE, Mutex::Recursive)
 {
 #ifdef DEBUG_NAMES
     _state_sem.name("WorkerThread._state_sem");
@@ -269,7 +270,7 @@ MICO::WorkerThread::WorkerThread()
  * thread pool.
  */
 MICO::WorkerThread::WorkerThread(MICO::ThreadPool *_tp)
-    : tp(_tp), op(NULL), op_critical(FALSE, MICOMT::Mutex::Recursive)
+    : tp(_tp), op(NULL), op_critical(FALSE, Mutex::Recursive)
 {
 #ifdef DEBUG_NAMES
     op_critical.name("WorkerThread.op_critical");
@@ -299,7 +300,7 @@ MICO::WorkerThread::~WorkerThread()
 void
 MICO::WorkerThread::register_operation( MICO::Operation* _op )
 {
-    MICOMT::AutoLock l(op_critical);
+    AutoLock l(op_critical);
 
     op = _op;
     op->thread( this );
@@ -312,7 +313,7 @@ MICO::WorkerThread::register_operation( MICO::Operation* _op )
 void
 MICO::WorkerThread::deregister_operation( MICO::Operation* _op )
 {
-    MICOMT::AutoLock l(op_critical);
+    AutoLock l(op_critical);
 
     if (op == _op)
     {
@@ -332,7 +333,7 @@ void
 MICO::WorkerThread::_run (void *arg) {
 
     if (MICO::Logger::IsLogged (MICO::Logger::Thread)) {
-	MICOMT::AutoDebugLock __lock;
+	AutoDebugLock __lock;
 	MICO::Logger::Stream (MICO::Logger::Thread) 
 	    << "WorkerThread::_run: " << endl;
     }
@@ -454,15 +455,15 @@ MICO::MTManager::thread_setup(unsigned int conn_limit, unsigned int req_limit)
 #endif
 }
 
-CORBA::Long MICO::MTManager::_S_server_concurrency_model = MICO::MTManager::_S_thread_pool;
-CORBA::Long MICO::MTManager::_S_client_concurrency_model = MICO::MTManager::_S_threaded_client;
+ServerConcurrencyModel MICO::MTManager::_S_server_concurrency_model = THREAD_POOL;
+ClientConcurrencyModel MICO::MTManager::_S_client_concurrency_model = THREADED;
 MICO::ThreadPoolManager* MICO::MTManager::_S_thread_pool_manager = NULL;
 
 void
-MICO::MTManager::server_concurrency_model(MICO::MTManager::ConcurrencyModel __model)
+MICO::MTManager::server_concurrency_model(ServerConcurrencyModel __model)
 {
     if (MICO::Logger::IsLogged (MICO::Logger::Thread)) {
-	MICOMT::AutoDebugLock __lock;
+	AutoDebugLock __lock;
 	MICO::Logger::Stream (MICO::Logger::Thread)
 	    << "Using " << __model << " as a concurrency model of whole orb." << endl;
     }
@@ -470,18 +471,18 @@ MICO::MTManager::server_concurrency_model(MICO::MTManager::ConcurrencyModel __mo
 }
 
 void
-MICO::MTManager::client_concurrency_model(MICO::MTManager::ConcurrencyModel model)
+MICO::MTManager::client_concurrency_model(ClientConcurrencyModel model)
 {
     _S_client_concurrency_model = model;
 }
 
-CORBA::Long
+ServerConcurrencyModel
 MICO::MTManager::server_concurrency_model()
 {
     return MICO::MTManager::_S_server_concurrency_model;
 }
 
-CORBA::Long
+ClientConcurrencyModel
 MICO::MTManager::client_concurrency_model()
 {
     return MICO::MTManager::_S_client_concurrency_model;
@@ -490,37 +491,31 @@ MICO::MTManager::client_concurrency_model()
 CORBA::Boolean
 MICO::MTManager::thread_pool()
 {
-    return _S_server_concurrency_model == _S_thread_pool;
+    return _S_server_concurrency_model == THREAD_POOL;
 }
 
 CORBA::Boolean
 MICO::MTManager::thread_per_connection()
 {
-    return _S_server_concurrency_model == _S_thread_per_connection;
-}
-
-CORBA::Boolean
-MICO::MTManager::thread_per_request()
-{
-    return _S_server_concurrency_model == _S_thread_per_request;
+    return _S_server_concurrency_model == THREAD_PER_CONNECTION;
 }
 
 CORBA::Boolean
 MICO::MTManager::threaded_client()
 {
-    return _S_client_concurrency_model == _S_threaded_client;
+    return _S_client_concurrency_model == THREADED;
 }
 
 CORBA::Boolean
 MICO::MTManager::blocking_threaded_client()
 {
-    return _S_client_concurrency_model == _S_blocking_threaded_client;
+    return _S_client_concurrency_model == BLOCKING_THREADED;
 }
 
 CORBA::Boolean
 MICO::MTManager::reactive_client()
 {
-    return _S_client_concurrency_model == _S_reactive_client;
+    return _S_client_concurrency_model == REACTIVE;
 }
 
 void

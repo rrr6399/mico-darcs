@@ -1,7 +1,7 @@
 /* -*- mode: c++; c-basic-offset: 4; -*-
  *
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2005 by The Mico Team
+ *  Copyright (c) 1997-2008 by The Mico Team
  * 
  *  thread management
  *  Copyright (C) 1999 Andreas Schultz                                 
@@ -440,30 +440,20 @@ namespace MICO
 
     class MTManager
     {
-	static CORBA::Long _S_server_concurrency_model;
-        static CORBA::Long _S_client_concurrency_model;
+	static MICOMT::ServerConcurrencyModel _S_server_concurrency_model;
+        static MICOMT::ClientConcurrencyModel _S_client_concurrency_model;
 	static MICO::ThreadPoolManager* _S_thread_pool_manager;
     public:
-	enum ConcurrencyModel
-	{
-	    _S_thread_pool,
-	    _S_thread_per_connection,
-	    _S_thread_per_request,
-            _S_reactive_client,
-            _S_blocking_threaded_client,
-            _S_threaded_client
-	};
-
 	static void
-	server_concurrency_model(MICO::MTManager::ConcurrencyModel __model);
+	server_concurrency_model(MICOMT::ServerConcurrencyModel __model);
 
         static void
-        client_concurrency_model(MICO::MTManager::ConcurrencyModel model);
+        client_concurrency_model(MICOMT::ClientConcurrencyModel model);
 	
-	static CORBA::Long
+	static MICOMT::ServerConcurrencyModel
 	server_concurrency_model();
 
-        static CORBA::Long
+        static MICOMT::ClientConcurrencyModel
         client_concurrency_model();
 
 	static CORBA::Boolean
@@ -471,9 +461,6 @@ namespace MICO
 
 	static CORBA::Boolean
 	thread_per_connection();
-
-	static CORBA::Boolean
-	thread_per_request();
 
         static CORBA::Boolean
         threaded_client();

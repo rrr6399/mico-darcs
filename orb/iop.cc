@@ -2535,7 +2535,6 @@ MICO::GIOPConn::input_ready()
 	    << " t_mod: " << MICO::MTManager::server_concurrency_model() << endl
 	    << "  pool: " << MICO::MTManager::thread_pool() << endl
 	    << "  conn: " << MICO::MTManager::thread_per_connection() << endl
-	    << "   req: " << MICO::MTManager::thread_per_request() << endl
 	    << "_activerefs: " << _activerefs << endl;
     }
 	
@@ -2550,14 +2549,6 @@ MICO::GIOPConn::input_ready()
 					   GIOPConnCallback::InputReady));
         MICO::MTManager::thread_pool_manager()->get_thread_pool(MICO::Operation::DeCode).put_msg(0, msg);
         return TRUE;
-    }
-    if (MICO::MTManager::thread_per_request()) {
-        MICO::msg_type    *msg;
-	msg = new msg_type(new GIOPConnMsg(this, this->input(),
-					   GIOPConnCallback::InputReady));
-	//_reader->send_msg( MICO::Operation::DeCode, msg );
-        assert(0); // how to rewrite line above for new design?
-	return TRUE;
     }
     if (MICO::MTManager::thread_per_connection()) {
 	return this->input_ready_callback(this->input());

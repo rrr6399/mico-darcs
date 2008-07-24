@@ -93,6 +93,7 @@ extern char* getenv (const char*);
 #endif
 
 
+using namespace MICOMT;
 using namespace std;
 
 /************************** misc dtors ****************************/
@@ -637,6 +638,7 @@ CORBA::ORB::ORB (int &argc, char **argv, const char *rcfile)
     //_currentid = 0;
 #else // HAVE_THREADS
     MICOMT::Thread::create_key(_current_rec_key, NULL);
+    threading_initialized_ = FALSE;
 #endif // HAVE_THREADS
     _rcfile = rcfile;
     _wait_for_completion = FALSE;
@@ -1758,6 +1760,9 @@ CORBA::ORB::run ()
 	if (_is_shutdown > 1)
 	    mico_throw(CORBA::BAD_INV_ORDER(4, COMPLETED_NO));
     }
+    if (!threading_initialized_) {
+        this->initialize_threading();
+    }
 #else // HAVE_THREADS
     assert (!_is_running);
 #endif // HAVE_THREADS
@@ -2512,6 +2517,10 @@ CORBA::ORB::invoke_async (Object_ptr obj,
     _currentid.push(msgid);
 
 #else // HAVE_THREADS
+    if (!threading_initialized_) {
+        this->initialize_threading();
+    }
+
     stack<CORBA::ORBInvokeRec*>* invs = static_cast<stack<CORBA::ORBInvokeRec*>*>
 	(MICOMT::Thread::get_specific(_current_rec_key));
     if (invs == NULL) {
@@ -2587,6 +2596,11 @@ CORBA::ORB::invoke_async (Object_ptr obj,
 CORBA::ORBMsgId
 CORBA::ORB::locate_async (Object_ptr obj, ORBCallback *cb, ORBMsgId id)
 {
+#ifdef HAVE_THREADS
+    if (!threading_initialized_) {
+        this->initialize_threading();
+    }
+#endif // HAVE_THREADS
     ObjectAdapter *oa = get_oa (obj);
     ORBInvokeRec *rec = get_invoke( id );
     if (!rec)
@@ -2612,6 +2626,11 @@ CORBA::ORB::bind_async (const char *repoid,
 			Address *addr, ORBCallback *cb,
 			ORBMsgId id)
 {
+#ifdef HAVE_THREADS
+    if (!threading_initialized_) {
+        this->initialize_threading();
+    }
+#endif // HAVE_THREADS
     ORBInvokeRec *rec = get_invoke( id );
     if (!rec)
 	rec = new_orbid();
@@ -3319,10 +3338,8 @@ CORBA::ORB_init (int &argc, char **argv, const char *_id)
     ULong conn_limit = 0;
     ULong request_limit = 4; // The most common servers have up to four CPUs
     Boolean thread_pool = TRUE;
-    Boolean thread_per_request = FALSE;
     Boolean thread_per_connection = FALSE;
-    MICO::MTManager::ConcurrencyModel
-        client_concurrency_model = MICO::MTManager::_S_threaded_client;
+    ClientConcurrencyModel client_concurrency_model = THREADED;
 #endif // HAVE_THREADS
 #ifdef MTDEBUG
     __mtdebug_init ();
@@ -3406,7 +3423,6 @@ CORBA::ORB_init (int &argc, char **argv, const char *_id)
     opts["-ORBNoResolve"]     = "";
     opts["-ORBThreadPool"]    = "";
     opts["-ORBThreadPerConnection"] = "";
-    opts["-ORBThreadPerRequest"] = "";
     opts["-ORBClientReactive"] = "";
     opts["-ORBClientThreaded"] = "";
     opts["-ORBClientThreadedBlocking"] = "";
@@ -3508,19 +3524,11 @@ CORBA::ORB_init (int &argc, char **argv, const char *_id)
         else if (arg == "-ORBThreadPool") {
 	    thread_pool = TRUE;
 	    thread_per_connection = FALSE;
-	    thread_per_request = FALSE;	    
 	    if (conn_limit != 0)
 		conn_limit = 0;
 	} else if (arg == "-ORBThreadPerConnection") {
 	    thread_pool = FALSE;	    
 	    thread_per_connection = TRUE;
-	    thread_per_request = FALSE;
-	    if (conn_limit < 1)
-		conn_limit = 10;
-	} else if (arg == "-ORBThreadPerRequest") {
-	    thread_pool = FALSE;
-	    thread_per_connection = FALSE;
-	    thread_per_request = TRUE;
 	    if (conn_limit < 1)
 		conn_limit = 10;
 	} else if (arg == "-ORBConnLimit") {
@@ -3528,11 +3536,11 @@ CORBA::ORB_init (int &argc, char **argv, const char *_id)
 	} else if (arg == "-ORBRequestLimit") {
 	    request_limit = atoi (val.c_str ());
 	} else if (arg == "-ORBClientReactive") {
-            client_concurrency_model = MICO::MTManager::_S_reactive_client;
+            client_concurrency_model = REACTIVE;
 	} else if (arg == "-ORBClientThreaded") {
-            client_concurrency_model = MICO::MTManager::_S_threaded_client;
+            client_concurrency_model = THREADED;
         } else if (arg == "-ORBClientThreadedBlocking") {
-            client_concurrency_model = MICO::MTManager::_S_blocking_threaded_client;
+            client_concurrency_model = BLOCKING_THREADED;
         }
 #endif // HAVE_THREADS
 #ifdef USE_CSIV2
@@ -3664,7 +3672,7 @@ CORBA::ORB_init (int &argc, char **argv, const char *_id)
     orb_instance->resource_manager ().connection_limit (conn_limit);
     orb_instance->resource_manager ().request_limit (request_limit);
     if (thread_pool) {
-	MICO::MTManager::server_concurrency_model(MICO::MTManager::_S_thread_pool);
+	MICO::MTManager::server_concurrency_model(THREAD_POOL);
 	if (MICO::Logger::IsLogged(MICO::Logger::Info)) {
 	  MICOMT::AutoDebugLock lock;
 	  MICO::Logger::Stream(MICO::Logger::Info)
@@ -3686,19 +3694,11 @@ CORBA::ORB_init (int &argc, char **argv, const char *_id)
         disp->block(TRUE);
         delete disp;
 	if (thread_per_connection) {
-	    MICO::MTManager::server_concurrency_model(MICO::MTManager::_S_thread_per_connection);
+	    MICO::MTManager::server_concurrency_model(THREAD_PER_CONNECTION);
 	    if (MICO::Logger::IsLogged(MICO::Logger::Info)) {
 		MICOMT::AutoDebugLock lock;
 		MICO::Logger::Stream(MICO::Logger::Info)
 		    << "Using thread-per-connection concurrency model." << endl;
-	    }
-	}
-	else if (thread_per_request) {
-	    MICO::MTManager::server_concurrency_model(MICO::MTManager::_S_thread_per_request);
-	    if (MICO::Logger::IsLogged(MICO::Logger::Info)) {
-		MICOMT::AutoDebugLock lock;
-		MICO::Logger::Stream(MICO::Logger::Info)
-		    << "Using thread-per-request concurrency model." << endl;
 	    }
 	}
 	else {
@@ -3710,15 +3710,15 @@ CORBA::ORB_init (int &argc, char **argv, const char *_id)
         MICOMT::AutoDebugLock lock;
         MICO::Logger::Stream(MICO::Logger::Info)
             << "Using client concurrency model: "; 
-        if (client_concurrency_model == MICO::MTManager::_S_reactive_client) {
+        if (client_concurrency_model == REACTIVE) {
             MICO::Logger::Stream(MICO::Logger::Info)
                 << "reactive" << endl;
         }
-        else if (client_concurrency_model == MICO::MTManager::_S_threaded_client) {
+        else if (client_concurrency_model == THREADED) {
             MICO::Logger::Stream(MICO::Logger::Info)
                 << "threaded" << endl;
         }
-        else if (client_concurrency_model == MICO::MTManager::_S_blocking_threaded_client) {
+        else if (client_concurrency_model == BLOCKING_THREADED) {
             MICO::Logger::Stream(MICO::Logger::Info)
                 << "threaded/blocking" << endl;
         }
@@ -4225,3 +4225,57 @@ CORBA::ORB_init (int &argc, char **argv, const char *_id)
     return CORBA::ORB::_duplicate (orb_instance);
 }
 
+#ifdef HAVE_THREADS
+void
+CORBA::ORB::initialize_threading()
+{
+    // get the policy & enforce its values
+    // otherwise use what's set by default
+    // or by the command-line parameters
+    MICOMT::AutoLock lock(this->threading_initialization_mutex_);
+    if (!this->threading_initialized_) {
+#ifdef THREADING_POLICIES
+        CORBA::PolicyTypeSeq pts;
+        pts.length(4);
+        pts[0] = SERVER_CONCURRENCY_MODEL_POLICY_TYPE;
+        pts[1] = CLIENT_CONCURRENCY_MODEL_POLICY_TYPE;
+        pts[2] = CONNECTION_LIMIT_POLICY_TYPE;
+        pts[3] = REQUEST_LIMIT_POLICY_TYPE;
+        CORBA::Object_var obj = this->resolve_initial_references("ORBPolicyManager");
+        CORBA::PolicyManager_var manager = CORBA::PolicyManager::_narrow(obj);
+        assert(!CORBA::is_nil(manager));
+        CORBA::PolicyList_var pl = manager->get_policy_overrides(pts);
+        assert(pl->length() >= 0 && pl->length() <= 3);
+        for (CORBA::ULong i = 0; i < pl->length(); i++) {
+            if (pl[i]->policy_type() == SERVER_CONCURRENCY_MODEL_POLICY_TYPE) {
+                ServerConcurrencyModelPolicy_var pol
+                    = ServerConcurrencyModelPolicy::_narrow(pl[i]);
+                assert(!CORBA::is_nil(pol));
+                MICO::MTManager::server_concurrency_model(pol->model());
+            }
+            if (pl[i]->policy_type() == CLIENT_CONCURRENCY_MODEL_POLICY_TYPE) {
+                ClientConcurrencyModelPolicy_var pol
+                    = ClientConcurrencyModelPolicy::_narrow(pl[i]);
+                assert(!CORBA::is_nil(pol));
+                MICO::MTManager::client_concurrency_model(pol->model());
+            }
+            if (pl[i]->policy_type() == CONNECTION_LIMIT_POLICY_TYPE) {
+                ConnectionLimitPolicy_var pol
+                    = ConnectionLimitPolicy::_narrow(pl[i]);
+                assert(!CORBA::is_nil(pol));
+                this->resource_manager().connection_limit(pol->limit());
+            }
+            if (pl[i]->policy_type() == REQUEST_LIMIT_POLICY_TYPE) {
+                RequestLimitPolicy_var pol
+                    = RequestLimitPolicy::_narrow(pl[i]);
+                assert(!CORBA::is_nil(pol));
+                this->resource_manager().request_limit(pol->limit());
+            }
+        }
+#endif // THREADING_POLICIES
+        MICO::MTManager::thread_setup(this->resource_manager().connection_limit(),
+                                      this->resource_manager().request_limit());
+        threading_initialized_ = TRUE;
+    }
+}
+#endif // HAVE_THREADS

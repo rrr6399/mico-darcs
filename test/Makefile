@@ -32,6 +32,10 @@ ifeq ($(USE_MESSAGING), yes)
 DIRS := $(DIRS) messaging
 endif
 
+ifeq ($(THREADING_POLICIES), yes)
+DIRS := $(DIRS) threading
+endif
+
 all: prg
 
 prg:

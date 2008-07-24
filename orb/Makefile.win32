@@ -80,6 +80,8 @@ SL3_SRCS = security/atlas.cc \
 
 MESSAGING_SRCS = messaging.cc messaging_impl.cc
 
+THREADING_POLICIES_SRCS = mtpolicy.cc mtpolicy_impl.cc
+
 !ifdef HAVE_MEMCHECK
 SRCS = $(SRCS) memcheck.cc memleaks.cc
 
@@ -101,7 +103,7 @@ SRCS = $(SRCS) os-windows.cc dii.cc typecode.cc any.cc codec.cc buffer.cc contex
   value.cc valuetype.cc valuetype_impl.cc dynany_impl.cc \
   policy2.cc tckind.cc orb_excepts.cc policy.cc poa.cc poa_base.cc \
   poa_impl.cc dynany.cc $(UNI_SRCS) $(EH_SRCS) $(PI_SRC) $(TIME_SRC) \
-  mtdebug.cc setterm.cc reflection.cc
+  mtdebug.cc setterm.cc reflection.cc mttypes.cc
 
 !ifdef HAVE_THREADS
 SRCS = $(SRCS) $(MT_SRCS)
@@ -109,6 +111,10 @@ SRCS = $(SRCS) $(MT_SRCS)
 
 !ifdef USE_MESSAGING
 SRCS = $(SRCS) $(MESSAGING_SRCS)
+!endif
+
+!ifdef THREADING_POLICIES
+SRCS = $(SRCS) $(THREADING_POLICIES_SRCS)
 !endif
 
 !ifdef USE_CSL2
