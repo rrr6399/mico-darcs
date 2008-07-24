@@ -713,6 +713,13 @@ IDLParam::config()
   cout << ")" << endl;
 #endif // HAVE_THREADS
 
+  cout << "threading policies.....: ";
+#ifdef THREADING_POLICIES
+  cout << "yes" << endl;
+#else
+  cout << "no" << endl;
+#endif
+
   exit (0);
 }
 

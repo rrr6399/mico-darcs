@@ -1,4 +1,4 @@
-/* include/mico/config.h.in.  Generated automatically from configure.in by autoheader 2.13.  */
+/* include/mico/config.h.in.  Generated automatically from configure.in by autoheader.  */
 
 /* Define if you don't have vprintf but do have _doprnt.  */
 #undef HAVE_DOPRNT
@@ -167,6 +167,9 @@
 
 /* whether ANSI C++ header files are present */
 #undef HAVE_ANSI_CPLUSPLUS_HEADERS
+
+/* whether to build Threading Policies API */
+#undef THREADING_POLICIES
 
 /* The number of bytes in a double.  */
 #undef SIZEOF_DOUBLE

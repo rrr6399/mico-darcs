@@ -153,3 +153,6 @@
 
 /* whether ANSI C++ header files are present */
 #undef HAVE_ANSI_CPLUSPLUS_HEADERS
+
+/* whether to build Threading Policies API */
+#undef THREADING_POLICIES

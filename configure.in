@@ -219,6 +219,10 @@ AC_ARG_ENABLE(orb-core-only,
  [  --enable-orb-core-only  build only ORB core w/o IDL/IR and other libraries],
  orb_core_only=$enableval, orb_core_only=no)
 
+AC_ARG_ENABLE(threading-policies,
+ [  --disable-threading-policies  do not build Threading Policies],
+ threading_policies=$enableval, threading_policies=yes)
+
 
 AC_SUBST(HAVE_MINGW)
 AC_SUBST(HAVE_CYGWIN)
@@ -2243,6 +2247,16 @@ USE_WIRELESS_TERMINAL=$use_wireless_terminal
 
 AC_SUBST(USE_WIRELESS_ACCESS)
 USE_WIRELESS_ACCESS=$use_wireless_access
+
+if test X"$threading_policies" != Xno -a X"$HAVE_THREADS" != Xno; then
+  AC_DEFINE(THREADING_POLICIES)
+else
+  # we need to disable Threading Policies
+  threading_policies=no
+fi
+
+AC_SUBST(THREADING_POLICIES)
+THREADING_POLICIES=$threading_policies
 
 AC_SUBST(IDL)
 AC_SUBST(CCMGEN)

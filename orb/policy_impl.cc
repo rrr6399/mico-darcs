@@ -43,6 +43,9 @@
 #ifdef USE_MESSAGING
 #include <mico/messaging_impl.h>
 #endif // USE_MESSAGING
+#ifdef THREADING_POLICIES
+#include <mico/mtpolicy_impl.h>
+#endif // THREADING_POLICIES
 
 #endif // FAST_PCH
 
@@ -481,6 +484,32 @@ CORBA::ORB::create_policy (CORBA::PolicyType type, const CORBA::Any &any)
     return new MICO::RelativeConnectionBindingTimeoutPolicy_impl(val);
   }
 #endif // USE_MESSAGING
+#ifdef THREADING_POLICIES
+  else if (type == MICOMT::SERVER_CONCURRENCY_MODEL_POLICY_TYPE) {
+    MICOMT::ServerConcurrencyModel val;
+    if (!(any >>= val))
+      mico_throw(CORBA::PolicyError(CORBA::BAD_POLICY_TYPE));
+    return new MICOMT::ServerConcurrencyModelPolicy_impl(val);
+  }
+  else if (type == MICOMT::CLIENT_CONCURRENCY_MODEL_POLICY_TYPE) {
+    MICOMT::ClientConcurrencyModel val;
+    if (!(any >>= val))
+      mico_throw(CORBA::PolicyError(CORBA::BAD_POLICY_TYPE));
+    return new MICOMT::ClientConcurrencyModelPolicy_impl(val);
+  }
+  else if (type == MICOMT::CONNECTION_LIMIT_POLICY_TYPE) {
+    CORBA::ULong val;
+    if (!(any >>= val))
+      mico_throw(CORBA::PolicyError(CORBA::BAD_POLICY_TYPE));
+    return new MICOMT::ConnectionLimitPolicy_impl(val);
+  }
+  else if (type == MICOMT::REQUEST_LIMIT_POLICY_TYPE) {
+    CORBA::ULong val;
+    if (!(any >>= val))
+      mico_throw(CORBA::PolicyError(CORBA::BAD_POLICY_TYPE));
+    return new MICOMT::RequestLimitPolicy_impl(val);
+  }
+#endif // THREADING_POLICIES
   else if (PInterceptor::PI::S_pfmap_.find(type)
 	   != PInterceptor::PI::S_pfmap_.end()) {
     return PInterceptor::PI::S_pfmap_[type]->create_policy

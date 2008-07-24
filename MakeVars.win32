@@ -33,6 +33,12 @@
 #
 USE_MESSAGING = 1
 
+# Threading Policies stuff
+# comment out the following line to disable compilation
+# of Threading Policies part
+#
+THREADING_POLICIES = 1
+
 # Adapted by Sorin Mustaca <sorinm@home.ro>
 # Download and compile the OpenSSL sources. Install the DLLs into win32-bin
 # and the libraries in win32-bin\lib. 
@@ -72,6 +78,10 @@ CSIV2_FLAGS = /DUSE_CSIV2 /DUSE_SL3
 
 !if defined(USE_MESSAGING)
 MESSAGING_FLAGS = /DUSE_MESSAGING
+!endif
+
+!if defined(THREADING_POLICIES)
+THREADING_POLICIES_FLAGS = /DTHREADING_POLICIES
 !endif
 
 # PTHREADS adaptation by Sorin Mustaca <sorinm@home.ro>
@@ -170,8 +180,8 @@ DELETE		= $(RM) *.obj *.exe *.def *.dmp *.dll *.lib *.exp  *.pdb *.pch *.ilk
 
 
 !ifdef RELEASE_BUILD
-CXXFLAGS        = /nologo /Ox /EHsc /GR /TP /MD $(SSL_FLAGS) $(CSIV2_FLAGS) $(MESSAGING_FLAGS) $(PTHREADS_FLAGS) $(CCM_FLAGS) $(CXXVC)
-CCFLAGS         = /nologo /TC /MD $(SSL_FLAGS) $(CSIV2_FLAGS) $(MESSAGING_FLAGS) $(PTHREADS_FLAGS) $(CCM_FLAGS) $(CXXVC)
+CXXFLAGS        = /nologo /Ox /EHsc /GR /TP /MD $(SSL_FLAGS) $(CSIV2_FLAGS) $(MESSAGING_FLAGS) $(THREADING_POLICIES_FLAGS) $(PTHREADS_FLAGS) $(CCM_FLAGS) $(CXXVC)
+CCFLAGS         = /nologo /TC /MD $(SSL_FLAGS) $(CSIV2_FLAGS) $(MESSAGING_FLAGS) $(THREADING_POLICIES_FLAGS) $(PTHREADS_FLAGS) $(CCM_FLAGS) $(CXXVC)
 LINKFLAGS       = /nologo /subsystem:console /OPT:REF /incremental:no $(SSL_LIBS) $(PTHREADS_LIB) $(MANIFEST)
 LINKDLLFLAGS    = /nologo /dll /incremental:no /OPT:REF $(SSL_LIBS) $(PTHREADS_LIB) $(MANIFEST)
 !else
@@ -180,8 +190,8 @@ LINKDLLFLAGS    = /nologo /dll /incremental:no /OPT:REF $(SSL_LIBS) $(PTHREADS_L
 # If you need faster compilation and execution times in DEBUG, just comment the var below
 #SECURITY_CHECKS	= /GS /GZ /Ge /RTCu /RTCs
 #HAVE_MEMCHECK = 1
-CXXFLAGS        = /nologo $(SECURITY_CHECKS) /Od /EHsc /GR /TP /Zi /MDd $(SSL_FLAGS) $(CSIV2_FLAGS) $(MESSAGING_FLAGS) $(PTHREADS_FLAGS) $(CCM_FLAGS) $(CXXVC)
-CCFLAGS         = /nologo $(SECURITY_CHECKS) /TC /Zi /MDd $(SSL_FLAGS) $(CSIV2_FLAGS) $(MESSAGING_FLAGS) $(PTHREADS_FLAGS) $(CCM_FLAGS) $(CXXVC)
+CXXFLAGS        = /nologo $(SECURITY_CHECKS) /Od /EHsc /GR /TP /Zi /MDd $(SSL_FLAGS) $(CSIV2_FLAGS) $(MESSAGING_FLAGS) $(THREADING_POLICIES_FLAGS) $(PTHREADS_FLAGS) $(CCM_FLAGS) $(CXXVC)
+CCFLAGS         = /nologo $(SECURITY_CHECKS) /TC /Zi /MDd $(SSL_FLAGS) $(CSIV2_FLAGS) $(MESSAGING_FLAGS) $(THREADING_POLICIES_FLAGS) $(PTHREADS_FLAGS) $(CCM_FLAGS) $(CXXVC)
 LINKFLAGS       = /nologo /debug /subsystem:console /incremental:no $(SSL_LIBS) $(PTHREADS_LIB) $(MANIFEST)
 LINKDLLFLAGS    = /nologo /debug /dll /incremental:no $(SSL_LIBS) $(PTHREADS_LIB) $(MANIFEST)
 !endif

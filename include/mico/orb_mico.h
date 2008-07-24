@@ -227,6 +227,11 @@ private:
         _connection_count--;
       }
     } resourceManager;
+
+    CORBA::Boolean threading_initialized_;
+    MICOMT::Mutex threading_initialization_mutex_;
+
+    void initialize_threading();
 #endif // HAVE_THREADS
     typedef std::vector<ObjectAdapter *> OAVec;
     typedef std::map<MsgId, ORBInvokeRec *, std::less<MsgId> > InvokeMap;

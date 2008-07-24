@@ -201,6 +201,11 @@ namespace PInterceptor
 
 #include <mico/timebase.h>
 
+#include <mico/mttypes.h>
+#ifdef THREADING_POLICIES
+#include <mico/mtpolicy.h>
+#endif // THREADING_POLICIES
+
 #ifndef MICO_CONF_NO_POA
 namespace PortableServer
 {
