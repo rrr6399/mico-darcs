@@ -1,6 +1,6 @@
 #
 #  MICO --- an Open Source CORBA implementation
-#  Copyright (c) 1997-2001 by The Mico Team
+#  Copyright (c) 1997-2008 by The Mico Team
 #
 #  This library is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Library General Public
@@ -30,7 +30,7 @@ MANUALLY_SET_CONFIG_ON = 1
 ##################################################################################################################
 
 # Current Version(clear if you want old behaviour)
-VERSION		= 2312
+VERSION		= 2313
 
 # define if you want a release build
 RELEASE_BUILD	= 1
