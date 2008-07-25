@@ -1,7 +1,7 @@
 /*
  *  MICO --- an Open Source CORBA implementation
  *  Copyright (C) 1998 Frank Pilhofer
- *  Copyright (c) 1999-2007 by The Mico Team
+ *  Copyright (c) 1999-2008 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -4206,6 +4206,13 @@ MICOPOA::POA_impl::validate_connection
     inconsistent_policies = new CORBA::PolicyList;
     inconsistent_policies->length(0);
     return TRUE;
+}
+
+void
+MICOPOA::POA_impl::timedout_invoke(CORBA::ORBMsgId)
+{
+    // shouldn't be called
+    assert(0);
 }
 
 #ifdef USE_CSL2

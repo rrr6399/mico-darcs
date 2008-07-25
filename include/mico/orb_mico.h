@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2007 by The Mico Team
+ *  Copyright (c) 1997-2008 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -618,6 +618,8 @@ public:
     validate_connection
     (CORBA::Object_ptr obj,
      CORBA::PolicyList_out inconsistent_policies) = 0;
+
+    virtual void timedout_invoke (ORBMsgId) = 0;
 
     virtual ~ObjectAdapter ();
 };

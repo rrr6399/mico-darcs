@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2007 by The Mico Team
+ *  Copyright (c) 1997-2008 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -824,6 +824,9 @@ public:
     virtual CORBA::Boolean
     validate_connection(CORBA::Object_ptr, CORBA::PolicyList_out);
 
+    virtual void
+    timedout_invoke(CORBA::ORBMsgId);
+
     CORBA::Boolean callback (GIOPConn *, GIOPConnCallback::Event);
     CORBA::Boolean input_callback (GIOPConn *, CORBA::Buffer *);
 
@@ -972,6 +975,9 @@ public:
 
     virtual CORBA::Boolean
     validate_connection(CORBA::Object_ptr, CORBA::PolicyList_out);
+
+    virtual void
+    timedout_invoke(CORBA::ORBMsgId);
 
     // ORBCallback interface
     CORBA::Boolean waitfor (CORBA::ORB_ptr, CORBA::ORBMsgId,  CORBA::ORBCallback::Event, CORBA::Long);

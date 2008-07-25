@@ -4592,6 +4592,12 @@ MICO::IIOPProxy::validate_connection
 }
 
 void
+MICO::IIOPProxy::timedout_invoke(CORBA::ORBMsgId id)
+{
+    this->del_invoke(this->pull_invoke(id));
+}
+
+void
 MICO::IIOPProxy::exec_invoke_reply (GIOPInContext &in, CORBA::ORBMsgId id,
 				    GIOP::ReplyStatusType stat,
 				    CORBA::Object_ptr obj,
@@ -6094,6 +6100,13 @@ MICO::IIOPServer::validate_connection
     // shouldn't be called
     assert(0);
     return FALSE;
+}
+
+void
+MICO::IIOPServer::timedout_invoke(CORBA::ORBMsgId)
+{
+    // shouldn't be called
+    assert(0);
 }
 
 CORBA::Boolean
