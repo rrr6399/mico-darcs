@@ -1,4 +1,184 @@
 
+version 2.3.13
+
+- fix Win32-POSIX threads debug build
+- fix crash on client side while closing connection with timed out
+  invocations (Ashish Kumar Sharma)
+- add and implement threading policies
+- fix assert in select dispatcher when connection is closed by worker
+  thread
+- fix Win32/VC++ build to include reflection support
+- fix make bootstrap on non-GNU Unix OS platforms (i.e. GNU patch/make
+  are installed as gpatch/gmake)
+- fix boootstrap.sh script for use with SunOS system shell
+- fix compilation issue when using GNU C++ 4.3.x (Markus Schaber)
+- fix memory leak in MIDL generator (Markus Schaber)
+- fix pi/dii-client-intercept-except test starting script
+- fix sl3/tls-naming test starting script
+- fix compilation of messaging tests
+- include SL3 and Messaging in default build
+- enhance IDL compiler --config output to include SL3 and CORBA
+  Messaging configuration details
+- add debug message to admin/build_with_vc.bat
+- add admin/build_with_vc.bat batch to support Windows-based buildbot
+  slaves
+- fix testsuite compilation on SunOS (s/SS/SSx/g, since SS is defined
+  in regset.h)
+- fix to not include os-misc.h in CORBA.h due to compilation issue in
+  application code on the Win32/VC++ platform
+- fix compile error on mac os x 10.3
+- Don't run ldconfig on Mac OS X (there is no ldconfig)
+- explicitly use static libs to workaround MacOS X linker bug
+- allow_undefined_symbols
+- isinf-detect
+- fix dynamic cast detection for os x
+- fix to set minor code and completion status of TIMEOUT exception
+- improve Sun C++ support in configure.in
+- fix static data initialization ordering issue for PI initializers
+- implement transport security current client credentials stack
+- disable some anachronism related warnings on Solaris/Sun C++
+  platform
+- fix ORB::wait for single-threaded build and disabled timeout (DII
+  issue)
+- fix messaging testsuite to not include *Current tests when using
+  single-threaded build
+- fix crash in policy management code on single-threaded build
+- enforce RelativeRoundtripTimeoutPolicy also on _bind requests
+- fix fixes in testsuite
+- fix MicoCCM compilation failure
+- enhance messaging testsuite
+- implement connection binding timeout feature
+  (RelativeConnectionBindingTimeoutPolicy)
+- fix request timeout feature to work well with new policy management
+- implement CORBA 3.0 compliant client side policy management
+- do not compile messaging tests when messaging is not enabled
+- fix compilation failure while using Sun C++/VC++
+  (validate_connection should return value) (reported by Mark Lindner)
+- add Object::_validate_connection implementation
+- add ORB::create_local_interface_tc implementation
+- fix compilation failure with Intel C++ which does not like our
+  exception demangle code
+- add support for Linux/Sun C++ 5.9 platform
+- merge and simplify configuration bits for Intel C++ 8.0, 9.0 and 10.0
+- fix IDL compiler long double output on S390/Linux platform using
+  STLport library (Dan Gogoasa)
+- fix PCH usage and build arguments on the Win32/VC++ platform
+- fix restoring of the naming service DB when the format from
+  2003_11_08 is in use
+- propagate timeout value also from the domain manager policies
+- port messaging/timeout test-case to the Win32/VC++ platform
+- port messaging to the Win32/VC++ platform
+- enforce timeout provided by the RelativeRoundtripTimeoutPolicy
+- improve timeout test-case to test all client's concurrency models
+- fix POSIX threads CondVar::timedwait method (GradSoft)
+- add --enable-messaging configure option
+- add and implement RelativeRoundtripTimeoutPolicy API and test-case
+- remove all VC++8 manifest files (they are automatically generated)
+- do not use /G5 C++ compiler parameter on Win32/VC++ platform
+- fix poa/account-3 demo run on Win32/VC++ platform
+- enhance poa/account-3 demo to use servant reference counting
+- enable compilation and installation of the implementation repository
+  daemon and management tool on the Win32/VC++ platform again
+- disable warning about possible loss of data (4244) while compiling
+  by VC++8
+- fix compilation of micoservice by VC++8
+- fix assertion in get_bind_request compiled by VC++8
+- harmonize acconfig.h (USE_SL3 was missing)
+- harmonize C++ type generation for typedefed string constants (Zoltan
+  Bordas)
+- fix performance issues with floating point numbers sequences on
+  platforms supporting IEEE floats (Zoltan Bordas)
+- explicitly set active profile in Wireless Bridges
+- fix typo in naming-mt demo (Bill Bruns)
+- remove old interceptors implementation files
+- remove includes of the old interceptor header file
+- remove old interceptor initializer up-call from the ORB
+- remove old interceptors up-calls from the DII/DSI
+- remove unnecessary include of the old interceptor header file from
+  the CSL2 headers
+- remove old interceptor demo
+- use PI instead of an old interceptor in the SSL demo
+- replace old interceptor-based initialization by PI's initializers in
+  the POA, Codesets, SSL and CSL2
+- enhance ORB support for command-line options intended to be removed
+  (consumed by the ORB)
+- add support for Intel C++ 9.0
+- remove unneeded variable from the ORB to fix a warning
+- fix CSL2 to use PEM_read_X509 instead of OpenSSL's internal
+  PEM_ASN1_read (Darren Frith)
+- fix Win32/POSIX thread build infrastructure for VC++8
+- change Sorin's email address
+- add warning about using regedit utility
+- some fixes for demos' build on the Win32/VC++7/8 platform
+- fix DII tests build on the Win32/VC++8 platform
+- fix IR-browser's diiproxy build on the Win32/VC++8 platform
+- remove --no-boa switch usage from the COSS build on the Win32
+  platform
+- fix throw.h warnings on Win32/VC++8 platform
+- workaround VC++8 code miscompilation issue
+- fix race-condition in GIOP connection while demarshaling object
+  reference (Arne Pajunen)
+- improve Win32/VC++ platform support by including VC++8 manifest file
+  support
+- add VC++ solution file for building pthread library
+- fix ORBInitInfo to add argv[0] to the arguments attribute
+- make IR thread-safe
+- fix IR compilation failure on Cygwin (reported by Arun Biyani and
+  Patrick Gräbel)
+- fix IDL compiler compilation failure when using GCC 2.95.4 (reported
+  by John McNamara)
+- enhance IR creator to pass a custom policy to the created POAs
+- fix memory leak in MICO codesets initialization
+- fix memory leak in MICO SSL initialization
+- fix two side-effect asserts in IOP (Arne Pajunen)
+- fix compilation of IDL compiler MIDL backend on Win32/VC++ platform
+- fix compilation of SL3 on Win32/VC++ platform
+- fix compilation of bench demo on Win32/VC++ platform
+- fix ObjectId ctor to initialize idlength variable (Arne Pajunen)
+- fix possible _non_existent call DoS vulnerability (reported by
+  Christoph Becker)
+- fix handling of fragmented GIOP messages
+- verify and fix expected output for SL3 tcpip-cep and tls-cep tests
+- fix crash when SL3 TLS/TCPIP acceptor's IOR address is NULL
+- enhance POA to use IP address/host name saved in IOR by SL3
+  TCPIP/TLS acceptor for comparison based on OCP in use
+- add support to SL3 TLS for propagating host information to the
+  generated object reference
+- enhance SL3TCPIP acceptor to provide address saved into the IOR
+- add support to SL3 TCPIP for propagating host information to the
+  generated object reference
+- fix PI testsuite issues (wrong IDL to C++ mapping usage)
+- fix some PI related memory leaks (Wolfgang Wunderlich)
+- clear some internal variables in ORB::destroy which hold reference
+  to the ORB instance (Wolfgang Wunderlich)
+- implement TypeCodeConst destructor
+- add IBM-866 (CCSID 00866) aka PC Data Cyrillic 2 code set (Nikolay
+  Logvinov)
+- fix encoding issue with KOI8-R code set (Nikolay Logvinov)
+- add --do_not_save_db option to the IRd and force saving of db by
+  sending SIGUSR (Nikolay Logvinov)
+- improve bootstrap.sh (now it also supports OpenBSD)
+- bootstrap plus fix the poa.h.diff patch
+- fix parameter type name generation for operation prototypes (use
+  absolute scoping now)
+- fix some deprecated conversion from string constant to char*
+- add -Wwrite-strings for GCC's CXXFLAGS
+- get rid of --no-boa option from makefiles
+- get rid of BOA related options from IDL compiler help
+- bootstrap
+- change bootstrap to require SL3 enabled
+- force to recompile SL3 IDL files during the bootstrap
+- improve code generation for aliased string constants
+- use -fno-strict-aliasing command-line option for GCC >= 4.1.x
+- fix sl3/user-pass-ipc test (need to setup object domains)
+- fix CSIv2/CSS's assert in case of invoking operation on non-CSIv2
+  enabled target object
+- add virtual dtor for CredentialsCuratorImplUser class to avoid
+  warnings
+- remove generated configure and add bootstrap.sh script
+- compile CSIv2/SL3 as the last files from the orb directory
+- merge MICO Security Level 3 project (MICO SL3)
+
 version 2.3.12
 
 - update INSTALL.txt
