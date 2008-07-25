@@ -2,7 +2,7 @@
 /*
  *  MICO --- an Open Source CORBA implementation
  *  Copyright (C) 1998 Frank Pilhofer
- *  Copyright (c) 1999-2007 by The Mico Team
+ *  Copyright (c) 1999-2008 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -659,6 +659,10 @@ public:
 
   virtual CORBA::Boolean
   validate_connection(CORBA::Object_ptr, CORBA::PolicyList_out);
+
+  virtual void
+  timedout_invoke(CORBA::ORBMsgId);
+
 #ifdef USE_CSL2
   // ODM stuff ###ras
   virtual void register_ODM_factory(ObjectDomainMapping::Factory_ptr fry);
