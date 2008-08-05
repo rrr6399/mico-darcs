@@ -6,7 +6,7 @@ LC_ALL=C
 
 allfiles () {
     cut -f 1 -d\  < MANIFEST
-    find . -type f | grep -v /CVS/ | grep -v "\.arch-ids" | grep -v "{arch}"
+    find . -type f | grep -v /CVS/ | grep -v "\.arch-ids" | grep -v "{arch}" | grep -v "_darcs"
 }
 
 for i in `allfiles | sort | uniq -u`; do
