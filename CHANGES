@@ -1,6 +1,9 @@
 
 version 2.3.13
 
+- update mkmanifest script to ignore _darcs directory
+- add README file for threading policies API
+- increase connection and request limit to 128 both
 - fix Win32-POSIX threads debug build
 - fix crash on client side while closing connection with timed out
   invocations (Ashish Kumar Sharma)
