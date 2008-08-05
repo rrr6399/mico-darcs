@@ -3335,9 +3335,9 @@ CORBA::ORB_init (int &argc, char **argv, const char *_id)
     // Connection checking is disabled by default
     // for default thread-pool concurrency model
     // Other concurrency model have default connection limit
-    // set to 10.
+    // set to 128.
     ULong conn_limit = 0;
-    ULong request_limit = 4; // The most common servers have up to four CPUs
+    ULong request_limit = 128; // kind of sane value for 2008
     Boolean thread_pool = TRUE;
     Boolean thread_per_connection = FALSE;
     ClientConcurrencyModel client_concurrency_model = THREADED;
@@ -3531,7 +3531,7 @@ CORBA::ORB_init (int &argc, char **argv, const char *_id)
 	    thread_pool = FALSE;	    
 	    thread_per_connection = TRUE;
 	    if (conn_limit < 1)
-		conn_limit = 10;
+		conn_limit = 128;
 	} else if (arg == "-ORBConnLimit") {
 	    conn_limit = atoi (val.c_str ());
 	} else if (arg == "-ORBRequestLimit") {
