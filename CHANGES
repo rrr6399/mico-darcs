@@ -2,12 +2,12 @@
 version 2.3.13
 
 - update mkmanifest script to ignore _darcs directory
-- add README file for threading policies API
+- add README file for threading policies API (sponsored by ESG GmbH)
 - increase connection and request limit to 128 both
 - fix Win32-POSIX threads debug build
 - fix crash on client side while closing connection with timed out
   invocations (Ashish Kumar Sharma)
-- add and implement threading policies
+- add and implement threading policies (sponsored by ESG GmbH)
 - fix assert in select dispatcher when connection is closed by worker
   thread
 - fix Win32/VC++ build to include reflection support
@@ -42,19 +42,24 @@ version 2.3.13
 - disable some anachronism related warnings on Solaris/Sun C++
   platform
 - fix ORB::wait for single-threaded build and disabled timeout (DII
-  issue)
+  issue) (sponsored by ESG GmbH)
 - fix messaging testsuite to not include *Current tests when using
-  single-threaded build
+  single-threaded build (sponsored by ESG GmbH)
 - fix crash in policy management code on single-threaded build
+  (sponsored by ESG GmbH)
 - enforce RelativeRoundtripTimeoutPolicy also on _bind requests
+  (sponsored by ESG GmbH)
 - fix fixes in testsuite
 - fix MicoCCM compilation failure
-- enhance messaging testsuite
+- enhance messaging testsuite (sponsored by ESG GmbH)
 - implement connection binding timeout feature
-  (RelativeConnectionBindingTimeoutPolicy)
+  (RelativeConnectionBindingTimeoutPolicy) (sponsored by ESG GmbH)
 - fix request timeout feature to work well with new policy management
+  (sponsored by ESG GmbH)
 - implement CORBA 3.0 compliant client side policy management
+  (sponsored by ESG GmbH)
 - do not compile messaging tests when messaging is not enabled
+  (sponsored by ESG GmbH)
 - fix compilation failure while using Sun C++/VC++
   (validate_connection should return value) (reported by Mark Lindner)
 - add Object::_validate_connection implementation
@@ -69,13 +74,18 @@ version 2.3.13
 - fix restoring of the naming service DB when the format from
   2003_11_08 is in use
 - propagate timeout value also from the domain manager policies
+  (sponsored by ESG GmbH)
 - port messaging/timeout test-case to the Win32/VC++ platform
-- port messaging to the Win32/VC++ platform
+  (sponsored by ESG GmbH)
+- port messaging to the Win32/VC++ platform (sponsored by ESG GmbH)
 - enforce timeout provided by the RelativeRoundtripTimeoutPolicy
+  (sponsored by ESG GmbH)
 - improve timeout test-case to test all client's concurrency models
+  (sponsored by ESG GmbH)
 - fix POSIX threads CondVar::timedwait method (GradSoft)
-- add --enable-messaging configure option
+- add --enable-messaging configure option (sponsored by ESG GmbH)
 - add and implement RelativeRoundtripTimeoutPolicy API and test-case
+  (sponsored by ESG GmbH)
 - remove all VC++8 manifest files (they are automatically generated)
 - do not use /G5 C++ compiler parameter on Win32/VC++ platform
 - fix poa/account-3 demo run on Win32/VC++ platform
@@ -91,7 +101,8 @@ version 2.3.13
   Bordas)
 - fix performance issues with floating point numbers sequences on
   platforms supporting IEEE floats (Zoltan Bordas)
-- explicitly set active profile in Wireless Bridges
+- explicitly set active profile in Wireless Bridges (Jaakko
+  Kangasharju)
 - fix typo in naming-mt demo (Bill Bruns)
 - remove old interceptors implementation files
 - remove includes of the old interceptor header file
