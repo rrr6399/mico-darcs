@@ -201,7 +201,7 @@ LINKDLLFLAGS    = /nologo /debug /dll /incremental:no $(SSL_LIBS) $(PTHREADS_LIB
 # Tcl support is not usable yet
 
 .SUFFIXES:
-.SUFFIXES:	.c .cc .cpp .obj .rc .RES .idl .class .java .cup
+.SUFFIXES:	.c .cc .cpp .cxx .obj .rc .RES .idl .class .java .cup
 
 .cc.obj:
 	$(CXX) /c $(CXXFLAGS) $< /Fo$*.obj
