@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2001 by The Mico Team
+ *  Copyright (c) 1997-2008 by The Mico Team
  *
  *  simple and fast array object and template
  *  Copyright (C) 1999 Andreas Schultz                                 
@@ -37,6 +37,7 @@
 
 #include <CORBA-SMALL.h>
 #include <mico/impl.h>
+#include <limits.h>
 
 #endif // FAST_PCH
 
