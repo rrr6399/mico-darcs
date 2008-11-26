@@ -81,7 +81,7 @@ idl$(VERSION).dll: $(DLL_OBJS) idl$(VERSION).def
 		/out:idl$(VERSION).dll \
 		/def:idl$(VERSION).def
 !ifdef VC8
-	$(MT) -manifest idl$(VERSION).dll.manifest -outputresource:idl$(VERSION).dll;#1
+	$(MT) -manifest idl$(VERSION).dll.manifest -outputresource:idl$(VERSION).dll;#2
 !endif
 
 #$(IDLDLL_VC8_FLAGS)

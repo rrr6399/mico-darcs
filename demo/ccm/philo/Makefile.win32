@@ -4,7 +4,7 @@
 !ifdef VC8
 mt:
 	$(MT) -manifest client.exe.manifest -outputresource:client.exe;#1
-	$(MT) -manifest philo.dll.manifest -outputresource:philo.dll;#1
+	$(MT) -manifest philo.dll.manifest -outputresource:philo.dll;#2
 !else
 mt:
 !endif

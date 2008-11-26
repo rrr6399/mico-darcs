@@ -3,9 +3,9 @@
 
 !ifdef VC8
 mt:
-	$(MT) -manifest channel.dll.manifest -outputresource:channel.dll;#1
-	$(MT) -manifest consumer.dll.manifest -outputresource:consumer.dll;#1
-	$(MT) -manifest producer.dll.manifest -outputresource:producer.dll;#1
+	$(MT) -manifest channel.dll.manifest -outputresource:channel.dll;#2
+	$(MT) -manifest consumer.dll.manifest -outputresource:consumer.dll;#2
+	$(MT) -manifest producer.dll.manifest -outputresource:producer.dll;#2
 	$(MT) -manifest client.exe.manifest -outputresource:client.exe;#1
 !else
 mt:
