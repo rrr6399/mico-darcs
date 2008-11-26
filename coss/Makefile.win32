@@ -142,7 +142,7 @@ micocoss$(VERSION).def:
 
 !ifdef VC8
 mt:
-	$(MT) -manifest micocoss$(VERSION).dll.manifest -outputresource:micocoss$(VERSION).dll;#1
+	$(MT) -manifest micocoss$(VERSION).dll.manifest -outputresource:micocoss$(VERSION).dll;#2
 !else
 mt:
 !endif

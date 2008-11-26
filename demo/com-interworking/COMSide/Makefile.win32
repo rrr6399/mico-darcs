@@ -65,7 +65,7 @@ account_p.obj : account_p.c account.h
 	account.dll: account_p.obj account_i.obj dlldata.obj account.def
     	$(link) $(linkdebug) -DLL -OUT:account.dll -DEF:account.def \
     	account_p.obj account_i.obj dlldata.obj rpcrt4.lib uuid.lib kernel32.lib
-	$(MT) -manifest account.dll.manifest -outputresource:account.dll;#1
+	$(MT) -manifest account.dll.manifest -outputresource:account.dll;#2
 !else
 	account.dll: account_p.obj account_i.obj dlldata.obj account.def
     	$(link) $(linkdebug) -DLL -OUT:account.dll -DEF:account.def \

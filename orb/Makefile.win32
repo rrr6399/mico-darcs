@@ -159,7 +159,7 @@ mico$(VERSION).lib mico$(VERSION).dll : mico$(VERSION).def
 
 !ifdef VC8
 mt:
-	$(MT) -manifest mico$(VERSION).dll.manifest -outputresource:mico$(VERSION).dll;#1
+	$(MT) -manifest mico$(VERSION).dll.manifest -outputresource:mico$(VERSION).dll;#2
 !else
 mt:
 !endif
