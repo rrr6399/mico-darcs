@@ -55,7 +55,7 @@ propertyd.exe: $(SRV_OBJS)
 	$(COPY) propertyd.exe ..\..\win32-bin
 
 PropertyService.h PropertyService.cc: ..\..\include\coss\PropertyService.idl
-	$(IDL) $(IDLFLAGS) --any --name PropertyService --poa --no-boa ..\..\include\coss\PropertyService.idl
+	$(IDL) $(IDLFLAGS) --any --name PropertyService --poa ..\..\include\coss\PropertyService.idl
 	$(COPY) PropertyService.h ..\..\include\coss
 
 # cleaning
