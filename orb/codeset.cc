@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2007 by The Mico Team
+ *  Copyright (c) 1997-2009 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -720,9 +720,7 @@ MICO::UniCodesetConv::decode (CORBA::Buffer &f, CORBA::ULong len,
 #ifdef __GNUG__
     char _f[flen+1];
 #else
-    CORBA::String_var _f;
-    if (_from->codepoint_size() != 1)
-	_f = CORBA::string_alloc (flen);
+    CORBA::String_var _f = CORBA::string_alloc (flen);
 #endif
 
     if (!f.get (_f, len * _from->codepoint_size())) {
