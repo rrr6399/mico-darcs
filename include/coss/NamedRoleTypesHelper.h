@@ -28,7 +28,7 @@
 #define __NamedRoleTypesHelper_h__
 
 
-#include "CosRelationships.h"
+#include <coss/CosRelationships.h>
 
 
 class NamedRoleTypesHelper

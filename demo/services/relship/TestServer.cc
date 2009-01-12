@@ -94,9 +94,9 @@ int main( int argc, char *argv[] )
 
   NamedRoleTypesHelper*
     nrth_TestRelationship = new NamedRoleTypesHelper (orb);
-  nrth_TestRelationship->add ("IDL:omg.org/Test/BaseRole:1.0", 
+  nrth_TestRelationship->add ("IDL:Test/BaseRole:1.0", 
 			 "BaseRole");
-  nrth_TestRelationship->add ("IDL:omg.org/Test/DerivedRole1:1.0", 
+  nrth_TestRelationship->add ("IDL:Test/DerivedRole1:1.0", 
 			      "DerivedRole1");
   
 

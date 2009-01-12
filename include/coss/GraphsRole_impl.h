@@ -27,8 +27,8 @@
 #ifndef __GraphsRole_impl_h__
 #define __GraphsRole_impl_h__
 
-#include "CosGraphs.h"
-#include "Role_impl.h"
+#include <coss/CosGraphs.h>
+#include <coss/Role_impl.h>
 
 namespace CosGraphs_impl {
 

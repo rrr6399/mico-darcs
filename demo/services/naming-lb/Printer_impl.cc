@@ -26,7 +26,7 @@ void Printer_impl::print (const char *message)
 
 Printer_impl::~Printer_impl ()
 {
-  printf ("-- printer %s is destroyed\n");
+  printf ("-- printer %s is destroyed\n", printerName);
 
   if (this->printerName != NULL)
     free (this->printerName);

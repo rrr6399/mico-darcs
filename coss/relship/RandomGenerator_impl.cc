@@ -41,7 +41,7 @@ RandomGenerator_impl::RandomGenerator_impl (RandomGenerator::Mode _mode)
 CORBA::Long
 RandomGenerator_impl::rand ()
 {
-  CORBA::Long number;
+  CORBA::Long number = 0;
   if (mode == RandomGenerator::generate)
     number = ::rand ();
   if (mode == RandomGenerator::proxy) {

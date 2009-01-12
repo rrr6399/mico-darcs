@@ -40,7 +40,7 @@ CosGraphs_impl::Role_impl::Role_impl ()
 
 
 CosGraphs_impl::Role_impl::Role_impl (CosRelationships::RelatedObject_ptr obj)
-  : POA_CosGraphs::Role (), ::Role_impl ()
+  : ::Role_impl (), POA_CosGraphs::Role () 
 {
 #if DEBUG
   cout << "  <CosGraphs::Role_impl> constructor with params\n";
