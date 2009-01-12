@@ -24,7 +24,7 @@
  */
 
 
-#include "CosRelationships.h"
+#include <coss/CosRelationships.h>
 
 #ifndef __InterfaceDefsHelper_h__
 #define __InterfaceDefsHelper_h__

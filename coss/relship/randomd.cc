@@ -54,7 +54,7 @@ int main (int argc, char *argv[])
     usage (argv);
     exit (1);
   }
-  RandomGenerator_impl* generator;
+  RandomGenerator_impl* generator = NULL;
 
   if (argc == 2) {
     if (strcmp (argv[1], "--generate") == 0) {

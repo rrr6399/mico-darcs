@@ -214,6 +214,10 @@ NamingContext_impl::restore (istream & in)
     else if (strcmp (type.c_str(), "nobject:") == 0) {
       binding.btype = CosNaming::nobject;
     }
+    else {
+        // corrupted type apparently
+        assert(0);
+    }
 
     /*
      * Insert into table

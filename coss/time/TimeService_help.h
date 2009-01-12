@@ -12,6 +12,9 @@
 //inaccuracy of the internal clock in seconds
 #define INACCURACY 1
 
+//Time units according to CORBAs "Time Service Specification, V1.1, May 2002"
+#define NANO100 10000000 
+
 //use the secure time? Only if your system clock is very accurate!
 //#define USESECURE 
 

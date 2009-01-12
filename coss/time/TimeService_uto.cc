@@ -73,7 +73,7 @@ UTO_impl::absolute_time()
 
    TimeBase::TimeT atimeV = timeV + TimeBase::TimeT(getTime());
    TimeBase::TdfT  atdfV = getTimezone();
-   TimeBase::TimeT ainaccurV = 10000000;
+   TimeBase::TimeT ainaccurV = NANO100;
    ainaccurV *= INACCURACY;
 
    UTO_impl * utoAbs = new UTO_impl(atimeV, ainaccurV , atdfV);

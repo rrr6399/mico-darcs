@@ -28,11 +28,9 @@
 
 CosTime::UTO_ptr
 TimeService_impl::universal_time()
-{
-   
-   TimeBase::TimeT timeV = timeV + TimeBase::TimeT(getTime());
-   TimeBase::TimeT inaccuracyV = 10000000;
-   inaccuracyV *= INACCURACY;
+{   
+   TimeBase::TimeT timeV = TimeBase::TimeT(getTime());
+   TimeBase::TimeT inaccuracyV = NANO100;    inaccuracyV *= INACCURACY;
    TimeBase::TdfT  tdfV = getTimezone();
 
    UTO_impl * utoAbs = new UTO_impl(timeV, inaccuracyV, tdfV);
@@ -59,6 +57,7 @@ TimeService_impl::secure_universal_time()
 
 #else   
 
+   retval = CosTime::UTO::_nil(); // to avoid compiler warnings
    mico_throw(CosTime::TimeUnavailable());
    
 #endif

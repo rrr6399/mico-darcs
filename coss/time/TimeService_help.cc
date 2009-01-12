@@ -50,7 +50,7 @@ TimeBase::TimeT getTime()
    tmp *= DAYLENGTH;
    timeV += tmp;
    //in 100 nano second steps
-   timeV *= 1000000;
+   timeV *= NANO100;
    
    return timeV;
 }
@@ -58,7 +58,7 @@ TimeBase::TimeT getTime()
 //resolution is in miliseconds
 TimeBase::TimeT getInaccuracy() 
 {
-   TimeBase::TimeT retval =1000000*INACCURACY;
+   TimeBase::TimeT retval =NANO100 *INACCURACY;
    return retval;
 }
 
@@ -90,7 +90,7 @@ time_t timeT2epoch(TimeBase::TimeT timeV)
    time_t etime;
 
    //in 100 nano second steps
-   timeV /= 1000000;
+   timeV /= NANO100;
    //Offset from Unix Epoch to 15 October 1582
    TimeBase::TimeT tmp = EPOCH2GREGOR;
    tmp *= DAYLENGTH;
