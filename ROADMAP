@@ -6,11 +6,10 @@ auxdir  -- ORB related stuff that cannot go into a shared lib at the moment
            (Xt and Qt support, DynAny). libmicoaux is built in this directory.
 coss    -- CORBA Services, only naming service at the moment. libmicocoss is
            built in this directory.
-daemon  -- BOA daemon (micod).
+daemon  -- implementation repository (micod) and admin tool (imr).
 demo    -- some examples.
 doc     -- documentation.
 idl     -- idl compiler (idl).
-imr     -- implementation repository and admin tool (imr).
 include -- include files.
 ir      -- interface repository and IR server (ird).
 man     -- unix manual pages.
