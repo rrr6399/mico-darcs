@@ -676,7 +676,7 @@ NamingContext_impl::RestoreNamingService (const char * dbfile)
 
 BindingIterator_impl::BindingIterator_impl (CORBA::ORB_ptr orb,
 					    const CosNaming::BindingList& bl) 
-  : idx (0), blist (bl), useorb (orb)
+  : idx (0), blist (bl), useorb (CORBA::ORB::_duplicate(orb))
 {
 }
 
