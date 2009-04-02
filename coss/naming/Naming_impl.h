@@ -32,7 +32,7 @@
 
 struct NmCtxBinding {
   CosNaming::BindingType btype;
-  CORBA::Object_ptr obj;
+  CORBA::Object_var obj;
 };
 
 class NamingContext_impl :
