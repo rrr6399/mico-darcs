@@ -1,6 +1,6 @@
 #
 #  MICO --- an Open Source CORBA implementation
-#  Copyright (c) 1997-2008 by The Mico Team
+#  Copyright (c) 1997-2009 by The Mico Team
 #
 #  This library is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Library General Public
@@ -732,7 +732,9 @@ if test X"$GXX" = Xyes; then
     # -mmillicode-long-calls
     CONF_LDFLAGS=-Wl,+s
     CONF_DLFLAGS=-Wl,-E
-    CONF_SOEXT=sl
+    case $target in
+    hppa*) CONF_SOEXT=sl ;;
+    esac
     CONF_OBJ_SIZE_LIMIT=yes
     ;;
   *freebsd2*|*freebsd3*)
