@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2005 by The Mico Team
+ *  Copyright (c) 1997-2009 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -38,8 +38,10 @@
 
 #if defined(_WIN32) && !defined(__MINGW32__)
 #include <sys/timeb.h>
+#define FD_SETSIZE 1024
 #include <winsock2.h>
 #elif defined (_WIN32) && defined(__MINGW32__)
+#define FD_SETSIZE 1024
 #include <sys/timeb.h>
 #include <winsock.h>
 #elif defined (_POCKET_PC)
