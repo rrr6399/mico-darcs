@@ -51,6 +51,9 @@
 #include <terminate.h>
 #endif
 
+#ifdef _WIN32
+#include <process.h>
+#endif // _WIN32
 
 using namespace std;
 
@@ -74,6 +77,9 @@ CORBA::Exception::_terminate_handler ()
    try {
        throw;
    } catch (const CORBA::Exception& ex) {
+#ifdef _WIN32
+#define getpid _getpid
+#endif // _WIN32
      cerr << "[" << getpid() << "|" << MICOMT::Thread::self() << "] uncaught MICO exception: ";
      ex._print (cerr);
      cerr << endl;
