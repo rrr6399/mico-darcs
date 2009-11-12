@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2005 by The Mico Team
+ *  Copyright (c) 1997-2009 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -333,6 +333,17 @@ MICO::InetAddress::resolve_host () const
 #endif // HAVE_THREADS
 	if (hent) {
 	    string s = hent->h_name;
+#ifdef _WIN32
+            // Windows XP returns (perhaps sometimes only!) host name
+            // in a form `<name>. ' -- note the space character at the
+            // end so we need to test for it and strip it off. At
+            // least this happens on Windows XP running inside
+            // VirtualBox (versions 2.2.4, 3.0.8, 3.0.10) on top of
+            // OpenSolaris 2009.06
+            if (s[s.size() - 1] == ' ') {
+                s = s.substr(0, s.size() - 1);
+            }
+#endif // _WIN32
 	    if ((int)s.find (".") < 0) {
 		// official name is not the FQDN. search the alias list ...
 		for (int i = 0; hent->h_aliases[i]; ++i) {
