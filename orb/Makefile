@@ -1,6 +1,6 @@
 #
 #  MICO --- an Open Source CORBA implementation
-#  Copyright (c) 1997-2008 by The Mico Team
+#  Copyright (c) 1997-2010 by The Mico Team
 #
 #  This library is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Library General Public
@@ -319,6 +319,8 @@ orbcore-generate:
 	mv valuetype.h ../include/mico/valuetype.h
 	$(IDL) --name tckind --windows-dll mico --pseudo \
 		--mico-core -B.. ../include/mico/tckind.idl
+	$(PATCH) < tckind.h.diffs
+	$(RM) tckind.*.orig
 	mv tckind.h ../include/mico/tckind.h
 	$(IDL) --name pi --windows-dll mico --mico-core --any --pseudo \
 		-B.. ../include/mico/pi.idl
@@ -409,6 +411,13 @@ diffs:
 	  ../../include/mico/poa.idl
 	$(RM) poa.cc.diffs
 	diff -c orig/poa.cc poa.cc > poa.cc.diffs || true
+	$(RM) -r orig
+	mkdir orig
+	cd orig; $(IDL) --name tckind --windows-dll mico --pseudo \
+		--mico-core -B.. ../../include/mico/tckind.idl
+	$(RM) tckind.h.diffs
+	cd ../include/mico; diff -c ../../orb/orig/tckind.h tckind.h \
+	  >> ../../orb/tckind.h.diffs || true
 	$(RM) -r orig
 
 clean:
