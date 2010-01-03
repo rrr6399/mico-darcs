@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2006 by The Mico Team
+ *  Copyright (c) 1997-2010 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -45,8 +45,6 @@
 
 
 using namespace std;
-
-#define TK_RECURSIVE ((int)0xffffffff)
 
 
 /********************************************************************/
@@ -157,7 +155,7 @@ CORBA::TypeCode::connect (TypeCode_ptr parent, Long depth)
      * connect nested recursive types when they are embedded into
      * a new constructed type (parent).
      */
-    if (tckind == TK_RECURSIVE) {
+    if (tckind == tk_recursive) {
 	if (!CORBA::is_nil (recurse_tc))
 	    return;
 	if (recurse_depth == depth ||
@@ -185,7 +183,7 @@ CORBA::TypeCode::disconnect (TypeCode_ptr parent)
     if (CORBA::is_nil (parent))
 	return;
 
-    if (tckind == TK_RECURSIVE) {
+    if (tckind == tk_recursive) {
 	if (recurse_tc == parent) {
 	    recurse_tc = _nil();
 	    if (repoid.length() > 0)
@@ -413,9 +411,7 @@ CORBA::TypeCode::create_recursive_sequence_tc (ULong bound, ULong offset)
 {
     CORBA::TypeCode_ptr tc = new TypeCode (tk_sequence);
     tc->len = bound;
-    // avoid "constant overflow" compiler warning
-    CORBA::ULong tk_recursive = TK_RECURSIVE;
-    tc->content = new TypeCode ((CORBA::TCKind)tk_recursive);
+    tc->content = new TypeCode (tk_recursive);
     tc->content->recurse_depth = offset;
     tc->content->connect (tc);
 
@@ -487,9 +483,7 @@ CORBA::TypeCode::create_recursive_tc (const char *rep_id)
     if (!rep_id)
 	mico_throw (CORBA::BAD_PARAM());
 
-    // avoid "constant overflow" compiler warning
-    CORBA::ULong tk_recursive = TK_RECURSIVE;
-    CORBA::TypeCode_ptr tc = new CORBA::TypeCode ((CORBA::TCKind)tk_recursive);
+    CORBA::TypeCode_ptr tc = new CORBA::TypeCode (tk_recursive);
     tc->recurse_depth = -1;
     tc->repoid = rep_id;
 
@@ -627,12 +621,12 @@ CORBA::TypeCode::equal (TypeCode_ptr tc,
 							   ignore_string_bounds);
     }
 
-    if (tckind == TK_RECURSIVE || tc->tckind == TK_RECURSIVE) {
+    if (tckind == tk_recursive || tc->tckind == tk_recursive) {
 	if ((!remove_aliases || 1) && tckind != tc->tckind)
 	    return FALSE;
-	if (tckind == TK_RECURSIVE && CORBA::is_nil (recurse_tc))
+	if (tckind == tk_recursive && CORBA::is_nil (recurse_tc))
 	    return FALSE;
-	if (tc->tckind == TK_RECURSIVE && CORBA::is_nil (tc->recurse_tc))
+	if (tc->tckind == tk_recursive && CORBA::is_nil (tc->recurse_tc))
 	    return FALSE;
 	CORBA::TypeCode_ptr metc = resolve_recursion();
 	CORBA::TypeCode_ptr hetc = tc->resolve_recursion();
@@ -746,7 +740,7 @@ CORBA::TypeCode::equal (TypeCode_ptr tc,
     case tk_enum:
         return repoid == tc->repoid && namevec == tc->namevec;
 
-    case TK_RECURSIVE:
+    case tk_recursive:
 	assert (0);
 
     default:
@@ -822,7 +816,7 @@ CORBA::TypeCode::equaltype (TypeCode_ptr tc, SetTC *_cache)
         return me->digits == he->digits && me->scale == he->scale;
 
     case tk_alias:
-    case TK_RECURSIVE:
+    case tk_recursive:
 	// cannot happen
 	assert (0);
 
@@ -930,7 +924,7 @@ CORBA::TypeCode::equaltype (TypeCode_ptr tc, SetTC *_cache)
 CORBA::TypeCode_ptr
 CORBA::TypeCode::resolve_recursion() const
 {
-    if (tckind != TK_RECURSIVE)
+    if (tckind != tk_recursive)
         return (TypeCode_ptr)this;
 
     assert (!CORBA::is_nil (recurse_tc));
@@ -948,7 +942,7 @@ CORBA::TypeCode::id () const
 	  tckind == tk_native || tckind == tk_abstract_interface ||
 	  tckind == tk_local_interface ||
 	  tckind == tk_value || tckind == tk_value_box ||
-	  (tckind == TK_RECURSIVE && repoid.length() > 0)))
+	  (tckind == tk_recursive && repoid.length() > 0)))
 	mico_throw (CORBA::TypeCode::BadKind());
     return repoid.c_str();
 }
@@ -1632,7 +1626,7 @@ CORBA::TypeCode::decode (DataDecoder &dc, MapPosTC *_omap, ULong level)
         check (dc.encaps_end (state));
         break;
 
-    case TK_RECURSIVE: {
+    case tk_recursive: {
 	Long recurse_pos;
 	check (dc.get_long (recurse_pos));
         Long rpos = dc.buffer()->rpos() - sizeof(CORBA::Long);
@@ -1691,7 +1685,7 @@ CORBA::TypeCode::encode (DataEncoder &ec, MapTCPos *_omap) const
 {
     MapTCPos *omap = _omap ? _omap : new MapTCPos;
 
-    if (tckind == TK_RECURSIVE) {
+    if (tckind == tk_recursive) {
         TypeCode_ptr p = resolve_recursion();
         if (!omap->count (p)) {
             // first occurrence. encode it as normal typecode ...
@@ -1866,7 +1860,7 @@ CORBA::TypeCode::encode (DataEncoder &ec, MapTCPos *_omap) const
 	ec.encaps_end (state);
 	break;
     }
-    case TK_RECURSIVE: {
+    case tk_recursive: {
         TypeCode_ptr p = resolve_recursion();
         MapTCPos::iterator i = omap->find (p);
         assert (i != omap->end());
@@ -1904,7 +1898,7 @@ CORBA::release (TypeCode_ptr t)
 CORBA::Boolean
 CORBA::TypeCode::is_recursive_seq ()
 {
-    if (tckind != tk_sequence || content->tckind != TK_RECURSIVE)
+    if (tckind != tk_sequence || content->tckind != tk_recursive)
 	return FALSE;
     CORBA::TCKind k = content->resolve_recursion()->unalias()->tckind;
     return (k == tk_struct || k == tk_union);

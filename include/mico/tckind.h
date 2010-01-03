@@ -63,7 +63,14 @@ enum TCKind {
   tk_value_box,
   tk_native,
   tk_abstract_interface,
-  tk_local_interface
+  tk_local_interface,
+  // kcg: this is a fix for GNU C++ 4.4.x complaining about
+  // incorrect TCKind values in typecode.cc's switch statements
+  // and broking them too by ommiting completely former TK_RECURSIVE
+  // blocks from the code generation. Now, it is happy due to this hack
+  // adding tk_recursive with appropriate value (required by the CORBA
+  // specification)
+  tk_recursive = 0xffffffff
 };
 
 typedef TCKind& TCKind_out;
