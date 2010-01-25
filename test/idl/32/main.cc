@@ -6,6 +6,9 @@
 #include <iostream.h>
 #endif // HAVE_ANSI_CPLUSPLUS_HEADERS
 
+#ifndef ULONG_MAX
+#include <limits.h>
+#endif // ULONG_MAX
 
 using namespace std;
 
