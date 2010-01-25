@@ -53,6 +53,8 @@
 
 #ifdef _WIN32
 #include <process.h>
+#else // _WIN32
+#include <unistd.h>
 #endif // _WIN32
 
 using namespace std;
