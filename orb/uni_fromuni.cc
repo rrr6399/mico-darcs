@@ -1,7 +1,7 @@
 /*
  *  Code Set Converters for MICO
  *  Copyright (C) 1997 Marcus Mueller & Thomas Holubar
- *  Copyright (c) 1998-2006 by The Mico Team
+ *  Copyright (c) 1998-2010 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -756,11 +756,12 @@ uni_slong uni_fromUTF8(char *dest, const char *utf8, uni_uword *chars, uni_uword
 
           if(string_type==(uni_ulong)C_ASCII7 ||
 	     string_type==C_ISO646)
-            if((utf8[si] & 0x80) != 0)
+            if((utf8[si] & 0x80) != 0) {
               if((utf8[si] & 0x40) != 0)
                 di--;
               else
                 dest[di-1] = C_ASCII7_UNKNOWN;
+            }
       }
 
     dest[di] = '\0';

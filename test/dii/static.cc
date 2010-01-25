@@ -252,7 +252,7 @@ public:
 		return FALSE;
 	    break;
 	default:
-	    CORBA::Boolean b;
+	    //CORBA::Boolean b;
 	    if (!CORBA::_stc_boolean->demarshal (dc, &((T *)v)->_m.b))
 		return FALSE;
 	    break;
@@ -876,10 +876,10 @@ do_tests ()
 	wchar_c (CORBA::_stc_wchar, 42);
 
     // string, wstring
-    char *string_i = "foo";
+    char *string_i = CORBA::string_dup("foo");
     Checker<StrCmp, char *> string_c (CORBA::_stc_string, string_i);
 
-    wchar_t *wstring_i = L"foo";
+    wchar_t *wstring_i = CORBA::wstring_dup(L"foo");
     Checker<WStrCmp, wchar_t *> wstring_c (CORBA::_stc_wstring, wstring_i);
 
     // any
@@ -1088,7 +1088,7 @@ do_tests ()
 }
 
 int
-main (int argc, char *argv)
+main (int argc, char *argv[])
 {
     do_tests();
     return 0;

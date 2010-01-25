@@ -133,7 +133,7 @@ add_stub (CORBA::Object_ptr obj, CORBA::Long x, CORBA::Long y, CORBA::String_out
 	CORBA::UnknownUserException *uuex =
 	    CORBA::UnknownUserException::_downcast (ex);
 	if (uuex) {
-	    const char *repoid = uuex->_except_repoid();
+	    //const char *repoid = uuex->_except_repoid();
 	    /*
 	     * // for each user exception ...
 	     * if (!strcmp (repoid, "IDL:Except:1.0")) {
@@ -181,7 +181,7 @@ fixed_stub (CORBA::Object_ptr obj, const SF &in, SF &inout, SF_out out)
 	CORBA::UnknownUserException *uuex =
 	    CORBA::UnknownUserException::_downcast (ex);
 	if (uuex) {
-	    const char *repoid = uuex->_except_repoid();
+	    //const char *repoid = uuex->_except_repoid();
 	    mico_throw (CORBA::UNKNOWN());
 	} else {
 	    mico_throw (*ex);
@@ -220,7 +220,7 @@ variable_stub (CORBA::Object_ptr obj, const SV &in, SV &inout, SV_out out)
 	CORBA::UnknownUserException *uuex =
 	    CORBA::UnknownUserException::_downcast (ex);
 	if (uuex) {
-	    const char *repoid = uuex->_except_repoid();
+	    //const char *repoid = uuex->_except_repoid();
 	    mico_throw (CORBA::UNKNOWN());
 	} else {
 	    mico_throw (*ex);

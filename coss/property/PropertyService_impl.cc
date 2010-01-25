@@ -1,6 +1,7 @@
 /*
  *  Object Property Service for MICO
  *  Copyright (C) 1998, 1999, 2000 Leif Jakobsmeier
+ *  Copyright (c) 2001-2010 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -116,7 +117,7 @@ PropertySetFactory_impl::create_constrained_propertyset
                   (const PropertyService::PropertyTypes &allowed_property_types,
                    const PropertyService::Properties &allowed_properties)
 {
-  PropertySet_impl* new_ps;
+  PropertySet_impl* new_ps = NULL;
   #ifdef HAVE_EXCEPTIONS
   try {
   #endif

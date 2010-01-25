@@ -48,7 +48,7 @@ public:
   };
   void run3( const fooSeq& seq )
   {
-    for( int i = 0; i < seq.length(); i++ ) {
+      for( CORBA::ULong i = 0; i < seq.length(); i++ ) {
       cout << "[" << i << "]" << endl;
       seq[ i ]->hello( "Berkeley" );
     }

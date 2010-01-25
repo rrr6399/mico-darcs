@@ -2,6 +2,7 @@
 /*
  *  Implementation of COSS Event Service for MICO
  *  Copyright (C) 1997 Kai-Uwe Sattler, Kay Roemer
+ *  Copyright (c) 1998-2010 by The Mico Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -161,13 +162,13 @@ private:
 class EventChannel_impl : public POA_CosEventChannelAdmin::EventChannel {
     CORBA::ULong _listeners;
     MICOMT::Mutex _listeners_mutex;
-    CORBA::Long _max_queue_size;
+    CORBA::ULong _max_queue_size;
 protected:
     EventChannel_impl ();
 
 public:
     EventChannel_impl (CORBA::Object_ptr obj);
-    EventChannel_impl (CORBA::Long max_queue_size);
+    EventChannel_impl (CORBA::ULong max_queue_size);
 
     CORBA::Boolean _save_object ();
 
@@ -185,7 +186,7 @@ public:
     void listen (CORBA::Boolean on);
     CORBA::Boolean listen ();
 
-    inline CORBA::Long max_queue_size () const
+    inline CORBA::ULong max_queue_size () const
     {
         return _max_queue_size;
     }

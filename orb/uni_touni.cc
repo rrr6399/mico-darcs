@@ -1,7 +1,7 @@
 /*
  *  Code Set Converters for MICO
  *  Copyright (C) 1997 Marcus Mueller & Thomas Holubar
- *  Copyright (c) 1998-2006 by The Mico Team
+ *  Copyright (c) 1998-2010 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -862,22 +862,24 @@ static uni_ulong ScanHTML(register const char *src, uni_uword *length)
   max = html2uniSize-1;
 
   if(upper <  uni_html2uniArray[min].upper) return(0l);
-  if(upper == uni_html2uniArray[min].upper)
+  if(upper == uni_html2uniArray[min].upper) {
     if(lower == uni_html2uniArray[min].lower)
     {
       *length = l;
       return( (uni_ulong)uni_html2uniArray[min].unicode );
     }
     else return(0l);    
+  }
 
   if(upper >  uni_html2uniArray[max].upper) return(0l);
-  if(upper == uni_html2uniArray[max].upper)
+  if(upper == uni_html2uniArray[max].upper) {
     if(lower == uni_html2uniArray[max].lower)
     {
       *length = l;
       return( (uni_ulong)uni_html2uniArray[max].unicode );
     }
     else return(0l);
+  }
 
   while(max-min > 1)
   {
@@ -1284,7 +1286,7 @@ uni_slong uni_toUTF8  (char *utf8, const char *src, uni_uword chars,
         c = 0x0500 + (uni_ubyte)src[si] - 0xA0;
       }
 
-      if(trans)
+      if(trans) {
         if(c < 0x80)
           utf8[di++] = (char)c;
         else
@@ -1293,6 +1295,7 @@ uni_slong uni_toUTF8  (char *utf8, const char *src, uni_uword chars,
           if(RC != C_OK) return(RC);
           di += strlen(&utf8[di]);
         }
+      }
     }
 
     utf8[di] = '\0';
@@ -1322,7 +1325,7 @@ uni_slong uni_toUTF8  (char *utf8, const char *src, uni_uword chars,
         default  : utf8[di] = src[si];
       }
 
-      if(trans)
+      if(trans) {
         if(c < 0x80)
           utf8[di++] = (char)c;
         else
@@ -1331,6 +1334,7 @@ uni_slong uni_toUTF8  (char *utf8, const char *src, uni_uword chars,
           if(RC != C_OK) return(RC);
           di += strlen(&utf8[di]);
         }
+      }
     }
 
     utf8[di] = '\0';
@@ -1459,7 +1463,7 @@ uni_slong uni_toUTF8  (char *utf8, const char *src, uni_uword chars,
     if( ((uni_ubyte)src[si] >= table1->offset) &&
         ((uni_ubyte)src[si] <  table1->offset + table1->size) )
       c = table1->array[ (uni_ubyte)src[si] - table1->offset ];
-    else if(table2 != NULL)
+    else if(table2 != NULL) {
       if( ((uni_ubyte)src[si] >= table2->offset) &&
           ((uni_ubyte)src[si] <  table2->offset + table2->size) )
         c = table2->array[ (uni_ubyte)src[si] - table2->offset ];
@@ -1467,6 +1471,7 @@ uni_slong uni_toUTF8  (char *utf8, const char *src, uni_uword chars,
         if( ((uni_ubyte)src[si] >= table3->offset) &&
             ((uni_ubyte)src[si] <  table3->offset + table3->size) )
           c = table3->array[ (uni_ubyte)src[si] - table3->offset ];
+    }
 
     if( (c==0l) && (src[si]!='\0') ) c = C_UTF8_UNKNOWN;
 
