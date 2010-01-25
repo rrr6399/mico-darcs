@@ -1294,6 +1294,8 @@ operator<<= (CORBA::Any &_a, Node *_v)
 CORBA::Boolean
 __any_extract (const CORBA::Any &_a, Node *&_v, MapIdVB &_m)
 {
+    assert(0);
+    return FALSE;
 }
 
 CORBA::Boolean
