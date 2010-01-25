@@ -2,6 +2,7 @@
 // Corba TimeService (according to basic specs)
 //
 // Copyright (C) 1999 C. Zerbst
+// Copyright (c) 2000-2010 by The Mico Team
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -57,10 +58,10 @@ TIO_impl::spans( CosTime::UTO_ptr time, CosTime::TIO_out overlap )
    CosTime::OverlapType retval;
   
    //Calculate the overlap type and intervall
-   long lower_boundW = time->time() - time->inaccuracy();
-   long diffLow  = lower_boundV - lower_boundW;
-   long upper_boundW = time->time() + time->inaccuracy();   
-   long diffHigh = upper_boundV - upper_boundW;
+   unsigned long lower_boundW = time->time() - time->inaccuracy();
+   unsigned long diffLow  = lower_boundV - lower_boundW;
+   unsigned long upper_boundW = time->time() + time->inaccuracy();   
+   unsigned long diffHigh = upper_boundV - upper_boundW;
    
    //cout << diffLow << " " << diffHigh << endl;
    TimeBase::TimeT interv_low  = 0;
@@ -114,10 +115,10 @@ TIO_impl::overlaps( CosTime::TIO_ptr interval, CosTime::TIO_out overlap )
    CosTime::OverlapType retval;
 
    //Calculate the overlap type and intervall
-   long lower_boundW = interval->time_interval().lower_bound;
-   long diffLow  = lower_boundV - lower_boundW;
-   long upper_boundW = interval->time_interval().upper_bound;
-   long diffHigh = upper_boundV - upper_boundW;
+   unsigned long lower_boundW = interval->time_interval().lower_bound;
+   unsigned long diffLow  = lower_boundV - lower_boundW;
+   unsigned long upper_boundW = interval->time_interval().upper_bound;
+   unsigned long diffHigh = upper_boundV - upper_boundW;
    
    TimeBase::TimeT interv_low  = 0;
    TimeBase::TimeT interv_high = 0;   
