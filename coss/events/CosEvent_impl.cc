@@ -1,6 +1,7 @@
 /*
  *  Implementation of COSS Event Service for MICO
  *  Copyright (C) 1997 Kai-Uwe Sattler, Kay Roemer
+ *  Copyright (c) 1998-2010 by The Mico Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -502,7 +503,7 @@ EventChannel_impl::EventChannel_impl (CORBA::Object_ptr obj)
 #endif
 }
 
-EventChannel_impl::EventChannel_impl (CORBA::Long mqs)
+EventChannel_impl::EventChannel_impl (CORBA::ULong mqs)
     : _push_supp(FALSE, MICOMT::Mutex::Recursive), _push_cons(FALSE, MICOMT::Mutex::Recursive),
       _pull_supp(FALSE, MICOMT::Mutex::Recursive), _pull_cons(FALSE, MICOMT::Mutex::Recursive)
 {

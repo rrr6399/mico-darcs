@@ -194,7 +194,7 @@ IRCopy::copy (CORBA::Container_ptr src,
 CORBA::Contained_ptr
 IRCopy::copy_Contained (CORBA::Contained_ptr src)
 {
-  CORBA::Contained_ptr res;
+  CORBA::Contained_ptr res = CORBA::Contained::_nil();
 
   CORBA::String_var id = src->id ();
   CORBA::Contained_var existing = _repo->lookup_id (id);
@@ -404,7 +404,7 @@ CORBA::IDLType_ptr
 IRCopy::copy_IDLType (CORBA::IDLType_ptr src)
 {
   CORBA::Contained_var cs = CORBA::Contained::_narrow (src);
-  CORBA::IDLType_ptr target;
+  CORBA::IDLType_ptr target = CORBA::IDLType::_nil();
 
   if (!CORBA::is_nil (cs)) {
     CORBA::Contained_var ct = copy_Contained (cs);

@@ -31,7 +31,7 @@ check (int expr, const char *msg)
 }
 
 const char *
-extract (CORBA::Any &a, char *types, int cond = 1, const char *val = "")
+extract (CORBA::Any &a, const char *types, int cond = 1, const char *val = "")
 {
     for ( ; *types; ++types) switch (*types) {
     case 's': {
@@ -129,8 +129,14 @@ extract (CORBA::Any &a, char *types, int cond = 1, const char *val = "")
     }
     case 'T': {
 	assert (isdigit (types[1]));
-	CORBA::ULong len = strtol (types+1, &types, 10);
-	--types;
+        char* tmptypes = CORBA::string_dup(types+1);
+        CORBA::ULong move = strlen(tmptypes);
+	CORBA::ULong len = strtol (tmptypes, &tmptypes, 10);
+        for (CORBA::ULong ix = 0; ix < move; ix++) {
+            types++;
+        }
+        CORBA::string_free(tmptypes);
+	//--types;
 	const char *o = 0;
 	int ret = ((a >>= CORBA::Any::to_string (o, len)) != cond ||
 		   (cond && strcmp (o, val)));
@@ -148,16 +154,24 @@ extract (CORBA::Any &a, char *types, int cond = 1, const char *val = "")
     }
     case 'U': {
 	assert (isdigit (types[1]));
-	CORBA::ULong len = strtol (types+1, &types, 10);
-	--types;
+        char* tmptypes = CORBA::string_dup(types+1);
+        CORBA::ULong move = strlen(tmptypes);
+	CORBA::ULong len = strtol (tmptypes, &tmptypes, 10);
+        for (CORBA::ULong ix = 0; ix < move; ix++) {
+            types++;
+        }
+        CORBA::string_free(tmptypes);
+	//--types;
 	const CORBA::WChar *o = 0;
-	int ret = ((a >>= CORBA::Any::to_wstring (o, len)) != cond ||
-		   (cond && xwcscmp (o, (CORBA::WChar *)val)));
+ 	int ret = ((a >>= CORBA::Any::to_wstring (o, len)) != cond ||
+ 		   (cond && xwcscmp (o, (CORBA::WChar *)val)));
+        
 	if (ret)
 	    return "BoundedWString";
 	break;
     }
     default:
+        cerr << "asserting on types: `" << types << "'" << endl;
 	assert (0);
     }
     return 0;
@@ -301,24 +315,24 @@ test_string ()
     int res = 0;
     CORBA::Any a;
 
-    char *i = "foobarbaz";
-    a <<= i;
-    res += check (!extract (a, "t", 1, i) &&
-		  !extract (a, "T0", 1, i) &&
+    string i = "foobarbaz";
+    a <<= i.c_str();
+    res += check (!extract (a, "t", 1, i.c_str()) &&
+		  !extract (a, "T0", 1, i.c_str()) &&
 		  !extract (a, "sSlLfdcob", 0),
 		  "unbounded string 1");
 
     i = "foobazbar";
-    a <<= CORBA::Any::from_string(i,0);
-    res += check (!extract (a, "T0", 1, i) &&
-		  !extract (a, "t", 1, i) &&
+    a <<= CORBA::Any::from_string(i.c_str(),0);
+    res += check (!extract (a, "T0", 1, i.c_str()) &&
+		  !extract (a, "t", 1, i.c_str()) &&
 		  !extract (a, "sSlLfdcob", 0),
 		  "unbounded string 2");
 
     i = "barfoobaz";
-    a <<= CORBA::Any::from_string(i,20);
-    res += check (!extract (a, "T20", 1, i) &&
-		  !extract (a, "T20", 1, i) &&
+    a <<= CORBA::Any::from_string(i.c_str(),20);
+    res += check (!extract (a, "T20", 1, i.c_str()) &&
+		  !extract (a, "T20", 1, i.c_str()) &&
 		  !extract (a, "sSlLfdcobtT10", 0),
 		  "bounded string");
     return res;
@@ -330,7 +344,7 @@ test_wstring ()
     int res = 0;
     CORBA::Any a;
 
-    CORBA::WChar *i = L"AB";
+    CORBA::WChar *i = CORBA::wstring_dup(L"AB");
 
     a <<= i;
     res += check (!extract (a, "u", 1, (char *)i) &&

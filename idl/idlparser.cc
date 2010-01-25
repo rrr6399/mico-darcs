@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2005 by The Mico Team
+ *  Copyright (c) 1997-2010 by The Mico Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -1857,7 +1857,7 @@ IDLParser::collectMethod( CORBA::Container_ptr con, ParseNode *node )
       assert( p->getType() == param_dcls );
       ParseNode *q;
       CORBA::ParameterMode mode;    // in, out, inout attribute
-      CORBA::IDLType_ptr idl_type;  // type specification
+      CORBA::IDLType_ptr idl_type = CORBA::IDLType::_nil();  // type specification
       
       q = p->getBranch( 1 );
       assert( q->getType() == param_dcl );

@@ -2,6 +2,7 @@
  *  Implementation of COSS Naming Service for MICO
  *  Copyright (C) 1997 Kai-Uwe Sattler
  *  Interoperable Naming Service extension by Frank Pilhofer
+ *  Copyright (c) 1998-2010 by The Mico Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -306,7 +307,7 @@ void NamingContext_impl::_do_bind (const CosNaming::Name& n,
 CosNaming::NamingContext_ptr
 NamingContext_impl::_force_local(CosNaming::NamingContext_ptr nc_in)
 {
-  PortableServer::ObjectId* oid;
+  PortableServer::ObjectId* oid = NULL;
   CORBA::Object_var obj;
   CORBA::Boolean remote = FALSE;
 #ifdef HAVE_EXCEPTIONS
