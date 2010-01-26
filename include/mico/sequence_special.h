@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2001 by The Mico Team
+ *  Copyright (c) 1997-2010 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -115,7 +115,7 @@ public:
 	delete[] b;
     }
 
-#if defined( __SUNPRO_CC )
+#if defined( __SUNPRO_CC ) && ( __SUNPRO_CC <= 0x5010 )
     friend MICO_Boolean
     operator== (const StringSequenceTmpl<T> &v1,
 		const StringSequenceTmpl<T> &v2)
@@ -200,7 +200,7 @@ StringSequenceTmpl<T>::operator[] (MICO_ULong idx) const
     return vec[idx];
 }
 
-#if !defined( __SUNPRO_CC )
+#if !defined( __SUNPRO_CC ) || ( __SUNPRO_CC > 0x5010 )
 template<class T>
 MICO_Boolean
 operator== (const StringSequenceTmpl<T> &v1, const StringSequenceTmpl<T> &v2)
@@ -304,7 +304,7 @@ public:
 	delete[] b;
     }
 
-#if defined( __SUNPRO_CC )
+#if defined( __SUNPRO_CC ) && ( __SUNPRO_CC <= 0x5010 )
     friend MICO_Boolean
     operator== (const BoundedStringSequenceTmpl<T,max> &v1,
 		const BoundedStringSequenceTmpl<T,max> &v2)
@@ -367,7 +367,7 @@ BoundedStringSequenceTmpl<T,max>::length (MICO_ULong l)
     }
 }
 
-#if !defined( __SUNPRO_CC )
+#if !defined( __SUNPRO_CC ) || ( __SUNPRO_CC > 0x5010 )
 template<class T, int max>
 MICO_Boolean
 operator== (const BoundedStringSequenceTmpl<T,max> &v1,
@@ -461,7 +461,7 @@ public:
 	delete[] b;
     }
 
-#if defined( __SUNPRO_CC )
+#if defined( __SUNPRO_CC ) && ( __SUNPRO_CC <= 0x5010 )
     friend MICO_Boolean
     operator== (const WStringSequenceTmpl<T> &v1,
 		const WStringSequenceTmpl<T> &v2)
@@ -546,7 +546,7 @@ WStringSequenceTmpl<T>::operator[] (MICO_ULong idx) const
     return vec[idx];
 }
 
-#if !defined( __SUNPRO_CC )
+#if !defined( __SUNPRO_CC ) || ( __SUNPRO_CC > 0x5010 )
 template<class T>
 MICO_Boolean
 operator== (const WStringSequenceTmpl<T> &v1, const WStringSequenceTmpl<T> &v2)
@@ -650,7 +650,7 @@ public:
 	delete[] b;
     }
 
-#if defined( __SUNPRO_CC )
+#if defined( __SUNPRO_CC ) && ( __SUNPRO_CC <= 0x5010 )
     friend MICO_Boolean
     operator== (const BoundedWStringSequenceTmpl<T,max> &v1,
 		const BoundedWStringSequenceTmpl<T,max> &v2)
@@ -713,7 +713,7 @@ BoundedWStringSequenceTmpl<T,max>::length (MICO_ULong l)
     }
 }
 
-#if !defined( __SUNPRO_CC )
+#if !defined( __SUNPRO_CC ) || ( __SUNPRO_CC > 0x5010 )
 template<class T, int max>
 MICO_Boolean
 operator== (const BoundedWStringSequenceTmpl<T,max> &v1,
@@ -807,7 +807,7 @@ public:
 	delete[] b;
     }
 
-#if defined( __SUNPRO_CC )
+#if defined( __SUNPRO_CC ) && ( __SUNPRO_CC <= 0x5010 )
     friend MICO_Boolean
     operator== (const IfaceSequenceTmpl<T,T_ptr> &v1,
 		const IfaceSequenceTmpl<T,T_ptr> &v2)
@@ -894,7 +894,7 @@ IfaceSequenceTmpl<T,T_ptr>::operator[] (MICO_ULong idx) const
     return vec[idx];
 }
 
-#if !defined( __SUNPRO_CC )
+#if !defined( __SUNPRO_CC ) || ( __SUNPRO_CC > 0x5010 )
 template<class T, class T_ptr>
 MICO_Boolean
 operator== (const IfaceSequenceTmpl<T,T_ptr> &v1,
@@ -999,7 +999,7 @@ public:
 	delete[] b;
     }
 
-#if defined( __SUNPRO_CC )
+#if defined( __SUNPRO_CC ) && ( __SUNPRO_CC <= 0x5010 )
     friend MICO_Boolean
     operator== (const BoundedIfaceSequenceTmpl<T,T_ptr,max> &v1,
 		const BoundedIfaceSequenceTmpl<T,T_ptr,max> &v2)
@@ -1065,7 +1065,7 @@ BoundedIfaceSequenceTmpl<T,T_ptr,max>::length (MICO_ULong l)
     }
 }
 
-#if !defined( __SUNPRO_CC )
+#if !defined( __SUNPRO_CC ) || ( __SUNPRO_CC > 0x5010 )
 template<class T, class T_ptr, int max>
 MICO_Boolean
 operator== (const BoundedIfaceSequenceTmpl<T,T_ptr,max> &v1,
