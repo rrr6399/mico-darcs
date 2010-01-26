@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2001 by The Mico Team
+ *  Copyright (c) 1997-2010 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -101,7 +101,7 @@ public:
 	delete[] b;
     }
 
-#if defined( __SUNPRO_CC )
+#if defined( __SUNPRO_CC ) && ( __SUNPRO_CC <= 0x5010 )
     friend MICO_Boolean
     operator== (const SequenceTmpl<T,TID> &v1, const SequenceTmpl<T,TID> &v2)
     {
@@ -192,7 +192,7 @@ SequenceTmpl<T,TID>::get_buffer (MICO_Boolean orphan)
     }
 }
 
-#if !defined( __SUNPRO_CC )
+#if !defined( __SUNPRO_CC ) || ( __SUNPRO_CC > 0x5010 )
 template<class T, int TID>
 MICO_Boolean
 operator== (const SequenceTmpl<T,TID> &v1, const SequenceTmpl<T,TID> &v2)
@@ -289,7 +289,7 @@ public:
 	delete[] b;
     }
 
-#if defined( __SUNPRO_CC )
+#if defined( __SUNPRO_CC ) && ( __SUNPRO_CC <= 0x5010 )
     friend MICO_Boolean
     operator== (const BoundedSequenceTmpl<T,TID,max> &v1,
 		const BoundedSequenceTmpl<T,TID,max> &v2)
@@ -360,7 +360,7 @@ BoundedSequenceTmpl<T,TID,max>::get_buffer (MICO_Boolean orphan)
     }
 }
 
-#if !defined( __SUNPRO_CC )
+#if !defined( __SUNPRO_CC ) || ( __SUNPRO_CC > 0x5010 )
 template<class T, int TID, int max>
 MICO_Boolean
 operator== (const BoundedSequenceTmpl<T,TID,max> &v1,
@@ -444,7 +444,7 @@ public:
   
   static void freebuf( T* b );
   
-#if defined( __SUNPRO_CC )
+#if defined( __SUNPRO_CC ) && ( __SUNPRO_CC <= 0x5010 )
   friend MICO_Boolean
   operator== (const SequenceIndTmpl<T_elem,T,n> &v1,
 	      const SequenceIndTmpl<T_elem,T,n> &v2)
@@ -464,7 +464,7 @@ public:
 #endif
 };
 
-#if !defined( __SUNPRO_CC )
+#if !defined( __SUNPRO_CC ) || ( __SUNPRO_CC > 0x5010 )
 template<class T_elem, class T, MICO_ULong n>
 MICO_Boolean
 operator== (const SequenceIndTmpl<T_elem,T,n> &v1,
@@ -546,7 +546,7 @@ public:
   
   static void freebuf (T *b);
 
-#if defined( __SUNPRO_CC )
+#if defined( __SUNPRO_CC ) && ( __SUNPRO_CC <= 0x5010 )
   friend MICO_Boolean
   operator== (const BoundedSequenceIndTmpl<T_elem,T,n,max> &v1,
 	      const BoundedSequenceIndTmpl<T_elem,T,n,max> &v2)
@@ -566,7 +566,7 @@ public:
 #endif
 };
 
-#if !defined( __SUNPRO_CC )
+#if !defined( __SUNPRO_CC ) || ( __SUNPRO_CC > 0x5010 )
 template<class T_elem, class T, MICO_ULong n, int max>
 MICO_Boolean
 operator== (const BoundedSequenceIndTmpl<T_elem,T,n,max> &v1,
