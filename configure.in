@@ -1,6 +1,6 @@
 #
 #  MICO --- an Open Source CORBA implementation
-#  Copyright (c) 1997-2009 by The Mico Team
+#  Copyright (c) 1997-2010 by The Mico Team
 #
 #  This library is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Library General Public
@@ -859,7 +859,7 @@ else
     ;;
   *solaris*)
     cxxversion=`$CXX -V 2>&1`
-    CONF_OPT_FLAGS=-xO2
+    CONF_OPT_FLAGS=-O
     CONF_SHARED_CC="$CXX -G"
     # kcg: following option is probably for very old SunPRO compiler
     # even Forte Developer C++ 6 update 2 should be ok with
