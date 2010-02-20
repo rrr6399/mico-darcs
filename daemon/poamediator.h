@@ -2,7 +2,7 @@
 /*
  *  MICO --- an Open Source CORBA implementation
  *  Copyright (C) 1998 Frank Pilhofer
- *  Copyright (c) 1999-2008 by The Mico Team
+ *  Copyright (c) 1999-2010 by The Mico Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -103,6 +103,7 @@ public:
 #ifdef USE_CSL2
   CORBA::Principal_ptr get_principal (CORBA::Object_ptr);
 #endif /* USE_CSL2  */
+  using POA_CORBA::POAMediator::invoke;
   CORBA::Boolean invoke (CORBA::ORBMsgId, CORBA::Object_ptr,
 			 CORBA::ORBRequest *,
 			 CORBA::Principal_ptr,

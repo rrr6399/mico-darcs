@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2001 by The Mico Team
+ *  Copyright (c) 1997-2010 by The Mico Team
  *  Copyright (c) 2002-2003 by ITO TU-Darmstadt
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -484,10 +484,10 @@ void CodeGenWSDL::emitTypes()
 		case CORBA::dk_Operation:
 			if (1)
 			{
-				CORBA::OperationDef_ptr o =
+				CORBA::OperationDef_ptr op =
 					CORBA::OperationDef::_narrow(x);
-				checkImplicit(o->result_def());
-				checkMembers(o->params());
+				checkImplicit(op->result_def());
+				checkMembers(op->params());
 			}
 			break;
 		case CORBA::dk_Struct:
@@ -1373,14 +1373,14 @@ void CodeGenWSDL::emitPortTypes()
 			
 			// Map all the methods in
 			Operations& ops = _ports[idlNameToWsdl(process.c_str())];
-			Operations::iterator o;
-			for (o = ops.begin(); o != ops.end(); ++o)
+			Operations::iterator oit;
+			for (oit = ops.begin(); oit != ops.end(); ++oit)
 			{
-				NameToOps::iterator n = nameToOps.find(o->name);
+				NameToOps::iterator n = nameToOps.find(oit->name);
 				if (n != nameToOps.end())
-					cerr << "warning: " << o->name << " ambiguous in " << a->first << endl;
+					cerr << "warning: " << oit->name << " ambiguous in " << a->first << endl;
 				else
-					nameToOps[o->name] = &(*o);
+					nameToOps[oit->name] = &(*oit);
 			}
 			
 			// Check all ancestors

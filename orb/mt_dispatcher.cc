@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2001 by The Mico Team
+ *  Copyright (c) 1997-2010 by The Mico Team
  * 
  *  multi-thread dispatcher
  *  Copyright (C) 1999 Andreas Schultz                                 
@@ -103,10 +103,10 @@ MICO::MTDispatcher::copy() const
  * object.
  */
 void
-MICO::MTDispatcher::process( MICO::msg_type * msg )
+MICO::MTDispatcher::process( MICO::msg_type * pmsg )
 {
 
-    MICO::ORBMsg *_msg = (MICO::ORBMsg *)msg->data();
+    MICO::ORBMsg *msg = (MICO::ORBMsg *)pmsg->data();
 
     if (MICO::Logger::IsLogged (MICO::Logger::Thread)) {
 	MICOMT::AutoDebugLock __lock;
@@ -114,15 +114,15 @@ MICO::MTDispatcher::process( MICO::msg_type * msg )
 	    << "MTDispatcher::process" << endl;
     }
 
-    switch (_msg->ev) {
+    switch (msg->ev) {
     case MICO::ORBMsg::KillConn:
 	if (MICO::Logger::IsLogged (MICO::Logger::Thread)) {
 	    MICOMT::AutoDebugLock __lock;
 	    MICO::Logger::Stream (MICO::Logger::Thread)
 		<< "  ORBMsg::KillConn" << endl;
 	}
-	assert( _msg->conn->state() == MICOMT::StateRefCnt::Terminated );
-	delete _msg->conn;
+	assert( msg->conn->state() == MICOMT::StateRefCnt::Terminated );
+	delete msg->conn;
 	break;
 
     case MICO::ORBMsg::CloseConn:
@@ -131,18 +131,18 @@ MICO::MTDispatcher::process( MICO::msg_type * msg )
 	    MICO::Logger::Stream (MICO::Logger::Thread)
 		<< "  ORBMsg::CloseConn" << endl;
 	}
-	_msg->cb->callback (_msg->conn, GIOPConnCallback::Closed);
+	msg->cb->callback (msg->conn, GIOPConnCallback::Closed);
 	break;
 
     default: 
 	if (MICO::Logger::IsLogged (MICO::Logger::Thread)) {
 	    MICOMT::AutoDebugLock __lock;
 	    MICO::Logger::Stream (MICO::Logger::Thread)
-		<< _msg->ev << endl;
+		<< msg->ev << endl;
 	}
     }
 
-    delete _msg;
     delete msg;
+    delete pmsg;
 }
 

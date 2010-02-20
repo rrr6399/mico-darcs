@@ -1,6 +1,7 @@
 //
 //  MICO PI --- an Open Source Portable Interceptor implementation
-//  Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2008 ObjectSecurity Ltd.
+//  Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2008,
+//                2010 ObjectSecurity Ltd.
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Library General Public
@@ -1555,10 +1556,10 @@ PInterceptor::IORInfo_impl::IORInfo_impl()
 
 PInterceptor::IORInfo_impl::IORInfo_impl
 (PortableServer::POA_ptr poa,
- CORBA::IOR* ior)
+ CORBA::IOR* pior)
 {
     poa_ = PortableServer::POA::_duplicate(poa);
-    ior_ = ior;
+    ior_ = pior;
     CORBA::UShort version = 0x0100;
     if (ior_ != NULL) {
 	CORBA::IORProfile* iorprof = ior_->profile

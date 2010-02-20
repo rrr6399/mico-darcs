@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2001 by The Mico Team
+ *  Copyright (c) 1997-2010 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -31,20 +31,20 @@ namespace CORBA {
 #define MICO_OBJ_MAGIC       0x31415927
 
 class MagicChecker {
-    ULong magic;
+    ULong _magic;
 public:
     void _check () const;
     void _check (const CORBA::Exception &) const;
     CORBA::Boolean _check_nothrow () const;
 protected:
     MagicChecker ()
-    { magic = MICO_OBJ_MAGIC; }
+    { _magic = MICO_OBJ_MAGIC; }
 
     ~MagicChecker ()
-    { magic = 0; }
+    { _magic = 0; }
 
     MagicChecker (const MagicChecker &)
-    { magic = MICO_OBJ_MAGIC; }
+    { _magic = MICO_OBJ_MAGIC; }
 
     MagicChecker &operator= (const MagicChecker &)
     { return *this; }
