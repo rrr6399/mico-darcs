@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2008 by The Mico Team
+ *  Copyright (c) 1997-2010 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -68,7 +68,7 @@ CORBA::Object::S_timeout_policy_instance_counter_lock_;
 void
 CORBA::MagicChecker::_check () const
 {
-    if (!this || magic != MICO_OBJ_MAGIC) {
+    if (!this || _magic != MICO_OBJ_MAGIC) {
 #ifdef USE_MEMTRACE
 	MemTrace_SelfTrace (stderr);
 #endif
@@ -79,7 +79,7 @@ CORBA::MagicChecker::_check () const
 void
 CORBA::MagicChecker::_check (const CORBA::Exception &ex) const
 {
-    if (!this || magic != MICO_OBJ_MAGIC) {
+    if (!this || _magic != MICO_OBJ_MAGIC) {
 #ifdef USE_MEMTRACE
 	MemTrace_SelfTrace (stderr);
 #endif
@@ -90,7 +90,7 @@ CORBA::MagicChecker::_check (const CORBA::Exception &ex) const
 CORBA::Boolean
 CORBA::MagicChecker::_check_nothrow () const
 {
-    if (!this || magic != MICO_OBJ_MAGIC) {
+    if (!this || _magic != MICO_OBJ_MAGIC) {
       if (MICO::Logger::IsLogged (MICO::Logger::Warning)) {
 	MICO::Logger::Stream (MICO::Logger::Warning)
 	  << "invalid object reference" << endl;
@@ -142,8 +142,8 @@ CORBA::Object::Object (IOR *i)
 {
     ior = i;
     fwd_ior = 0;
-    orb = CORBA::ORB_instance ("mico-local-orb", FALSE);
-    if (!CORBA::is_nil(orb) && !orb->plugged() && ior)
+    _orb = CORBA::ORB_instance ("mico-local-orb", FALSE);
+    if (!CORBA::is_nil(_orb) && !_orb->plugged() && ior)
 	ior->addressing_disposition (GIOP::ReferenceAddr);
 }
 
@@ -151,7 +151,7 @@ CORBA::Object::Object (const Object &o)
 {
     ior = o.ior ? new IOR (*o.ior) : 0;
     fwd_ior = o.fwd_ior ? new IOR (*o.fwd_ior) : 0;
-    orb = CORBA::ORB::_duplicate (o.orb);
+    _orb = CORBA::ORB::_duplicate (o._orb);
     _managers = o._managers;
     _policies = o._policies;
 }
@@ -168,8 +168,8 @@ CORBA::Object::operator= (const Object &o)
 	if (fwd_ior)
 	    delete fwd_ior;
 	fwd_ior = o.fwd_ior ? new IOR (*o.fwd_ior) : 0;
-	CORBA::release (orb);
-	orb = CORBA::ORB::_duplicate (o.orb);
+	CORBA::release (_orb);
+	_orb = CORBA::ORB::_duplicate (o._orb);
 	_managers = o._managers;
 	_policies = o._policies;
     }
@@ -182,7 +182,7 @@ CORBA::Object::~Object ()
         delete ior;
     if (fwd_ior)
         delete fwd_ior;
-    CORBA::release (orb);
+    CORBA::release (_orb);
 }
 
 void
@@ -506,9 +506,9 @@ CORBA::Object::_hash (ULong max)
 CORBA::ORB_ptr
 CORBA::Object::_orbnc()
 {
-    if (CORBA::is_nil(orb))
-	orb = CORBA::ORB_instance ("mico-local-orb");
-    return orb;
+    if (CORBA::is_nil(_orb))
+	_orb = CORBA::ORB_instance ("mico-local-orb");
+    return _orb;
 }
 
 #ifdef USE_MESSAGING

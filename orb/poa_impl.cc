@@ -1,7 +1,7 @@
 /*
  *  MICO --- an Open Source CORBA implementation
  *  Copyright (C) 1998 Frank Pilhofer
- *  Copyright (c) 1999-2008 by The Mico Team
+ *  Copyright (c) 1999-2010 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -315,7 +315,7 @@ static void __current_cleanup(void *css)
 }
 #endif
 
-MICOPOA::POACurrent_impl::POACurrent_impl (CORBA::ORB_ptr _orb)
+MICOPOA::POACurrent_impl::POACurrent_impl (CORBA::ORB_ptr porb)
 {
 #ifndef HAVE_THREADS
   state_stack_ = NULL;
@@ -326,7 +326,7 @@ MICOPOA::POACurrent_impl::POACurrent_impl (CORBA::ORB_ptr _orb)
 #endif // HAVE_THREADS
   assert (CORBA::is_nil (PortableServer::_the_poa_current));
   PortableServer::_the_poa_current = this;
-  orb = _orb;
+  orb = porb;
   orb->set_initial_reference ("POACurrent", this);
 }
 
@@ -1924,13 +1924,13 @@ MICOPOA::POA_impl::POA_impl (const char * _name,
 			     PortableServer::POAManager_ptr _manager,
 			     const CORBA::PolicyList & policies,
 			     POA_impl * _parent,
-			     CORBA::ORB_ptr _orb)
-    : name (_name), parent(_parent), orb(_orb), ObjectActivationLock(FALSE, MICOMT::Mutex::Recursive)
+			     CORBA::ORB_ptr porb)
+    : name (_name), parent(_parent), orb(porb), ObjectActivationLock(FALSE, MICOMT::Mutex::Recursive)
 {
   destructed = 0;
   unique_id = 0;
   set_policies (policies);
-  ior_template_ = new CORBA::IOR(*_orb->ior_template());
+  ior_template_ = new CORBA::IOR(*porb->ior_template());
 #ifdef USE_SL3
   TransportSecurity::ObjectCredentialsPolicy_var ocp
       = TransportSecurity::ObjectCredentialsPolicy::_nil();
@@ -2126,12 +2126,12 @@ MICOPOA::POA_impl::POA_impl (const char * _name,
  * Constructor for Root POA
  */
 
-MICOPOA::POA_impl::POA_impl (CORBA::ORB_ptr _orb)
-  : orb (_orb)
+MICOPOA::POA_impl::POA_impl (CORBA::ORB_ptr porb)
+  : orb (porb)
 {
   destructed = 0;
   unique_id = 0;
-  ior_template_ = new CORBA::IOR(*_orb->ior_template());
+  ior_template_ = new CORBA::IOR(*porb->ior_template());
 
   /*
    * We keep one reference to ourselves

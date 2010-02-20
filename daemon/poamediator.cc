@@ -1,7 +1,7 @@
 /*
  *  MICO --- an Open Source CORBA implementation
  *  Copyright (C) 1998 Frank Pilhofer
- *  Copyright (c) 1999-2008 by The Mico Team
+ *  Copyright (c) 1999-2010 by The Mico Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -865,7 +865,7 @@ POAMediatorImpl::waitfor (CORBA::ORB_ptr, CORBA::ORBMsgId msgid,
 }
 
 void
-POAMediatorImpl::notify (CORBA::ORB_ptr orb, CORBA::ORBMsgId id,
+POAMediatorImpl::notify (CORBA::ORB_ptr porb, CORBA::ORBMsgId id,
 			 CORBA::ORBCallback::Event ev)
 {
   MICOMT::AutoLock __lock(_M_global_lock);
@@ -877,12 +877,12 @@ POAMediatorImpl::notify (CORBA::ORB_ptr orb, CORBA::ORBMsgId id,
       CORBA::ORBRequest *req;
       CORBA::Object_var obj;
       GIOP::AddressingDisposition ad;
-      CORBA::InvokeStatus stat = orb->get_invoke_reply (id, obj, req, ad);
+      CORBA::InvokeStatus stat = porb->get_invoke_reply (id, obj, req, ad);
 
       MapIdId::iterator i = requests.find (id);
       assert (i != requests.end());
 
-      orb->answer_invoke ((*i).second, stat, obj, req, ad);
+      porb->answer_invoke ((*i).second, stat, obj, req, ad);
       requests.erase (i);
     }
     break;
@@ -891,7 +891,7 @@ POAMediatorImpl::notify (CORBA::ORB_ptr orb, CORBA::ORBMsgId id,
     {
       // a bind completed ...
       CORBA::Object_var obj;
-      CORBA::LocateStatus stat = orb->get_bind_reply (id, obj);
+      CORBA::LocateStatus stat = porb->get_bind_reply (id, obj);
 
       MapIdId::iterator i = requests.find (id);
       assert (i != requests.end());
@@ -901,7 +901,7 @@ POAMediatorImpl::notify (CORBA::ORB_ptr orb, CORBA::ORBMsgId id,
 
       if (stat == CORBA::LocateHere) {
 	// found matching object ...
-	orb->answer_bind (id2, stat, obj);
+	porb->answer_bind (id2, stat, obj);
 	// cancel all binds resulting from the same bind "broadcast"
 	cancel (id2);
       } else {
@@ -916,7 +916,7 @@ POAMediatorImpl::notify (CORBA::ORB_ptr orb, CORBA::ORBMsgId id,
 
 	if (i == requests.end()) {
 	  // ... its the last bind request; answer anyway
-	  orb->answer_bind (id2, stat, obj);
+	  porb->answer_bind (id2, stat, obj);
 	}
 
 	// ignore, there are more outstanding bind requests ...

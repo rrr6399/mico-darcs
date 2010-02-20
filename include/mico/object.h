@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2008 by The Mico Team
+ *  Copyright (c) 1997-2010 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -101,7 +101,7 @@ typedef SequenceTmpl< PolicyType,MICO_TID_DEF> PolicyTypeSeq;
 class Object : public ServerlessObject {
     IOR *ior;
     IOR *fwd_ior;
-    ORB_ptr orb;
+    ORB_ptr _orb;
     std::string ident;
 #ifdef USE_MESSAGING
 private:

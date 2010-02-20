@@ -1,7 +1,7 @@
 // -*- c++ -*-
 //
 //  MICO SL3 --- an Open Source SL3 implementation
-//  Copyright (C) 2003, 2004, 2005, 2006 ObjectSecurity Ltd.
+//  Copyright (C) 2003, 2004, 2005, 2006, 2010 ObjectSecurity Ltd.
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Library General Public
@@ -237,6 +237,7 @@ namespace MICOSL3_SL3TLS
 	CORBA::Boolean
 	numeric();
 
+        using MICOSL3_TransportSecurity::TransportAcceptor_impl::port;
 	void
 	port(CORBA::Long p);
 

@@ -83,6 +83,7 @@ public:
     // use invoke instead of dispatch
     virtual void invoke(CORBA::StaticServerRequest_ptr req);
 
+    using POA_CosEventComm::PullSupplier::pull;
     virtual void pull (CORBA::StaticServerRequest_ptr req) = 0;
 };
 
