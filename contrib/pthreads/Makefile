@@ -11,7 +11,7 @@
 DLL_VER	= 2
 DLL_VERD= $(DLL_VER)d
 
-DEVROOT	= .
+DEVROOT	= C:\pthreads
 
 DLLDEST	= $(DEVROOT)\DLL
 LIBDEST	= $(DEVROOT)\LIB
@@ -24,13 +24,11 @@ INLINED_STAMPS	= pthreadVCE$(DLL_VER).stamp pthreadVSE$(DLL_VER).stamp pthreadVC
 STATIC_STAMPS	= pthreadVCE$(DLL_VER).static pthreadVSE$(DLL_VER).static pthreadVC$(DLL_VER).static \
 				  pthreadVCE$(DLL_VERD).static pthreadVSE$(DLL_VERD).static pthreadVC$(DLL_VERD).static
 
-#OPTIM	= /O2 /Ob2
-OPTIM	=
+OPTIM	= /O2 /Ob2
 OPTIMD	=
 
-GENERAL_CFLAGS	= /W3 /nologo /I. /D_WIN32_WINNT=0x400 /DHAVE_CONFIG_H
-CFLAGS	= $(GENERAL_CFLAGS) /MD
-CFLAGSD	= /DDEBUG /D_DEBUG /Zi $(GENERAL_CFLAGS) /MDd
+CFLAGS	= /W3 /MD /nologo /I. /D_WIN32_WINNT=0x400 /DHAVE_CONFIG_H
+CFLAGSD	= /Zi $(CFLAGS)
 
 
 # Default cleanup style
@@ -468,12 +466,12 @@ install: $(DLLS)
 $(DLLS): $(DLL_OBJS)
 	cl /LDd /Zi /nologo $(DLL_OBJS) \
 		/link /nodefaultlib:libcmt /implib:$*.lib \
-		wsock32.lib /out:$@
+		msvcrt.lib wsock32.lib /out:$@
 
 $(INLINED_STAMPS): $(DLL_INLINED_OBJS)
 	cl /LDd /Zi /nologo $(DLL_INLINED_OBJS) \
 		/link /nodefaultlib:libcmt /implib:$*.lib \
-		wsock32.lib /out:$*.dll
+		msvcrt.lib wsock32.lib /out:$*.dll
 
 $(STATIC_STAMPS): $(DLL_INLINED_OBJS)
 	if exist $*.lib del $*.lib

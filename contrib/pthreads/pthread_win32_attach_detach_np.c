@@ -91,10 +91,30 @@ pthread_win32_process_attach_np ()
 
 #endif
 
+#ifdef _WIN64
+
+/*
+ * InterlockedCompareExchange routine in WIN64 is an intrinsic function.
+ * See PTW32_INTERLOCKED_COMPARE_EXCHANGE implement.h
+ */
+
+#else
+
+#ifdef WINCE
+
+  /*
+   * Load COREDLL and try to get address of InterlockedCompareExchange
+   */
+  ptw32_h_kernel32 = LoadLibrary (TEXT ("COREDLL.DLL"));
+
+#else
+
   /*
    * Load KERNEL32 and try to get address of InterlockedCompareExchange
    */
   ptw32_h_kernel32 = LoadLibrary (TEXT ("KERNEL32.DLL"));
+
+#endif
 
   ptw32_interlocked_compare_exchange =
     (PTW32_INTERLOCKED_LONG (WINAPI *)
@@ -132,6 +152,8 @@ pthread_win32_process_attach_np ()
     {
       ptw32_features |= PTW32_SYSTEM_INTERLOCKED_COMPARE_EXCHANGE;
     }
+
+#endif
 
   /*
    * Load QUSEREX.DLL and try to get address of QueueUserAPCEx
@@ -261,7 +283,7 @@ pthread_win32_thread_detach_np ()
        */
       ptw32_thread_t * sp = (ptw32_thread_t *) pthread_getspecific (ptw32_selfThreadKey);
 
-      if (sp != NULL) // otherwise Win32 thread with no implicit POSIX handle.
+      if (sp != NULL)
 	{
 	  ptw32_callUserDestroyRoutines (sp->ptHandle);
 
@@ -269,10 +291,16 @@ pthread_win32_thread_detach_np ()
 	  sp->state = PThreadStateLast;
 	  /*
 	   * If the thread is joinable at this point then it MUST be joined
-	   * or detached explicitly by the application.
+	   * or detached explicitly by the application because it's
+	   * detachState cannot be changed from this point on.
 	   */
 	  (void) pthread_mutex_unlock (&sp->cancelLock);
 
+	  /*
+	   * No race condition here because detachState will not be changed
+	   * elsewhere now that thread state is PThreadStateLast (set above
+	   * behind mutex).
+	   */
 	  if (sp->detachState == PTHREAD_CREATE_DETACHED)
 	    {
 	      ptw32_threadDestroy (sp->ptHandle);
