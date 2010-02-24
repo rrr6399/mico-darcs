@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2006 by The Mico Team
+ *  Copyright (c) 1997-2010 by The Mico Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -236,7 +236,7 @@ void ParseNode::setIdent( char *anIdent )
 	    tmp = ts.substr(1);
 	    ts = tmp;
 	}
-	unsigned long pos = 0;
+	string::size_type pos = 0;
 	while((pos = ts.find("::_")) != string::npos) {
 	    tmp = ts.substr(0, pos + 2) + ts.substr(pos + 3, ts.size());
 	    ts = tmp;
