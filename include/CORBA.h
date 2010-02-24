@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2008 by The Mico Team
+ *  Copyright (c) 1997-2010 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -53,7 +53,11 @@
   #else
     #error unknown (Windows-)Compiler
   #endif
-  #include <mico/config-win32.h>
+  #if !defined(_WIN64)
+    #include <mico/config-win32.h>
+  #else
+    #include <mico/config-win64.h>
+  #endif
 #elif defined (_POCKET_PC)
   #include <mico/config-ppc.h>
 #else
