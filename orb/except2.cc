@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2009 by The Mico Team
+ *  Copyright (c) 1997-2010 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -51,11 +51,7 @@
 #include <terminate.h>
 #endif
 
-#ifdef _WIN32
-#include <process.h>
-#else // _WIN32
-#include <unistd.h>
-#endif // _WIN32
+#include <mico/os-misc.h>
 
 using namespace std;
 
@@ -79,10 +75,11 @@ CORBA::Exception::_terminate_handler ()
    try {
        throw;
    } catch (const CORBA::Exception& ex) {
-#ifdef _WIN32
-#define getpid _getpid
-#endif // _WIN32
-     cerr << "[" << getpid() << "|" << MICOMT::Thread::self() << "] uncaught MICO exception: ";
+     cerr << "[" << OSMisc::getpid()
+#ifdef HAVE_THREADS
+          << "|" << MICOMT::Thread::self()
+#endif // HAVE_THREADS
+	  << "] uncaught MICO exception: ";
      ex._print (cerr);
      cerr << endl;
      ex._print_stack_trace (cerr);
