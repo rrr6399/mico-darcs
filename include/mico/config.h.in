@@ -171,6 +171,9 @@
 /* whether to build Threading Policies API */
 #undef THREADING_POLICIES
 
+/* Define if you have libumem available on your system */
+#undef HAVE_UMEM
+
 /* The number of bytes in a double.  */
 #undef SIZEOF_DOUBLE
 
@@ -393,6 +396,9 @@
 /* Define if you have the <thread.h> header file.  */
 #undef HAVE_THREAD_H
 
+/* Define if you have the <umem.h> header file.  */
+#undef HAVE_UMEM_H
+
 /* Define if you have the <unistd.h> header file.  */
 #undef HAVE_UNISTD_H
 
@@ -452,6 +458,9 @@
 
 /* Define if you have the termcap library (-ltermcap).  */
 #undef HAVE_LIBTERMCAP
+
+/* Define if you have the umem library (-lumem).  */
+#undef HAVE_LIBUMEM
 
 /* Define if you have the wsock32 library (-lwsock32).  */
 #undef HAVE_LIBWSOCK32
