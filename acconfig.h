@@ -156,3 +156,6 @@
 
 /* whether to build Threading Policies API */
 #undef THREADING_POLICIES
+
+/* Define if you have libumem available on your system */
+#undef HAVE_UMEM
