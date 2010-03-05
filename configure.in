@@ -1278,6 +1278,7 @@ if test `uname` = FreeBSD; then
 fi
 
 if test X"$use_threads" = Xyes -a X"$umem" = Xyes; then
+  LIBS_BACKUP=$LIBS
   AC_CHECK_LIB(umem, open)
   AC_CHECK_LIB(umem, malloc)
   AC_CHECK_LIB(umem, free)
@@ -1288,6 +1289,7 @@ if test X"$use_threads" = Xyes -a X"$umem" = Xyes; then
       SHLIBS="-lumem $SHLIBS"
     fi
   fi
+  LIBS=$LIBS_BACKUP
 fi
 
 AC_SUBST(BASE_LIBS)
