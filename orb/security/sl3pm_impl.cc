@@ -1,6 +1,6 @@
 //
 //  MICO SL3 --- an Open Source SL3 implementation
-//  Copyright (C) 2002, 2003, 2004 ObjectSecurity Ltd.
+//  Copyright (C) 2002, 2003, 2004, 2010 ObjectSecurity Ltd.
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Library General Public
@@ -138,8 +138,8 @@ MICOSL3_SL3PM::ProxyPrincipalFactory_impl::create_for_unmarshal()
 
 ProxyPrincipal*
 MICOSL3_SL3PM::ProxyPrincipalFactory_impl::create
-(Principal* speaking,
- Principal* speaks_for)
+(SL3PM::Principal* speaking,
+ SL3PM::Principal* speaks_for)
 {
     return new ProxyPrincipal_impl(speaking, speaks_for);
 }
@@ -180,8 +180,8 @@ MICOSL3_SL3PM::QuotingPrincipalFactory_impl::create_for_unmarshal()
 
 QuotingPrincipal*
 MICOSL3_SL3PM::QuotingPrincipalFactory_impl::create
-(Principal* speaking,
- Principal* quotes_for)
+(SL3PM::Principal* speaking,
+ SL3PM::Principal* quotes_for)
 {
     return new QuotingPrincipal_impl(speaking, quotes_for);
 }

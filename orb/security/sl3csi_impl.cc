@@ -1,6 +1,6 @@
 //
 //  MICO SL3 --- an Open Source SL3 implementation
-//  Copyright (C) 2003, 2004 ObjectSecurity Ltd.
+//  Copyright (C) 2003, 2004, 2010 ObjectSecurity Ltd.
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Library General Public
@@ -391,7 +391,7 @@ MICOSL3_SL3CSI::CSICredsInitiator::CSICredsInitiator
     TransportSecurity::CredentialsInitiator_var initiator = transport_creds_->the_initiator();
     assert(!CORBA::is_nil(initiator));
     SimplePrincipal_var tprinc = NULL;
-    Principal_var transp_princ = initiator->the_principal();
+    SL3PM::Principal_var transp_princ = initiator->the_principal();
     principal_ = NULL;
     if (!CORBA::is_nil(generator)) {
 	PrincipalName_var name = generator->client_authentication_principal();
@@ -722,7 +722,7 @@ MICOSL3_SL3CSI::CredentialsAcquirer_impl::~CredentialsAcquirer_impl()
 }
 
 
-OwnCredentials_ptr
+SecurityLevel3::OwnCredentials_ptr
 MICOSL3_SL3CSI::CredentialsAcquirer_impl::get_credentials(Boolean on_list)
 {
     if (MICO::Logger::IsLogged(MICO::Logger::Security)) {
@@ -731,7 +731,7 @@ MICOSL3_SL3CSI::CredentialsAcquirer_impl::get_credentials(Boolean on_list)
 	    << "SL3CSI: CredentialsAcquirer_impl::get_credentials" << endl;
     }
     curator_->add_own_credentials(creds_, on_list);
-    return OwnCredentials::_duplicate(creds_);
+    return SecurityLevel3::OwnCredentials::_duplicate(creds_);
 }
 
 

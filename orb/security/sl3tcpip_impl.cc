@@ -1,6 +1,6 @@
 //
 //  MICO SL3 --- an Open Source SL3 implementation
-//  Copyright (C) 2002, 2003, 2004, 2005, 2006 ObjectSecurity Ltd.
+//  Copyright (C) 2002, 2003, 2004, 2005, 2006, 2010 ObjectSecurity Ltd.
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Library General Public
@@ -352,7 +352,7 @@ MICOSL3_SL3TCPIP::CredentialsAcquirer_impl::~CredentialsAcquirer_impl()
 }
 
 
-OwnCredentials_ptr
+TransportSecurity::OwnCredentials_ptr
 MICOSL3_SL3TCPIP::CredentialsAcquirer_impl::get_credentials
 (CORBA::Boolean on_list)
 {
@@ -410,7 +410,7 @@ MICOSL3_SL3TCPIP::CredentialsAcquirerFactory_impl::CredentialsAcquirerFactory_im
 }
 
 
-CredentialsAcquirer_ptr
+TransportSecurity::CredentialsAcquirer_ptr
 MICOSL3_SL3TCPIP::CredentialsAcquirerFactory_impl::create
 (Argument_ptr value)
 {
@@ -1042,9 +1042,9 @@ MICOSL3_SL3TCPIP::ORBInitializer::post_init
 {
     CORBA::Object_var obj = info->resolve_initial_references
 	("TransportSecurity::SecurityManager");
-    SecurityManager_var secman = SecurityManager::_narrow(obj);
+    TransportSecurity::SecurityManager_var secman = TransportSecurity::SecurityManager::_narrow(obj);
     assert(!CORBA::is_nil(secman));
-    CredentialsCurator_ptr curator = secman->credentials_curator();
+    TransportSecurity::CredentialsCurator_ptr curator = secman->credentials_curator();
     MICOSL3_TransportSecurity::CredentialsCurator_impl* curator_impl
 	= dynamic_cast<MICOSL3_TransportSecurity::CredentialsCurator_impl*>
 	(curator);

@@ -1,6 +1,6 @@
 //
 //  MICO SL3 --- an Open Source SL3 implementation
-//  Copyright (C) 2002, 2003, 2004, 2005, 2008 ObjectSecurity Ltd.
+//  Copyright (C) 2002, 2003, 2004, 2005, 2008, 2010 ObjectSecurity Ltd.
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Library General Public
@@ -72,7 +72,7 @@ MICOSL3_TransportSecurity::_init()
 // CredentialsInitiator_impl
 //
 
-Principal*
+SL3PM::Principal*
 MICOSL3_TransportSecurity::CredentialsInitiator_impl::the_principal()
 {
     CORBA::add_ref(principal_);
@@ -161,7 +161,7 @@ MICOSL3_TransportSecurity::CredentialsInitiator_impl::expiry_time()
 // CredentialsAcceptor_impl
 //
 
-Principal*
+SL3PM::Principal*
 MICOSL3_TransportSecurity::CredentialsAcceptor_impl::the_principal()
 {
     CORBA::add_ref(principal_);
@@ -378,9 +378,9 @@ MICOSL3_TransportSecurity::OwnCredentials_impl::release_credentials()
     CORBA::ORB_var orb = CORBA::ORB_instance("mico-local-orb", FALSE);
     CORBA::Object_var obj = orb->resolve_initial_references
 	("TransportSecurity::SecurityManager");
-    SecurityManager_var secman = SecurityManager::_narrow(obj);
+    TransportSecurity::SecurityManager_var secman = TransportSecurity::SecurityManager::_narrow(obj);
     assert(!CORBA::is_nil(secman));
-    CredentialsCurator_var curator = secman->credentials_curator();
+    TransportSecurity::CredentialsCurator_var curator = secman->credentials_curator();
     assert(!CORBA::is_nil(curator));
     CORBA::String_var id = this->creds_id();
     curator->release_credentials(id);
@@ -439,8 +439,8 @@ MICOSL3_TransportSecurity::OwnCredentials_impl::notify_destroy()
 //
 
 MICOSL3_TransportSecurity::ClientCredentials_impl::ClientCredentials_impl
-(OwnCredentials_ptr parent_credentials)
-    : parent_credentials_(OwnCredentials::_duplicate(parent_credentials))
+(TransportSecurity::OwnCredentials_ptr parent_credentials)
+    : parent_credentials_(TransportSecurity::OwnCredentials::_duplicate(parent_credentials))
 {
 }
 
@@ -452,7 +452,7 @@ MICOSL3_TransportSecurity::ClientCredentials_impl::context_id()
 }
 
 
-Principal*
+SL3PM::Principal*
 MICOSL3_TransportSecurity::ClientCredentials_impl::client_principal()
 {
     return client_principal_;
@@ -473,7 +473,7 @@ MICOSL3_TransportSecurity::ClientCredentials_impl::client_restricted_resources()
 }
 
 
-Principal*
+SL3PM::Principal*
 MICOSL3_TransportSecurity::ClientCredentials_impl::target_principal()
 {
     return target_principal_;
@@ -504,7 +504,7 @@ MICOSL3_TransportSecurity::ClientCredentials_impl::environmental_attributes()
 TransportSecurity::OwnCredentials_ptr
 MICOSL3_TransportSecurity::ClientCredentials_impl::parent_credentials()
 {
-    return OwnCredentials::_duplicate(parent_credentials_);
+    return TransportSecurity::OwnCredentials::_duplicate(parent_credentials_);
 }
 
 
@@ -562,8 +562,8 @@ MICOSL3_TransportSecurity::ClientCredentials_impl::quotable()
 //
 
 MICOSL3_TransportSecurity::TargetCredentials_impl::TargetCredentials_impl
-(OwnCredentials_ptr parent_credentials)
-    : parent_credentials_(OwnCredentials::_duplicate(parent_credentials))
+(TransportSecurity::OwnCredentials_ptr parent_credentials)
+    : parent_credentials_(TransportSecurity::OwnCredentials::_duplicate(parent_credentials))
 {
 }
 
@@ -575,7 +575,7 @@ MICOSL3_TransportSecurity::TargetCredentials_impl::context_id()
 }
 
 
-Principal*
+SL3PM::Principal*
 MICOSL3_TransportSecurity::TargetCredentials_impl::client_principal()
 {
     CORBA::add_ref(client_principal_);
@@ -597,7 +597,7 @@ MICOSL3_TransportSecurity::TargetCredentials_impl::client_restricted_resources()
 }
 
 
-Principal*
+SL3PM::Principal*
 MICOSL3_TransportSecurity::TargetCredentials_impl::target_principal()
 {
     CORBA::add_ref(target_principal_);
@@ -678,18 +678,18 @@ MICOSL3_TransportSecurity::TargetCredentials_impl::target_endorsed()
 //
 // CredentialsCurator_impl
 //
-OwnCredentialsList*
+TransportSecurity::OwnCredentialsList*
 MICOSL3_TransportSecurity::CredentialsCurator_impl::default_creds_list()
 {
-    return new OwnCredentialsList(default_creds_list_);
+    return new TransportSecurity::OwnCredentialsList(default_creds_list_);
 }
 
 
-CredentialsAcquirer_ptr
+TransportSecurity::CredentialsAcquirer_ptr
 MICOSL3_TransportSecurity::CredentialsCurator_impl::acquire_credentials
 (SL3AQArgs::Argument_ptr acquisition_arguments)
 {
-    CredentialsAcquirerFactory_ptr fact = CredentialsAcquirerFactory::_nil();
+    TransportSecurity::CredentialsAcquirerFactory_ptr fact = TransportSecurity::CredentialsAcquirerFactory::_nil();
     for (fact_iter_type i = factories_.begin(); i != factories_.end(); i++) {
   	if ((*i)->supports_all_args(acquisition_arguments)) {
   	    fact = (*i);
@@ -697,7 +697,7 @@ MICOSL3_TransportSecurity::CredentialsCurator_impl::acquire_credentials
   	}
     }
     assert(!CORBA::is_nil(fact));
-    CredentialsAcquirer_ptr ca = fact->create(acquisition_arguments);
+    TransportSecurity::CredentialsAcquirer_ptr ca = fact->create(acquisition_arguments);
     CredentialsCuratorImplUser* user = dynamic_cast
 	<MICOSL3_TransportSecurity::CredentialsCuratorImplUser*>(ca);
     assert(user != NULL);
@@ -706,7 +706,7 @@ MICOSL3_TransportSecurity::CredentialsCurator_impl::acquire_credentials
 }
 
 
-OwnCredentials_ptr
+TransportSecurity::OwnCredentials_ptr
 MICOSL3_TransportSecurity::CredentialsCurator_impl::get_own_credentials
 (const char* creds_id)
 {
@@ -716,11 +716,11 @@ MICOSL3_TransportSecurity::CredentialsCurator_impl::get_own_credentials
 	id = own_creds_list_[i]->creds_id();
 	//cerr << i << ":" << id << endl;
 	if (strcmp(id.in(), creds_id) == 0) {
-	    return OwnCredentials::_duplicate(own_creds_list_[i]);
+	    return TransportSecurity::OwnCredentials::_duplicate(own_creds_list_[i]);
 	}
     }
     //cerr << "NIL returned" << endl;
-    return OwnCredentials::_nil();
+    return TransportSecurity::OwnCredentials::_nil();
 }
 
 
@@ -748,7 +748,7 @@ MICOSL3_TransportSecurity::CredentialsCurator_impl::remove_credentials
 	    if (tsacceptor != NULL) {
 		tsacceptor->shutdown();
 	    }
-	    OwnCredentials_impl* creds_impl
+            OwnCredentials_impl* creds_impl
 		= dynamic_cast<OwnCredentials_impl*>
 		(default_creds_list_[i].in());
 	    assert(creds_impl != NULL);
@@ -772,7 +772,7 @@ MICOSL3_TransportSecurity::CredentialsCurator_impl::release_credentials
 	MICO::Logger::Stream(MICO::Logger::Security)
 	    << "SL3TS: release_credentials: " << creds_id << endl;
     }
-    OwnCredentials_var creds = this->get_own_credentials(creds_id);
+    TransportSecurity::OwnCredentials_var creds = this->get_own_credentials(creds_id);
     if (CORBA::is_nil(creds)) {
 	mico_throw(CORBA::BAD_PARAM(20002, CORBA::COMPLETED_NO));
     }
@@ -794,7 +794,7 @@ MICOSL3_TransportSecurity::CredentialsCurator_impl::release_credentials
     // i.e. target credentials
     for (ic_iter_type it = init_contexts_.begin();
 	 it != init_contexts_.end(); ) {
-	OwnCredentials_var tcr = (*it)->parent_credentials();
+        TransportSecurity::OwnCredentials_var tcr = (*it)->parent_credentials();
 	CORBA::String_var parent_id = tcr->creds_id();
 	if (strcmp(parent_id.in(), creds_id) == 0) {
 	    it = init_contexts_.erase(it);
@@ -816,15 +816,15 @@ MICOSL3_TransportSecurity::CredentialsCurator_impl::register_acquirer_factory
 
 void
 MICOSL3_TransportSecurity::CredentialsCurator_impl::add_own_credentials
-(OwnCredentials_ptr creds, Boolean on_list)
+(TransportSecurity::OwnCredentials_ptr creds, Boolean on_list)
 {
     own_creds_list_.length(own_creds_list_.length() + 1);
     own_creds_list_[own_creds_list_.length() - 1]
-	= OwnCredentials::_duplicate(creds);
+	= TransportSecurity::OwnCredentials::_duplicate(creds);
     if (on_list) {
 	default_creds_list_.length(default_creds_list_.length() + 1);
 	default_creds_list_[default_creds_list_.length() - 1]
-	    = OwnCredentials::_duplicate(creds);
+	    = TransportSecurity::OwnCredentials::_duplicate(creds);
     }
 }
 
@@ -842,12 +842,12 @@ MICOSL3_TransportSecurity::CredentialsCurator_impl::add_init_context
 }
 
 
-TargetCredentials_ptr
+TransportSecurity::TargetCredentials_ptr
 MICOSL3_TransportSecurity::CredentialsCurator_impl::get_target_credentials
 (CORBA::Object_ptr obj,
  CORBA::Boolean include_ipc_creds)
 {
-    TargetCredentials_ptr result = TargetCredentials::_nil();
+    TransportSecurity::TargetCredentials_ptr result = TransportSecurity::TargetCredentials::_nil();
     const CORBA::Address* tcpip_target_addr = obj->_ior()->addr
 	(CORBA::IORProfile::TAG_INTERNET_IOP);
     const CORBA::Address* tls_target_addr = obj->_ior()->addr
@@ -864,15 +864,15 @@ MICOSL3_TransportSecurity::CredentialsCurator_impl::get_target_credentials
 		<< "       tls_target_addr: " << tls_target_addr->stringify() << endl;
     }
     CredentialsIdList creds_ids(0);
-    OwnCredentialsList_var creds_list = NULL;
-    ContextEstablishmentPolicy_var policy
-	= ContextEstablishmentPolicy::_nil();
+    TransportSecurity::OwnCredentialsList_var creds_list = NULL;
+    TransportSecurity::ContextEstablishmentPolicy_var policy
+	= TransportSecurity::ContextEstablishmentPolicy::_nil();
     SecurityLevel3::ContextEstablishmentPolicy_var sl3_policy
 	= SecurityLevel3::ContextEstablishmentPolicy::_nil();
     // we try transport policy first
     try {
-	CORBA::Policy_var p = obj->_get_policy(ContextEstablishmentPolicyType);
-	policy = ContextEstablishmentPolicy::_narrow(p);
+	CORBA::Policy_var p = obj->_get_policy(TransportSecurity::ContextEstablishmentPolicyType);
+	policy = TransportSecurity::ContextEstablishmentPolicy::_narrow(p);
     } catch (CORBA::BAD_PARAM&) {
 	// this is thrown by MICO and CORBA 2.2. It seems MICO
 	// is not compliant here with CORBA 2.3.
@@ -906,7 +906,7 @@ MICOSL3_TransportSecurity::CredentialsCurator_impl::get_target_credentials
 	    = sl3_policy->creds_list();
 	//cerr << "sl3_creds_list->length(): " << sl3_creds_list->length()
 	//<< endl;
-	creds_list = new OwnCredentialsList;
+	creds_list = new TransportSecurity::OwnCredentialsList;
 	creds_list->length(0);
 	for (CORBA::ULong i = 0; i < sl3_creds_list->length(); i++) {
 	    SecurityLevel3::CredsInitiator_var init
@@ -950,7 +950,7 @@ MICOSL3_TransportSecurity::CredentialsCurator_impl::get_target_credentials
 	    //cerr << "ic: " << ic << endl;
 	    //if (ic != NULL)
 	    //cerr << "ic->target_addr(): " << ic->target_addr()->stringify() << endl;
-	    OwnCredentials_var parent = (*i).in()->parent_credentials();
+	    TransportSecurity::OwnCredentials_var parent = (*i).in()->parent_credentials();
 	    String_var id = parent->creds_id();
 	    //cerr << "id: " << id.in() << endl;
 	    //cerr << "creds_ids[j]: " << creds_ids[j].in() << endl;
@@ -961,7 +961,7 @@ MICOSL3_TransportSecurity::CredentialsCurator_impl::get_target_credentials
 		    && tls_target_addr != NULL
 		    && (*tls_target_addr) == (*(tls_ic->target_addr()))))
 		&& strcmp(creds_ids[j].in(), id.in()) == 0) {
-		result = TargetCredentials::_duplicate((*i).in());
+		result = TransportSecurity::TargetCredentials::_duplicate((*i).in());
 		if (MICO::Logger::IsLogged(MICO::Logger::Security)) {
 		    MICOMT::AutoDebugLock lock;
 		    MICO::Logger::Stream(MICO::Logger::Security)
@@ -980,7 +980,7 @@ MICOSL3_TransportSecurity::CredentialsCurator_impl::get_target_credentials
 	    string key = creds_ids[j].in();
 	    if (key.find("MICO_IPC:") != string::npos) {
 		// found IPC own credentials
-		TargetCredentials_ptr tmp_target
+		TransportSecurity::TargetCredentials_ptr tmp_target
 		    = MICOSL3_SL3IPC::IPCCredsMapper::self()
 		    ->get_target_credentials(creds_list[j]);
 		if (CORBA::is_nil(tmp_target)) {
@@ -1029,7 +1029,7 @@ MICOSL3_TransportSecurity::CredentialsCurator_impl::get_target_credentials
 }
 
 
-OwnCredentials_ptr
+TransportSecurity::OwnCredentials_ptr
 MICOSL3_TransportSecurity::CredentialsCurator_impl::find_own_credentials_for
 (const Address* addr)
 {
@@ -1055,7 +1055,7 @@ MICOSL3_TransportSecurity::CredentialsCurator_impl::find_own_credentials_for
                     || (strcmp(i_bound_addr->host(), "0.0.0.0") == 0
                         && strcmp(i_bound_addr->proto(), i_addr->proto()) == 0
                         && i_bound_addr->port() == i_addr->port())) {
-                    return OwnCredentials::_duplicate(this->own_creds_list_[i]);
+                    return TransportSecurity::OwnCredentials::_duplicate(this->own_creds_list_[i]);
                 }
             }
             MICOSL3_SL3TLS::TLSAcceptor* tls_acceptor
@@ -1077,12 +1077,12 @@ MICOSL3_TransportSecurity::CredentialsCurator_impl::find_own_credentials_for
                     || (strcmp(i_bound_addr->host(), "0.0.0.0") == 0
                         && strcmp(ssl_bound_addr->proto(), ssl_addr->proto()) == 0
                         && i_bound_addr->port() == i_addr->port())) {
-                    return OwnCredentials::_duplicate(this->own_creds_list_[i]);
+                    return TransportSecurity::OwnCredentials::_duplicate(this->own_creds_list_[i]);
                 }
             }
         }
     }
-    return OwnCredentials::_nil();
+    return TransportSecurity::OwnCredentials::_nil();
 }
 
 
@@ -1142,7 +1142,7 @@ MICOSL3_TransportSecurity::SecurityCurrent_impl::SecurityCurrent_impl()
 }
 
 
-ClientCredentials_ptr
+TransportSecurity::ClientCredentials_ptr
 MICOSL3_TransportSecurity::SecurityCurrent_impl::client_credentials()
 {
 #ifndef HAVE_THREADS
@@ -1217,14 +1217,14 @@ MICOSL3_TransportSecurity::SecurityManager_impl::SecurityManager_impl
 }
 
 
-CredentialsCurator_ptr
+TransportSecurity::CredentialsCurator_ptr
 MICOSL3_TransportSecurity::SecurityManager_impl::credentials_curator()
 {
-    return CredentialsCurator::_duplicate(curator_);
+    return TransportSecurity::CredentialsCurator::_duplicate(curator_);
 }
 
 
-TargetCredentials_ptr
+TransportSecurity::TargetCredentials_ptr
 MICOSL3_TransportSecurity::SecurityManager_impl::get_target_credentials
 (CORBA::Object_ptr the_object)
 {
@@ -1234,7 +1234,7 @@ MICOSL3_TransportSecurity::SecurityManager_impl::get_target_credentials
 	    << "SL3TS: SecurityManager_impl::get_target_credentials: "
 	    << the_object << endl;
     }
-    TargetCredentials_ptr result = curator_->get_target_credentials(the_object, FALSE);
+    TransportSecurity::TargetCredentials_ptr result = curator_->get_target_credentials(the_object, FALSE);
     if (CORBA::is_nil(result)) {
 	the_object->_non_existent();
 	result = curator_->get_target_credentials(the_object, TRUE);
@@ -1243,10 +1243,10 @@ MICOSL3_TransportSecurity::SecurityManager_impl::get_target_credentials
 }
 
 
-ContextEstablishmentPolicy_ptr
+TransportSecurity::ContextEstablishmentPolicy_ptr
 MICOSL3_TransportSecurity::SecurityManager_impl::create_context_estab_policy
 (CredsDirective creds_directive,
- const OwnCredentialsList& creds_list,
+ const TransportSecurity::OwnCredentialsList& creds_list,
  FeatureDirective use_client_auth,
  FeatureDirective use_target_auth,
  FeatureDirective use_confidentiality,
@@ -1258,9 +1258,9 @@ MICOSL3_TransportSecurity::SecurityManager_impl::create_context_estab_policy
 }
 
 
-ObjectCredentialsPolicy_ptr
+TransportSecurity::ObjectCredentialsPolicy_ptr
 MICOSL3_TransportSecurity::SecurityManager_impl::create_object_creds_policy
-(const OwnCredentialsList& creds_list)
+(const TransportSecurity::OwnCredentialsList& creds_list)
 {
     return new ObjectCredentialsPolicy_impl(creds_list);
 }
@@ -1279,7 +1279,7 @@ MICOSL3_TransportSecurity::SecurityManager_impl::security_enabled()
 //
 
 MICOSL3_TransportSecurity::InitiatingContext_impl::InitiatingContext_impl
-(OwnCredentials_ptr parent_credentials)
+(TransportSecurity::OwnCredentials_ptr parent_credentials)
     : TargetCredentials_impl(parent_credentials)
 {
     // we need parent credentials to obtain all observers
@@ -1387,8 +1387,8 @@ MICOSL3_TransportSecurity::InitiatingContext_impl::notify_destroy_context()
 //
 
 MICOSL3_TransportSecurity::AcceptingContext_impl::AcceptingContext_impl
-(OwnCredentials_ptr parent_credentials)
-    : ClientCredentials_impl(OwnCredentials::_duplicate(parent_credentials))
+(TransportSecurity::OwnCredentials_ptr parent_credentials)
+    : ClientCredentials_impl(TransportSecurity::OwnCredentials::_duplicate(parent_credentials))
 {
     // we need parent credentials to obtain all observers
     assert(!CORBA::is_nil(parent_credentials_));
@@ -1676,7 +1676,7 @@ MICOSL3_TransportSecurity::TransportAcceptor_impl::enable()
 
 MICOSL3_TransportSecurity::ContextEstablishmentPolicy_impl::ContextEstablishmentPolicy_impl
 (CredsDirective creds_directive,
- const OwnCredentialsList& creds_list,
+ const TransportSecurity::OwnCredentialsList& creds_list,
  FeatureDirective use_client_auth,
  FeatureDirective use_target_auth,
  FeatureDirective use_confidentiality,
@@ -1688,10 +1688,10 @@ MICOSL3_TransportSecurity::ContextEstablishmentPolicy_impl::ContextEstablishment
 }
 
 
-OwnCredentialsList*
+TransportSecurity::OwnCredentialsList*
 MICOSL3_TransportSecurity::ContextEstablishmentPolicy_impl::creds_list()
 {
-    return new OwnCredentialsList(creds_list_);
+    return new TransportSecurity::OwnCredentialsList(creds_list_);
 }
 
 
@@ -1733,7 +1733,7 @@ MICOSL3_TransportSecurity::ContextEstablishmentPolicy_impl::use_integrity()
 CORBA::PolicyType
 MICOSL3_TransportSecurity::ContextEstablishmentPolicy_impl::policy_type()
 {
-    return ContextEstablishmentPolicyType;
+    return TransportSecurity::ContextEstablishmentPolicyType;
 }
 
 
@@ -1759,7 +1759,7 @@ MICOSL3_TransportSecurity::ContextEstablishmentPolicy_impl::destroy()
 //
 
 MICOSL3_TransportSecurity::ObjectCredentialsPolicy_impl::ObjectCredentialsPolicy_impl
-(const OwnCredentialsList& creds_list)
+(const TransportSecurity::OwnCredentialsList& creds_list)
     : creds_list_(creds_list)
 {
 }
@@ -1768,14 +1768,14 @@ MICOSL3_TransportSecurity::ObjectCredentialsPolicy_impl::ObjectCredentialsPolicy
 TransportSecurity::OwnCredentialsList*
 MICOSL3_TransportSecurity::ObjectCredentialsPolicy_impl::creds_list()
 {
-    return new OwnCredentialsList(this->creds_list_);
+    return new TransportSecurity::OwnCredentialsList(this->creds_list_);
 }
 
 
 CORBA::PolicyType
 MICOSL3_TransportSecurity::ObjectCredentialsPolicy_impl::policy_type()
 {
-    return ObjectCredentialsPolicyType;
+    return TransportSecurity::ObjectCredentialsPolicyType;
 }
 
 
@@ -1911,9 +1911,9 @@ MICOSL3_TransportSecurity::TSServerRequestInterceptor::receive_request
 	}
 	else {
 	    // hint == NULL means that we do in process call
-	    CredentialsCurator_var curator = secman_->credentials_curator();
-	    OwnCredentialsList_var creds = curator->default_creds_list();
-	    OwnCredentials_var ipc_creds = OwnCredentials::_nil();
+	    TransportSecurity::CredentialsCurator_var curator = secman_->credentials_curator();
+	    TransportSecurity::OwnCredentialsList_var creds = curator->default_creds_list();
+	    TransportSecurity::OwnCredentials_var ipc_creds = TransportSecurity::OwnCredentials::_nil();
 	    for (CORBA::ULong i = 0; i < creds->length(); i++) {
 		String_var id = creds[i]->creds_id();
 		string tmp = id.in();
@@ -1928,7 +1928,7 @@ MICOSL3_TransportSecurity::TSServerRequestInterceptor::receive_request
 		// to use in process calls
 		assert(0);
 	    }
-	    ClientCredentials_ptr res 
+	    TransportSecurity::ClientCredentials_ptr res 
 		= MICOSL3_SL3IPC::IPCCredsMapper::self()->get_client_credentials
 		(ipc_creds);
 	    if (CORBA::is_nil(res)) {

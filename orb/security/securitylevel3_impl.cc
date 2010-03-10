@@ -1,6 +1,6 @@
 //
 //  MICO SL3 --- an Open Source SL3 implementation
-//  Copyright (C) 2002, 2003, 2004 ObjectSecurity Ltd.
+//  Copyright (C) 2002, 2003, 2004, 2010 ObjectSecurity Ltd.
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Library General Public
@@ -73,7 +73,7 @@ MICOSL3_SecurityLevel3::_init()
 // CredsInitiator_impl
 //
 
-Principal*
+SL3PM::Principal*
 MICOSL3_SecurityLevel3::CredsInitiator_impl::the_principal()
 {
     CORBA::add_ref(principal_);
@@ -141,7 +141,7 @@ MICOSL3_SecurityLevel3::CredsInitiator_impl::expiry_time()
 // CredsAcceptor_impl
 //
 
-Principal*
+SL3PM::Principal*
 MICOSL3_SecurityLevel3::CredsAcceptor_impl::the_principal()
 {
     CORBA::add_ref(principal_);
@@ -306,9 +306,9 @@ MICOSL3_SecurityLevel3::OwnCredentials_impl::release_credentials()
     assert(!CORBA::is_nil(orb));
     CORBA::Object_var obj = orb->resolve_initial_references
 	("SecurityLevel3::SecurityManager");
-    SecurityManager_var secman = SecurityManager::_narrow(obj);
+    SecurityLevel3::SecurityManager_var secman = SecurityLevel3::SecurityManager::_narrow(obj);
     assert(!CORBA::is_nil(secman));
-    CredentialsCurator_var curator = secman->credentials_curator();
+    SecurityLevel3::CredentialsCurator_var curator = secman->credentials_curator();
     assert(!CORBA::is_nil(curator));
     CORBA::String_var id = this->creds_id();
     curator->release_own_credentials(id);
@@ -386,7 +386,7 @@ MICOSL3_SecurityLevel3::ClientCredentials_impl::context_id()
 }
 
 
-Principal*
+SL3PM::Principal*
 MICOSL3_SecurityLevel3::ClientCredentials_impl::client_principal()
 {
     CORBA::add_ref(client_principal_);
@@ -408,7 +408,7 @@ MICOSL3_SecurityLevel3::ClientCredentials_impl::client_restricted_resources()
 }
 
 
-Principal*
+SL3PM::Principal*
 MICOSL3_SecurityLevel3::ClientCredentials_impl::target_principal()
 {
     CORBA::add_ref(target_principal_);
@@ -437,10 +437,10 @@ MICOSL3_SecurityLevel3::ClientCredentials_impl::environmental_attributes()
 }
 
 
-OwnCredentials_ptr
+SecurityLevel3::OwnCredentials_ptr
 MICOSL3_SecurityLevel3::ClientCredentials_impl::parent_credentials()
 {
-    return OwnCredentials::_duplicate(parent_credentials_);
+    return SecurityLevel3::OwnCredentials::_duplicate(parent_credentials_);
 }
 
 
@@ -482,7 +482,7 @@ MICOSL3_SecurityLevel3::ClientCredentials_impl::context_id(const char* id)
 
 void
 MICOSL3_SecurityLevel3::ClientCredentials_impl::client_principal
-(Principal* principal)
+(SL3PM::Principal* principal)
 {
     CORBA::add_ref(principal);
     client_principal_ = principal;
@@ -507,7 +507,7 @@ MICOSL3_SecurityLevel3::ClientCredentials_impl::client_restricted_resources
 
 void
 MICOSL3_SecurityLevel3::ClientCredentials_impl::target_principal
-(Principal* principal)
+(SL3PM::Principal* principal)
 {
     CORBA::add_ref(principal);
     target_principal_ = principal;
@@ -540,9 +540,9 @@ MICOSL3_SecurityLevel3::ClientCredentials_impl::environmental_attributes
 
 void
 MICOSL3_SecurityLevel3::ClientCredentials_impl::parent_credentials
-(OwnCredentials_ptr creds)
+(SecurityLevel3::OwnCredentials_ptr creds)
 {
-    parent_credentials_ = OwnCredentials::_duplicate(creds);
+    parent_credentials_ = SecurityLevel3::OwnCredentials::_duplicate(creds);
     assert(!CORBA::is_nil(parent_credentials_));
     OwnCredentials_impl* impl = dynamic_cast<OwnCredentials_impl*>
 	(parent_credentials_.in());
@@ -638,7 +638,7 @@ MICOSL3_SecurityLevel3::TargetCredentials_impl::context_id()
 }
 
 
-Principal*
+SL3PM::Principal*
 MICOSL3_SecurityLevel3::TargetCredentials_impl::client_principal()
 {
     CORBA::add_ref(client_principal_);
@@ -660,7 +660,7 @@ MICOSL3_SecurityLevel3::TargetCredentials_impl::client_restricted_resources()
 }
 
 
-Principal*
+SL3PM::Principal*
 MICOSL3_SecurityLevel3::TargetCredentials_impl::target_principal()
 {
     CORBA::add_ref(target_principal_);
@@ -689,10 +689,10 @@ MICOSL3_SecurityLevel3::TargetCredentials_impl::environmental_attributes()
 }
 
 
-OwnCredentials_ptr
+SecurityLevel3::OwnCredentials_ptr
 MICOSL3_SecurityLevel3::TargetCredentials_impl::parent_credentials()
 {
-    return OwnCredentials::_duplicate(parent_credentials_);
+    return SecurityLevel3::OwnCredentials::_duplicate(parent_credentials_);
 }
 
 
@@ -755,7 +755,7 @@ MICOSL3_SecurityLevel3::TargetCredentials_impl::context_id(const char* id)
 
 void
 MICOSL3_SecurityLevel3::TargetCredentials_impl::client_principal
-(Principal* principal)
+(SL3PM::Principal* principal)
 {
     CORBA::add_ref(principal);
     client_principal_ = principal;
@@ -780,7 +780,7 @@ MICOSL3_SecurityLevel3::TargetCredentials_impl::client_restricted_resources
 
 void
 MICOSL3_SecurityLevel3::TargetCredentials_impl::target_principal
-(Principal* principal)
+(SL3PM::Principal* principal)
 {
     CORBA::add_ref(principal);
     target_principal_ = principal;
@@ -813,9 +813,9 @@ MICOSL3_SecurityLevel3::TargetCredentials_impl::environmental_attributes
 
 void
 MICOSL3_SecurityLevel3::TargetCredentials_impl::parent_credentials
-(OwnCredentials_ptr creds)
+(SecurityLevel3::OwnCredentials_ptr creds)
 {
-    parent_credentials_ = OwnCredentials::_duplicate(creds);
+    parent_credentials_ = SecurityLevel3::OwnCredentials::_duplicate(creds);
     assert(!CORBA::is_nil(parent_credentials_));
     OwnCredentials_impl* impl = dynamic_cast<OwnCredentials_impl*>
 	(parent_credentials_.in());
@@ -915,11 +915,11 @@ MICOSL3_SecurityLevel3::TargetCredentials_impl::notify_destroy()
 // CredentialsCurator_impl
 //
 
-OwnCredentialsList*
+SecurityLevel3::OwnCredentialsList*
 MICOSL3_SecurityLevel3::CredentialsCurator_impl::default_creds_list()
 {
     MICOMT::AutoRDLock lock(default_creds_list_lock_);
-    return new OwnCredentialsList(default_creds_list_);
+    return new SecurityLevel3::OwnCredentialsList(default_creds_list_);
 }
 
 
@@ -936,7 +936,7 @@ MICOSL3_SecurityLevel3::CredentialsCurator_impl::default_creds_ids()
 }
 
 
-CredentialsAcquirer_ptr
+SecurityLevel3::CredentialsAcquirer_ptr
 MICOSL3_SecurityLevel3::CredentialsCurator_impl::acquire_credentials
 (SL3AQArgs::Argument_ptr acquisition_arguments)
 {
@@ -946,7 +946,7 @@ MICOSL3_SecurityLevel3::CredentialsCurator_impl::acquire_credentials
 }
 
 
-OwnCredentials_ptr
+SecurityLevel3::OwnCredentials_ptr
 MICOSL3_SecurityLevel3::CredentialsCurator_impl::get_own_credentials
 (const char* credentials_id)
 {
@@ -954,10 +954,10 @@ MICOSL3_SecurityLevel3::CredentialsCurator_impl::get_own_credentials
     for (ULong i = 0; i < own_creds_list_.length(); i++) {
 	CORBA::String_var id = own_creds_list_[i]->creds_id();
 	if (strcmp(id.in(), credentials_id) == 0) {
-	    return OwnCredentials::_duplicate(own_creds_list_[i]);
+	    return SecurityLevel3::OwnCredentials::_duplicate(own_creds_list_[i]);
 	}
     }
-    return OwnCredentials::_nil();
+    return SecurityLevel3::OwnCredentials::_nil();
 }
 
 
@@ -1019,7 +1019,7 @@ MICOSL3_SecurityLevel3::CredentialsCurator_impl::release_own_credentials
 
 void
 MICOSL3_SecurityLevel3::CredentialsCurator_impl::add_own_credentials
-(OwnCredentials_ptr creds, Boolean on_list)
+(SecurityLevel3::OwnCredentials_ptr creds, Boolean on_list)
 {
     if (MICO::Logger::IsLogged(MICO::Logger::Security)) {
 	MICOMT::AutoDebugLock lock;
@@ -1031,13 +1031,13 @@ MICOSL3_SecurityLevel3::CredentialsCurator_impl::add_own_credentials
 	MICOMT::AutoWRLock lock(own_creds_list_lock_);
 	own_creds_list_.length(own_creds_list_.length() + 1);
 	own_creds_list_[own_creds_list_.length() - 1]
-	    = OwnCredentials::_duplicate(creds);
+	    = SecurityLevel3::OwnCredentials::_duplicate(creds);
     }
     if (on_list) {
 	MICOMT::AutoWRLock lock(default_creds_list_lock_);
 	default_creds_list_.length(default_creds_list_.length() + 1);
 	default_creds_list_[default_creds_list_.length() - 1]
-	    = OwnCredentials::_duplicate(creds);
+	    = SecurityLevel3::OwnCredentials::_duplicate(creds);
     }
 }
 
@@ -1047,20 +1047,20 @@ MICOSL3_SecurityLevel3::CredentialsCurator_impl::add_own_credentials
 //
 
 MICOSL3_SecurityLevel3::SecurityManager_impl::SecurityManager_impl
-(CredentialsCurator_ptr curator)
-    : curator_(CredentialsCurator::_duplicate(curator))
+(SecurityLevel3::CredentialsCurator_ptr curator)
+    : curator_(SecurityLevel3::CredentialsCurator::_duplicate(curator))
 {
 }
 
 
-CredentialsCurator_ptr
+SecurityLevel3::CredentialsCurator_ptr
 MICOSL3_SecurityLevel3::SecurityManager_impl::credentials_curator()
 {
-    return CredentialsCurator::_duplicate(curator_);
+    return SecurityLevel3::CredentialsCurator::_duplicate(curator_);
 }
 
 
-TargetCredentials_ptr
+SecurityLevel3::TargetCredentials_ptr
 MICOSL3_SecurityLevel3::SecurityManager_impl::get_target_credentials
 (CORBA::Object_ptr the_object)
 {
@@ -1082,7 +1082,7 @@ MICOSL3_SecurityLevel3::SecurityManager_impl::get_target_credentials
 	// probably communication error with target
 	// (something like COMM_FAILURE or TRANSIENT)
 	// so we need to return NIL creds
-	return TargetCredentials::_nil();
+	return SecurityLevel3::TargetCredentials::_nil();
     }
     TargetCredsHolder* holder = dynamic_cast<TargetCredsHolder*>(t_creds.in());
     assert(holder != NULL);
@@ -1133,7 +1133,7 @@ MICOSL3_SecurityLevel3::SecurityManager_impl::get_target_credentials
 		delete name;
 		key += wstr2str(wtn);
 	    }
-	    Principal_var pr = initiator->the_principal();
+            SL3PM::Principal_var pr = initiator->the_principal();
 	    QuotingPrincipal* qp = NULL;
 	    if (pr->the_type() == PT_Quoting
 		&& ((qp = QuotingPrincipal::_downcast(pr)) != NULL)) {
@@ -1148,7 +1148,7 @@ MICOSL3_SecurityLevel3::SecurityManager_impl::get_target_credentials
 	}
     }
     //cerr << "key: " << key << endl;
-    TargetCredentials_ptr tc = holder->csi_creds(key);
+    SecurityLevel3::TargetCredentials_ptr tc = holder->csi_creds(key);
     if (CORBA::is_nil(tc)) {
 	// target credentials doesn't exist yet
 	// => force to create them by calling remote
@@ -1165,10 +1165,10 @@ MICOSL3_SecurityLevel3::SecurityManager_impl::get_target_credentials
 }
 
 
-ContextEstablishmentPolicy_ptr
+SecurityLevel3::ContextEstablishmentPolicy_ptr
 MICOSL3_SecurityLevel3::SecurityManager_impl::create_context_estab_policy
 (CredsDirective creds_directive,
- const OwnCredentialsList& creds_list,
+ const SecurityLevel3::OwnCredentialsList& creds_list,
  FeatureDirective use_client_auth,
  FeatureDirective use_target_auth,
  FeatureDirective use_confidentiality,
@@ -1185,12 +1185,12 @@ MICOSL3_SecurityLevel3::ContextEstablishmentPolicy_impl::~ContextEstablishmentPo
 }
 
 
-ObjectCredentialsPolicy_ptr
+SecurityLevel3::ObjectCredentialsPolicy_ptr
 MICOSL3_SecurityLevel3::SecurityManager_impl::create_object_creds_policy
-(const OwnCredentialsList& creds_list)
+(const SecurityLevel3::OwnCredentialsList& creds_list)
 {
     assert(0);
-    return ObjectCredentialsPolicy::_nil();
+    return SecurityLevel3::ObjectCredentialsPolicy::_nil();
 }
 
 
@@ -1198,7 +1198,7 @@ MICOSL3_SecurityLevel3::SecurityManager_impl::create_object_creds_policy
 // SecurityCurrent_impl
 //
 
-ClientCredentials_ptr
+SecurityLevel3::ClientCredentials_ptr
 MICOSL3_SecurityLevel3::SecurityCurrent_impl::client_credentials()
 {
     if (MICO::Logger::IsLogged(MICO::Logger::Security)) {
@@ -1235,7 +1235,7 @@ MICOSL3_SecurityLevel3::SecurityCurrent_impl::request_is_local()
 
 MICOSL3_SecurityLevel3::ContextEstablishmentPolicy_impl::ContextEstablishmentPolicy_impl
 (CredsDirective creds_directive,
- const OwnCredentialsList& creds_list,
+ const SecurityLevel3::OwnCredentialsList& creds_list,
  FeatureDirective use_client_auth,
  FeatureDirective use_target_auth,
  FeatureDirective use_confidentiality,
@@ -1247,11 +1247,11 @@ MICOSL3_SecurityLevel3::ContextEstablishmentPolicy_impl::ContextEstablishmentPol
 }
 
 
-OwnCredentialsList*
+SecurityLevel3::OwnCredentialsList*
 MICOSL3_SecurityLevel3::ContextEstablishmentPolicy_impl::creds_list()
 {
     //cerr << "ContextEstablishmentPolicy_impl::creds_list()" << endl;
-    return new OwnCredentialsList(creds_list_);
+    return new SecurityLevel3::OwnCredentialsList(creds_list_);
 }
 
 
@@ -1294,7 +1294,7 @@ CORBA::PolicyType
 MICOSL3_SecurityLevel3::ContextEstablishmentPolicy_impl::policy_type()
 {
     //cerr << "ContextEstablishmentPolicy_impl::policy_type()" << endl;
-    return ContextEstablishmentPolicyType;
+    return SecurityLevel3::ContextEstablishmentPolicyType;
 }
 
 
@@ -1367,17 +1367,17 @@ SecurityLevel3::TargetCredentials_ptr
 MICOSL3_SecurityLevel3::TargetCredsHolder::csi_creds(const string& key)
 {
     if (creds_map_.count(key) > 0) {
-	return TargetCredentials::_duplicate(creds_map_[key]);
+	return SecurityLevel3::TargetCredentials::_duplicate(creds_map_[key]);
     }
-    return TargetCredentials::_nil();
+    return SecurityLevel3::TargetCredentials::_nil();
 }
 
 
 void
 MICOSL3_SecurityLevel3::TargetCredsHolder::csi_creds
-(const string& key, TargetCredentials_ptr creds)
+(const string& key, SecurityLevel3::TargetCredentials_ptr creds)
 {
-    creds_map_[key] = TargetCredentials::_duplicate(creds);
+    creds_map_[key] = SecurityLevel3::TargetCredentials::_duplicate(creds);
 }
 
 
@@ -1388,7 +1388,7 @@ MICOSL3_SecurityLevel3::TargetCredsHolder::release_credentials(const char* id)
     for (TargetCredentialsMapIterator it = creds_map_.begin();
 	 it != creds_map_.end();
 	 it++) {
-	OwnCredentials_var tcr = (*it).second->parent_credentials();
+        SecurityLevel3::OwnCredentials_var tcr = (*it).second->parent_credentials();
 	CORBA::String_var parent_id = tcr->creds_id();
 	if (strcmp(parent_id.in(), id) == 0) {
 	    string key = (*it).first;
@@ -1398,7 +1398,7 @@ MICOSL3_SecurityLevel3::TargetCredsHolder::release_credentials(const char* id)
 		(creds_map_[key].in());
 	    assert(impl != NULL);
 	    impl->notify_release();
-	    creds_map_[key] = TargetCredentials::_nil();
+	    creds_map_[key] = SecurityLevel3::TargetCredentials::_nil();
 	}
     }
     while (!key_stack.empty()) {
@@ -1428,49 +1428,49 @@ SecurityLevel3::ClientCredentials_ptr
 MICOSL3_SecurityLevel3::ClientCredsHolder::csi_creds(const string& key)
 {
     if (creds_map_.count(key) > 0) {
-	return ClientCredentials::_duplicate(creds_map_[key]);
+	return SecurityLevel3::ClientCredentials::_duplicate(creds_map_[key]);
     }
-    return ClientCredentials::_nil();
+    return SecurityLevel3::ClientCredentials::_nil();
 }
 
 
 void
 MICOSL3_SecurityLevel3::ClientCredsHolder::csi_creds
-(const string& key, ClientCredentials_ptr creds)
+(const string& key, SecurityLevel3::ClientCredentials_ptr creds)
 {
-    creds_map_[key] = ClientCredentials::_duplicate(creds);
+    creds_map_[key] = SecurityLevel3::ClientCredentials::_duplicate(creds);
 }
 
 
-ClientCredentials_ptr
+SecurityLevel3::ClientCredentials_ptr
 MICOSL3_SecurityLevel3::ClientCredsHolder::current_creds()
 {
 #ifdef HAVE_THREADS
-    ClientCredentials_ptr creds
-	= static_cast<ClientCredentials*>
+    SecurityLevel3::ClientCredentials_ptr creds
+	= static_cast<SecurityLevel3::ClientCredentials*>
 	(MICOMT::Thread::get_specific(thread_key_));
-    return ClientCredentials::_duplicate(creds);
+    return SecurityLevel3::ClientCredentials::_duplicate(creds);
 #else // HAVE_THREADS
-    return ClientCredentials::_duplicate(current_creds_);
+    return SecurityLevel3::ClientCredentials::_duplicate(current_creds_);
 #endif // HAVE_THREADS
 }
 
 
 void
 MICOSL3_SecurityLevel3::ClientCredsHolder::current_creds
-(ClientCredentials_ptr creds)
+(SecurityLevel3::ClientCredentials_ptr creds)
 {
 #ifdef HAVE_THREADS
-    ClientCredentials_ptr prev_creds
-	= static_cast<ClientCredentials*>
+    SecurityLevel3::ClientCredentials_ptr prev_creds
+	= static_cast<SecurityLevel3::ClientCredentials*>
 	(MICOMT::Thread::get_specific(thread_key_));
     if (!CORBA::is_nil(prev_creds)) {
 	CORBA::release(prev_creds);
     }
     MICOMT::Thread::set_specific
-	(thread_key_, ClientCredentials::_duplicate(creds));
+	(thread_key_, SecurityLevel3::ClientCredentials::_duplicate(creds));
 #else // HAVE_THREADS
-    current_creds_ = ClientCredentials::_duplicate(creds);
+    current_creds_ = SecurityLevel3::ClientCredentials::_duplicate(creds);
 #endif // HAVE_THREADS
 }
 
@@ -1483,7 +1483,7 @@ MICOSL3_SecurityLevel3::ClientCredsHolder::release_credentials(const char* id)
     for (ClientCredentialsMapIterator it = creds_map_.begin();
 	 it != creds_map_.end();
 	 it++) {
-	OwnCredentials_var tcr = (*it).second->parent_credentials();
+        SecurityLevel3::OwnCredentials_var tcr = (*it).second->parent_credentials();
 	CORBA::String_var parent_id = tcr->creds_id();
 	if (strcmp(parent_id.in(), id) == 0) {
 	    string key = (*it).first;
@@ -1494,7 +1494,7 @@ MICOSL3_SecurityLevel3::ClientCredsHolder::release_credentials(const char* id)
 		(creds_map_[key].in());
 	    assert(impl != NULL);
 	    impl->notify_release();
-	    creds_map_[key] = ClientCredentials::_nil();
+	    creds_map_[key] = SecurityLevel3::ClientCredentials::_nil();
 	}
     }
     while (!key_stack.empty()) {
@@ -1503,6 +1503,6 @@ MICOSL3_SecurityLevel3::ClientCredsHolder::release_credentials(const char* id)
 	long i = creds_map_.erase(key);
 	assert(i == 1);
     }
-    this->current_creds(ClientCredentials::_nil());
+    this->current_creds(SecurityLevel3::ClientCredentials::_nil());
 }
 

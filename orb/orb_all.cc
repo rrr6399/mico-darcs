@@ -68,6 +68,9 @@
 
 #include "timebase.cc"
 
+#include "reflection.cc"
+#include "mttypes.cc"
+
 // needed by both CSIv2 and CSL2
 #if (defined(USE_CSL2)) || (defined(USE_CSIV2))
 #include "security/csi_base.cc"
@@ -80,6 +83,37 @@
 #include "security/csiv2.cc"
 #include "security/csiv2_impl.cc"
 #endif // USE_CSIV2
+
+#ifdef USE_SL3
+#include "security/atlas.cc"
+#include "security/sl3pm.cc"
+#include "security/sl3cm.cc"
+#include "security/sl3om.cc"
+#include "security/securitylevel3.cc"
+#include "security/transportsecurity.cc"
+#include "security/transportsecurity_p.cc"
+#include "security/sl3aqargs.cc"
+#include "security/sl3tcpip.cc"
+#include "security/sl3tls.cc"
+#include "security/sl3aqargs_p.cc"
+#include "security/sl3csi.cc"
+#include "security/userpassword.cc"
+#include "security/trust.cc"
+#include "security/sl3authorization.cc"
+#include "security/sl3ipc.cc"
+#include "security/sl3omext.cc"
+#include "security/sl3pm_impl.cc"
+#include "security/securitylevel3_impl.cc"
+#include "security/transportsecurity_impl.cc"
+#include "security/sl3tcpip_impl.cc"
+#include "security/sl3aqargs_p_impl.cc"
+#include "security/sl3aqargs_impl.cc"
+#include "security/sl3utils.cc"
+#include "security/sl3csi_impl.cc"
+#include "security/sl3tls_impl.cc"
+#include "security/sl3ipc_impl.cc"
+#include "security/sl3cmdext.cc"
+#endif // USE_SL3
 
 #ifdef USE_CSL2
 #include "security/security.cc"
@@ -113,3 +147,13 @@
 #include "mt_dispatcher.cc"
 #include "mt_manager.cc"
 #endif // HAVE_THREADS
+
+#ifdef USE_MESSAGING
+#include "messaging.cc"
+#include "messaging_impl.cc"
+#endif // USE_MESSAGING
+
+#ifdef THREADING_POLICIES
+#include "mtpolicy.cc"
+#include "mtpolicy_impl.cc"
+#endif // THREADING_POLICIES

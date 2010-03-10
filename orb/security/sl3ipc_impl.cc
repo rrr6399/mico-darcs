@@ -1,6 +1,6 @@
 //
 //  MICO SL3 --- an Open Source SL3 implementation
-//  Copyright (C) 2004 ObjectSecurity Ltd.
+//  Copyright (C) 2004, 2010 ObjectSecurity Ltd.
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Library General Public
@@ -298,7 +298,7 @@ MICOSL3_SL3IPC::CredentialsAcquirer_impl::~CredentialsAcquirer_impl()
 }
 
 
-OwnCredentials_ptr
+TransportSecurity::OwnCredentials_ptr
 MICOSL3_SL3IPC::CredentialsAcquirer_impl::get_credentials
 (CORBA::Boolean on_list)
 {
@@ -357,7 +357,7 @@ MICOSL3_SL3IPC::CredentialsAcquirerFactory_impl::CredentialsAcquirerFactory_impl
 }
 
 
-CredentialsAcquirer_ptr
+TransportSecurity::CredentialsAcquirer_ptr
 MICOSL3_SL3IPC::CredentialsAcquirerFactory_impl::create
 (Argument_ptr value)
 {
@@ -818,9 +818,9 @@ MICOSL3_SL3IPC::ORBInitializer::post_init
 {
     CORBA::Object_var obj = info->resolve_initial_references
 	("TransportSecurity::SecurityManager");
-    SecurityManager_var secman = SecurityManager::_narrow(obj);
+    TransportSecurity::SecurityManager_var secman = TransportSecurity::SecurityManager::_narrow(obj);
     assert(!CORBA::is_nil(secman));
-    CredentialsCurator_ptr curator = secman->credentials_curator();
+    TransportSecurity::CredentialsCurator_ptr curator = secman->credentials_curator();
     MICOSL3_TransportSecurity::CredentialsCurator_impl* curator_impl
 	= dynamic_cast<MICOSL3_TransportSecurity::CredentialsCurator_impl*>
 	(curator);
@@ -850,59 +850,59 @@ MICOSL3_SL3IPC::IPCCredsMapper::self()
 }
 
 
-ClientCredentials_ptr
-MICOSL3_SL3IPC::IPCCredsMapper::get_client_credentials(OwnCredentials_ptr creds)
+TransportSecurity::ClientCredentials_ptr
+MICOSL3_SL3IPC::IPCCredsMapper::get_client_credentials(TransportSecurity::OwnCredentials_ptr creds)
 {
     assert(!CORBA::is_nil(creds));
     String_var id = creds->creds_id();
     string key = id.in();
     if (client_creds_map_.count(key) > 0) {
-	return ClientCredentials::_duplicate(client_creds_map_[key]);
+	return TransportSecurity::ClientCredentials::_duplicate(client_creds_map_[key]);
     }
-    return ClientCredentials::_nil();
+    return TransportSecurity::ClientCredentials::_nil();
 }
 
-TargetCredentials_ptr
-MICOSL3_SL3IPC::IPCCredsMapper::get_target_credentials(OwnCredentials_ptr creds)
+TransportSecurity::TargetCredentials_ptr
+MICOSL3_SL3IPC::IPCCredsMapper::get_target_credentials(TransportSecurity::OwnCredentials_ptr creds)
 {
     assert(!CORBA::is_nil(creds));
     String_var id = creds->creds_id();
     string key = id.in();
     if (target_creds_map_.count(key) > 0) {
-	return TargetCredentials::_duplicate(target_creds_map_[key]);
+	return TransportSecurity::TargetCredentials::_duplicate(target_creds_map_[key]);
     }
-    return TargetCredentials::_nil();
+    return TransportSecurity::TargetCredentials::_nil();
 }
 
 
 void
 MICOSL3_SL3IPC::IPCCredsMapper::add_client_credentials
-(OwnCredentials_ptr own_creds,
- ClientCredentials_ptr client_creds)
+(TransportSecurity::OwnCredentials_ptr own_creds,
+ TransportSecurity::ClientCredentials_ptr client_creds)
 {
     assert(!CORBA::is_nil(own_creds));
     String_var id = own_creds->creds_id();
     string key = id.in();
     assert(client_creds_map_.count(key) == 0);
-    client_creds_map_[key] = ClientCredentials::_duplicate(client_creds);
+    client_creds_map_[key] = TransportSecurity::ClientCredentials::_duplicate(client_creds);
 }
 
 
 void
 MICOSL3_SL3IPC::IPCCredsMapper::add_target_credentials
-(OwnCredentials_ptr own_creds,
- TargetCredentials_ptr target_creds)
+(TransportSecurity::OwnCredentials_ptr own_creds,
+ TransportSecurity::TargetCredentials_ptr target_creds)
 {
     assert(!CORBA::is_nil(own_creds));
     String_var id = own_creds->creds_id();
     string key = id.in();
     assert(target_creds_map_.count(key) == 0);
-    target_creds_map_[key] = TargetCredentials::_duplicate(target_creds);
+    target_creds_map_[key] = TransportSecurity::TargetCredentials::_duplicate(target_creds);
 }
 
 
 void
-MICOSL3_SL3IPC::IPCCredsMapper::remove_credentials(OwnCredentials_ptr own_creds)
+MICOSL3_SL3IPC::IPCCredsMapper::remove_credentials(TransportSecurity::OwnCredentials_ptr own_creds)
 {
     assert(0);
 }

@@ -1,6 +1,6 @@
 //
 //  MICO SL3 --- an Open Source SL3 implementation
-//  Copyright (C) 2003, 2004, 2005, 2006 ObjectSecurity Ltd.
+//  Copyright (C) 2003, 2004, 2005, 2006, 2010 ObjectSecurity Ltd.
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Library General Public
@@ -403,7 +403,7 @@ MICOSL3_SL3TLS::CredentialsAcquirer_impl::~CredentialsAcquirer_impl()
 }
 
 
-OwnCredentials_ptr
+TransportSecurity::OwnCredentials_ptr
 MICOSL3_SL3TLS::CredentialsAcquirer_impl::get_credentials
 (CORBA::Boolean on_list)
 {
@@ -466,7 +466,7 @@ MICOSL3_SL3TLS::CredentialsAcquirerFactory_impl::CredentialsAcquirerFactory_impl
 }
 
 
-CredentialsAcquirer_ptr
+TransportSecurity::CredentialsAcquirer_ptr
 MICOSL3_SL3TLS::CredentialsAcquirerFactory_impl::create(Argument_ptr value)
 {
     return new CredentialsAcquirer_impl(value);
@@ -810,14 +810,14 @@ MICOSL3_SL3TLS::TLSAcceptor::enable()
 		    MICO::Logger::Stream(MICO::Logger::Security)
 			<< "SL3TLS: naddr: " << naddr << endl;
 		}
-		Address* addr = Address::parse(naddr.c_str());
+                CORBA::Address* addr = CORBA::Address::parse(naddr.c_str());
 		assert(addr);
-                Address* ior_addr = NULL;
+                CORBA::Address* ior_addr = NULL;
                 if (hosts->length() == 1) {
                     string ior_addr_str = "ssl:inet:";
                     ior_addr_str +=  hosts[(CORBA::ULong)0].in();
                     ior_addr_str += ":" + xdec(i);
-                    ior_addr = Address::parse(ior_addr_str.c_str());
+                    ior_addr = CORBA::Address::parse(ior_addr_str.c_str());
                 }
 		if (server->listen(addr, ior_addr)) {
 		    i_addr = dynamic_cast<MICOSSL::SSLAddress*>(addr);
@@ -845,14 +845,14 @@ MICOSL3_SL3TLS::TLSAcceptor::enable()
 		MICO::Logger::Stream(MICO::Logger::Security)
 		    << "SL3TLS: naddr2: " << naddr << endl;
 	    }
-	    Address* addr = Address::parse(naddr.c_str());
+            CORBA::Address* addr = CORBA::Address::parse(naddr.c_str());
 	    assert(addr);
-            Address* ior_addr = NULL;
+            CORBA::Address* ior_addr = NULL;
             if (hosts->length() == 1) {
                 string ior_addr_str = "ssl:inet:";
                 ior_addr_str +=  hosts[(CORBA::ULong)0].in();
                 ior_addr_str += ":" + xdec(this->low_port());
-                ior_addr = Address::parse(ior_addr_str.c_str());
+                ior_addr = CORBA::Address::parse(ior_addr_str.c_str());
             }
 	    if (server->listen(addr, ior_addr)) {
 		i_addr = dynamic_cast<MICOSSL::SSLAddress*>(addr);
@@ -886,15 +886,15 @@ MICOSL3_SL3TLS::TLSAcceptor::enable()
 	    MICO::Logger::Stream(MICO::Logger::Security)
 		<< "SL3TLS: naddr3: " << naddr << endl;
 	}
-	Address* addr = Address::parse(naddr.c_str());
-        const Address* baddr;
+        CORBA::Address* addr = CORBA::Address::parse(naddr.c_str());
+        const CORBA::Address* baddr;
 	assert(addr);
         if (hosts->length() > 0) {
             // unsupported case
             assert(0);
         }
 	if (server->listen(addr, 0, baddr)) {
-            Address* clone_addr = baddr->clone();
+            CORBA::Address* clone_addr = baddr->clone();
 	    i_addr = dynamic_cast<MICOSSL::SSLAddress*>(clone_addr);
 	    assert(i_addr != NULL);
 	}
@@ -1343,9 +1343,9 @@ MICOSL3_SL3TLS::ORBInitializer::post_init
 {
     CORBA::Object_var obj = info->resolve_initial_references
 	("TransportSecurity::SecurityManager");
-    SecurityManager_var secman = SecurityManager::_narrow(obj);
+    TransportSecurity::SecurityManager_var secman = TransportSecurity::SecurityManager::_narrow(obj);
     assert(!CORBA::is_nil(secman));
-    CredentialsCurator_ptr curator = secman->credentials_curator();
+    TransportSecurity::CredentialsCurator_ptr curator = secman->credentials_curator();
     MICOSL3_TransportSecurity::CredentialsCurator_impl* curator_impl
 	= dynamic_cast<MICOSL3_TransportSecurity::CredentialsCurator_impl*>
 	(curator);

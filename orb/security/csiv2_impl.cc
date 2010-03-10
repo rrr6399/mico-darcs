@@ -1,6 +1,6 @@
 //
 //  MICO CSIv2 --- an Open Source CSIv2 implementation
-//  Copyright (C) 2002, 2003, 2004, 2005 ObjectSecurity Ltd.
+//  Copyright (C) 2002, 2003, 2004, 2005, 2010 ObjectSecurity Ltd.
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Library General Public
@@ -805,7 +805,7 @@ CSIv2::CSS_impl::create_csi_creds
 	    MICOSL3_SL3CSI::CSICredsInitiator* initiator_impl
 		= dynamic_cast<MICOSL3_SL3CSI::CSICredsInitiator*>(initiator.in());
 	    assert(initiator_impl != NULL);
-	    Principal_var creds_princ = initiator->the_principal();
+            SL3PM::Principal_var creds_princ = initiator->the_principal();
 	    TokenProcessor_var token_processor = TokenProcessor::_nil();
 	    SL3AQArgs::TokenProcessorSeq_var tpseq = initiator_impl->tpseq();
 	    if (authorization_token.length() > 0
@@ -833,7 +833,7 @@ CSIv2::CSS_impl::create_csi_creds
 	    AuthorizationInfo* auth_info = NULL;
 	    if (!CORBA::is_nil(token_processor)) {
 		// we have suitable token processor
-		Principal_var transport_principal
+                SL3PM::Principal_var transport_principal
 		    = t_creds->client_principal();
 		StatementList_var transport_statements
 		    = t_creds->client_supporting_statements();
@@ -849,7 +849,7 @@ CSIv2::CSS_impl::create_csi_creds
 		if (creds_princ->the_type() == PT_Quoting) {
 		    QuotingPrincipal* quoting = QuotingPrincipal::_downcast
 			(creds_princ);
-		    Principal* speaking = quoting->speaking();
+                    SL3PM::Principal* speaking = quoting->speaking();
 		    if (speaking->the_type() == PT_Proxy) {
 			ProxyPrincipal* proxy = ProxyPrincipal::_downcast
 			    (quoting->speaking());
@@ -864,7 +864,7 @@ CSIv2::CSS_impl::create_csi_creds
 			break;
 		    }
 		}
-		Principal* identity_assert_principal = NULL;
+                SL3PM::Principal* identity_assert_principal = NULL;
 		StatementList identity_assert_statements;
 		identity_assert_statements.length(0);
 		auth_info = token_processor->accept_token
@@ -878,15 +878,15 @@ CSIv2::CSS_impl::create_csi_creds
 		     authorization_token);
 		
 	    }
-	    Principal* client_principal = NULL;
+            SL3PM::Principal* client_principal = NULL;
 	    if (creds_princ->the_type() == PT_Proxy) {
 		// proxy principal
 		ProxyPrincipal* orig_princ
 		    = ProxyPrincipal::_downcast(creds_princ);
 		assert(orig_princ != NULL);
 		client_principal = new MICOSL3_SL3PM::ProxyPrincipal_impl
-		    (Principal::_downcast(orig_princ->speaking()->_copy_value()),
-		     Principal::_downcast(orig_princ->speaks_for()->_copy_value()));
+		    (SL3PM::Principal::_downcast(orig_princ->speaking()->_copy_value()),
+		     SL3PM::Principal::_downcast(orig_princ->speaks_for()->_copy_value()));
 	    }
 	    else if (creds_princ->the_type() == PT_Quoting) {
 		// quoting principal
@@ -907,7 +907,7 @@ CSIv2::CSS_impl::create_csi_creds
 		assert(0);
 	    }
 	    assert(client_principal != NULL);
-	    Principal_var t_princ = t_creds->client_principal();
+            SL3PM::Principal_var t_princ = t_creds->client_principal();
 //  		    PrinAttributeList attrs = t_princ->environmental_attributes();
 //  		    client_principal->speaking()->environmental_attributes(attrs);
 //  		    client_principal->environmental_attributes(attrs);
@@ -954,7 +954,7 @@ CSIv2::CSS_impl::create_csi_creds
 	    res.length(0);
 	    target_creds->client_restricted_resources(res);
 	    target_creds->target_principal
-		(Principal::_downcast(t_creds->target_principal()->_copy_value()));
+		(SL3PM::Principal::_downcast(t_creds->target_principal()->_copy_value()));
 	    StatementList_var transp_target_stats = t_creds->target_supporting_statements();
 	    target_creds->target_supporting_statements(transp_target_stats.in());
 	    PrinAttributeList_var env_attrs = t_creds->environmental_attributes();
@@ -1303,7 +1303,7 @@ CSIv2::TSS_impl::accept_transport_context()
 	SL3TLS::TLSX509IdentityProcessor_var identity_processor
 	    = acceptor_impl->identity_processor();
 	if (!CORBA::is_nil(identity_processor)) {
-	    Principal* client_princ = ts_client_creds->client_principal();
+            SL3PM::Principal* client_princ = ts_client_creds->client_principal();
 	    PrincipalName auth_name = client_princ->the_name();
 	    PrincipalName identity_name;
 	    AuthorizationToken token;
@@ -2151,7 +2151,7 @@ CSIv2::SecurityManager_impl::client_identity_token
 	assert(!CORBA::is_nil(creds));
 	SecurityLevel3::CredsInitiator_var initiator = creds->creds_initiator();
 	assert(!CORBA::is_nil(initiator));
-	Principal_var pr = initiator->the_principal();
+        SL3PM::Principal_var pr = initiator->the_principal();
 	QuotingPrincipal* qp = NULL;
 	if (pr->the_type() == PT_Quoting
 	    && ((qp = QuotingPrincipal::_downcast(pr)) != NULL)) {
@@ -2551,7 +2551,7 @@ CSIv2::SecurityManager_impl::create_csi_creds
 	creds->creds_state(CS_Valid);
 	creds->context_id(cid.c_str());
 	// transport principal
-	Principal_var transport_principal
+        SL3PM::Principal_var transport_principal
 	    = transp_client_creds->client_principal();
 	StatementList_var transport_statements
 	    = transp_client_creds->client_supporting_statements();
@@ -2642,7 +2642,7 @@ CSIv2::SecurityManager_impl::create_csi_creds
 		 identity_assert_statements,
 		 auth_token);
 	}
-	Principal_var client_principal = NULL;
+        SL3PM::Principal_var client_principal = NULL;
 	if (info != NULL) {
 	    // manage info information
 	    creds->client_principal(info->the_principal);
@@ -2684,7 +2684,7 @@ CSIv2::SecurityManager_impl::create_csi_creds
 	    }
 	    creds->client_supporting_statements(csstats);
 	}
-	Principal_var transp_target_principal
+        SL3PM::Principal_var transp_target_principal
 	    = transp_client_creds->target_principal();
 	creds->target_principal(transp_target_principal);
 	StatementList_var tsstats
