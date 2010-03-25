@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2010 by The Mico Team
+ *  Copyright (c) 1997-2008 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -3356,10 +3356,10 @@ CORBA::ORB_init (int &argc, char **argv, const char *_id)
     // for default thread-pool concurrency model
     // Other concurrency model have default connection limit
     // set to 128.
-    ULong conn_limit = 0;
+    ULong conn_limit = 1024;
     ULong request_limit = 128; // kind of sane value for 2008
-    Boolean thread_pool = TRUE;
-    Boolean thread_per_connection = FALSE;
+    Boolean thread_pool = FALSE;
+    Boolean thread_per_connection = TRUE;
     ClientConcurrencyModel client_concurrency_model = THREADED;
 #endif // HAVE_THREADS
 #ifdef MTDEBUG
@@ -3551,7 +3551,7 @@ CORBA::ORB_init (int &argc, char **argv, const char *_id)
 	    thread_pool = FALSE;	    
 	    thread_per_connection = TRUE;
 	    if (conn_limit < 1)
-		conn_limit = 128;
+		conn_limit = 1024;
 	} else if (arg == "-ORBConnLimit") {
 	    conn_limit = atoi (val.c_str ());
 	} else if (arg == "-ORBRequestLimit") {
