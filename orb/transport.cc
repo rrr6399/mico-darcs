@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2005 by The Mico Team
+ *  Copyright (c) 1997-2010 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -307,6 +307,7 @@ MICO::SocketTransportServer::SocketTransportServer ()
 {
 #ifdef HAVE_THREADS
     __NAME( name( "SocketTransportServer" ) );
+    this->worker_thread_ = NULL;
 #endif // HAVE_THREADS
     listening = FALSE;
 
@@ -327,6 +328,10 @@ MICO::SocketTransportServer::~SocketTransportServer ()
     OSNet::sock_shutdown(fd);
     OSNet::sock_close (fd);
 #ifdef HAVE_THREADS
+    if (this->worker_thread_ != NULL) {
+        this->worker_thread_->deregister_operation(this);
+        this->worker_thread_->mark_idle();
+    }
     this->finalize_shutdown();
 #endif // HAVE_THREADS
 }
@@ -443,6 +448,7 @@ MICO::SocketTransportServer::create_thread() {
     WorkerThread *kt = MICO::MTManager::thread_pool_manager()->get_thread_pool( MICO::Operation::Accept ).get_idle_thread();
     kt->register_operation( this );
     kt->mark_busy();
+    this->worker_thread_ = kt;
 }
 
 void
