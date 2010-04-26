@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2010 by The Mico Team
+ *  Copyright (c) 1997-2008 by The Mico Team
  * 
  *  OSThread: An abstract Thread class for MICO
  *  Copyright (C) 1999 Andy Kersting & Andreas Schultz
@@ -43,6 +43,12 @@ using namespace std;
 // Global things (used/defined ONLY when HAVE_THREADS is defined)
 //
 #ifdef HAVE_THREADS  
+
+pthread_mutexattr_t
+MICOMT::Mutex::S_normal_mutex_attr_;
+
+pthread_mutexattr_t
+MICOMT::Mutex::S_recursive_mutex_attr_;
 
 static pthread_mutex_t __debug_mutex = PTHREAD_MUTEX_INITIALIZER;
 //static pthread_mutex_t __debug_mutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
@@ -364,7 +370,6 @@ MICOMT::Mutex::Mutex(MICO_Boolean locked, Attribute attr)
 #endif // DEBUG_NAMES
 {
     int result;
-    pthread_mutexattr_t m_attr;
 #ifdef MTDEBUG
     if (MICO::Logger::IsLogged(MICO::Logger::Thread)) {
 	__mtdebug_lock();
@@ -384,27 +389,36 @@ MICOMT::Mutex::Mutex(MICO_Boolean locked, Attribute attr)
     _cnt = 0;
     _rec = 0;
 #endif
-    result = pthread_mutexattr_init(&m_attr);
-    assert(!result);
-    if (attr != Normal) {
-	switch (attr) {
-	case Recursive:
+    if (attr == Normal) {
+        result = pthread_mutex_init(&_mutex, &S_normal_mutex_attr_);
+        if (result == EINVAL) {
+            // perhaps mutex attribute is not initialized yet?
+            int res2 = pthread_mutexattr_init(&MICOMT::Mutex::S_normal_mutex_attr_);
+            assert(!res2);
+            result = pthread_mutex_init(&_mutex, &S_normal_mutex_attr_);
+        }
+        assert(!result);
+    }
+    else if (attr == Recursive) {
 #ifdef SOLARIS_MUTEX
 	    _rec = 1;
 #else // SOLARIS_MUTEX
-            result = pthread_mutexattr_settype(&m_attr,
-					       PTHREAD_MUTEX_RECURSIVE);
+            result = pthread_mutex_init(&_mutex, &S_recursive_mutex_attr_);
+            if (result == EINVAL) {
+                // perhaps mutex attribute is not initialized yet?
+                int res2 = pthread_mutexattr_init(&MICOMT::Mutex::S_recursive_mutex_attr_);
+                assert(!res2);
+                res2 = pthread_mutexattr_settype(&MICOMT::Mutex::S_recursive_mutex_attr_,
+                                                 PTHREAD_MUTEX_RECURSIVE);
+                assert (!res2);
+                result = pthread_mutex_init(&_mutex, &S_recursive_mutex_attr_);
+            }
 	    assert (!result);
 #endif // SOLARIS_MUTEX
-	    break;
-	default:
-	    break;
-	}
     }
-    result = pthread_mutex_init(&_mutex, &m_attr);
-    assert(!result);
-    result = pthread_mutexattr_destroy(&m_attr); 
-    assert(!result);
+    else {
+        assert(0);
+    }
     if (locked)
 	this->lock();
 }
