@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2008 by The Mico Team
+ *  Copyright (c) 1997-2010 by The Mico Team
  * 
  *  OSThread: An abstract Thread class for MICO
  *  Copyright (C) 1999 Andy Kersting & Andreas Schultz
@@ -214,6 +214,10 @@ protected:
     unsigned int _cnt;	//!< Counter of recursive mutex
     unsigned int _rec;	//!< Is mutex recursive?
 #endif // SOLARIS_MUTEX
+
+private:
+    static pthread_mutexattr_t S_normal_mutex_attr_;
+    static pthread_mutexattr_t S_recursive_mutex_attr_;
 };
 
 
