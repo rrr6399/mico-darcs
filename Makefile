@@ -1,7 +1,7 @@
 #
 # MICO --- a free CORBA implementation
 # Copyright (C) 1997 Kay Roemer & Arno Puder
-# Copyright (c) 1998-2008 by The Mico Team
+# Copyright (c) 1998-2010 by The Mico Team
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ INSTALLDIRS = admin orb ir daemon idl cpp auxdir coss ccm tools include man demo
 MINLIBDIRS = orb ir idl
 MINPRGDIRS = cpp idl
 
-all: system
+all .NOTPARALLEL: dep system
 
 world .NOTPARALLEL: system extra
 
