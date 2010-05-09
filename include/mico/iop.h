@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2008 by The Mico Team
+ *  Copyright (c) 1997-2010 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -891,17 +891,29 @@ class IIOPServer : public CORBA::ObjectAdapter,
 		   public CORBA::ORBCallback, public GIOPConnCallback, public GIOPConnMgr,
 		   public CORBA::TransportServerCallback {
     typedef CORBA::ULong MsgId;
+public:
+    // this needs to be public typedef due to type usage in
+    // IIOPServer_cleanup_idrecmap function
     typedef std::map<MsgId, IIOPServerInvokeRec *, std::less<MsgId> > MapIdConn;
+private:
     typedef std::list<GIOPConn *> ListConn;
     typedef std::vector<CORBA::TransportServer*> VecTranspServ;
-
+#ifdef HAVE_THREADS
+    typedef std::map<MICOMT::Thread::ThreadID, MICOMT::Locked<MapIdConn>*> ThreadIdRecMap;
+public:
+    static MICOMT::Thread::ThreadKey S_idrec_map_key_;
+#endif // HAVE_THREADS
+private:
     MICOMT::Locked<VecTranspServ> _tservers;
 
     MICOMT::Locked<ListConn> _conns;
 
+#ifndef HAVE_THREADS
     MapIdConn _orbids;
+#else // HAVE_THREADS
     MICOMT::Mutex _orbids_mutex;
-
+    ThreadIdRecMap _orbids;
+#endif // HAVE_THREADS
     CORBA::ORB_ptr _orb;
 
 #ifdef USE_IOP_CACHE
