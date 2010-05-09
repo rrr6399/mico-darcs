@@ -50,6 +50,10 @@
 #include <mico/messaging.h>
 #endif // USE_MESSAGING
 
+#ifdef HAVE_SOLARIS_ATOMICS
+#include <atomic.h>
+#endif // HAVE_SOLARIS_ATOMICS
+
 #endif // FAST_PCH
 
 
@@ -117,6 +121,9 @@ CORBA::ServerlessObject::_ref ()
 #if defined(HAVE_GCC_ATOMICS)
     _check();
     __sync_fetch_and_add(&refs, 1);
+#elif defined(HAVE_SOLARIS_ATOMICS)
+    _check();
+    atomic_inc_ulong((ULong*)&refs);
 #else
     MICOMT::AutoLock lock(refslock);
     _check ();
@@ -129,6 +136,8 @@ CORBA::ServerlessObject::_deref ()
 {
 #if defined(HAVE_GCC_ATOMICS)
     return _check_nothrow() && __sync_sub_and_fetch(&refs, 1) <= 0;
+#elif defined(HAVE_SOLARIS_ATOMICS)
+    return _check_nothrow() && atomic_dec_ulong_nv((ULong*)&refs) <= 0;
 #else
     MICOMT::AutoLock lock(refslock);
     return _check_nothrow() && --refs <= 0;

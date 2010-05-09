@@ -29,9 +29,9 @@ namespace CORBA {
 // base class for all serverless objects
 class ServerlessObject : public MagicChecker {
     Long refs;
-#if !defined(HAVE_GCC_ATOMICS)
+#if !defined(HAVE_GCC_ATOMICS) && !defined(HAVE_SOLARIS_ATOMICS)
     MICOMT::Mutex refslock;
-#endif // !HAVE_GCC_ATOMICS
+#endif // !HAVE_GCC_ATOMICS && !HAVE_SOLARIS_ATOMICS
 public:
     virtual ~ServerlessObject ();
 

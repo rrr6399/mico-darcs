@@ -174,6 +174,9 @@
 /* Define if you have libumem available on your system */
 #undef HAVE_UMEM
 
+/* Define if you have Solaris OS which supports atomic functions in libc (atomic.h)*/
+#undef HAVE_SOLARIS_ATOMICS
+
 /* The number of bytes in a double.  */
 #undef SIZEOF_DOUBLE
 
@@ -215,6 +218,15 @@
 
 /* Define if you have the asinl function.  */
 #undef HAVE_ASINL
+
+/* Define if you have the atomic_dec_ulong_nv function.  */
+#undef HAVE_ATOMIC_DEC_ULONG_NV
+
+/* Define if you have the atomic_inc_ulong function.  */
+#undef HAVE_ATOMIC_INC_ULONG
+
+/* Define if you have the atomic_inc_ulong_nv function.  */
+#undef HAVE_ATOMIC_INC_ULONG_NV
 
 /* Define if you have the backtrace function.  */
 #undef HAVE_BACKTRACE
@@ -284,6 +296,9 @@
 
 /* Define if you have the <arpa/inet.h> header file.  */
 #undef HAVE_ARPA_INET_H
+
+/* Define if you have the <atomic.h> header file.  */
+#undef HAVE_ATOMIC_H
 
 /* Define if you have the <bfd.h> header file.  */
 #undef HAVE_BFD_H
