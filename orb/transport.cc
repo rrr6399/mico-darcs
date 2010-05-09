@@ -65,6 +65,7 @@ CORBA::TransportServerCallback::~TransportServerCallback ()
 
 CORBA::Transport::~Transport ()
 {
+    CORBA::release(principal_);
 }
 
 CORBA::Long
@@ -102,7 +103,10 @@ CORBA::Transport::isbuffering ()
 CORBA::Principal_ptr
 CORBA::Transport::get_principal ()
 {
-    return new CORBA::Principal (this);
+    if (CORBA::is_nil(principal_)) {
+        principal_ = new CORBA::Principal(this);
+    }
+    return CORBA::Principal::_duplicate(principal_);
 }
 
 /*********************** SocketTransport *****************************/
