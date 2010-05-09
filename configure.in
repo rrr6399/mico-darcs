@@ -1353,9 +1353,6 @@ AC_MSG_RESULT($have_ansi_cplusplus_headers)
 AC_CHECK_HEADERS(cxxabi.h)
 AC_CHECK_FUNCS([__cxa_demangle])
 
-# GNU C++/GLIBC forced unwind exception support
-AC_CHECK_FORCED_UNWIND
-
 #
 # Checks for typedefs, structures, and compiler characteristics.
 #

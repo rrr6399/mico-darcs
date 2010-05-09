@@ -114,16 +114,25 @@ CORBA::ServerlessObject::~ServerlessObject ()
 void
 CORBA::ServerlessObject::_ref ()
 {
+#if defined(HAVE_GCC_ATOMICS)
+    _check();
+    __sync_fetch_and_add(&refs, 1);
+#else
     MICOMT::AutoLock lock(refslock);
     _check ();
     ++refs;
+#endif
 }
 
 CORBA::Boolean
 CORBA::ServerlessObject::_deref ()
 {
+#if defined(HAVE_GCC_ATOMICS)
+    return _check_nothrow() && __sync_sub_and_fetch(&refs, 1) <= 0;
+#else
     MICOMT::AutoLock lock(refslock);
     return _check_nothrow() && --refs <= 0;
+#endif // HAVE_GCC_ATOMICS
 }
 
 CORBA::Long
