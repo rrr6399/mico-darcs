@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2007 by The Mico Team
+ *  Copyright (c) 1997-2010 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -126,6 +126,12 @@ public:
     virtual CORBA::Principal_ptr get_principal ();
 
     virtual ~Transport ();
+
+    Transport()
+        : principal_(NULL)
+    {}
+private:
+    CORBA::Principal_ptr principal_;
 };
 
 struct TransportCallback {
