@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2008 by The Mico Team
+ *  Copyright (c) 1997-2010 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -246,7 +246,13 @@ private:
     MICOMT::Locked<isa_cacheList> _isa_cache;
     std::vector<std::string> _bindaddrs;
     MICOMT::RWLocked<OAVec> _adapters;
-    MICOMT::RWLocked<InvokeMap> _invokes;
+#ifndef HAVE_THREADS
+    InvokeMap _invokes;
+#else // HAVE_THREADS
+    typedef std::map<MICOMT::Thread::ThreadID, MICOMT::Locked<InvokeMap>*> ThreadIDInvokeMap;
+    MICOMT::Locked<ThreadIDInvokeMap> _invokes;
+    MICOMT::Thread::ThreadKey _invokes_key;
+#endif // HAVE_THREADS
 
     Dispatcher *_disp;
     IOR *_tmpl;
@@ -564,6 +570,11 @@ public:
     validate_connection
     (CORBA::Object_ptr obj,
      CORBA::PolicyList_out inconsistent_policies);
+
+#ifdef HAVE_THREADS
+    Boolean
+    remove_empty_invocations_map();
+#endif // HAVE_THREADS
     // end-mico-extension
 
     static ORB_ptr _duplicate (ORB_ptr o)
