@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2001 by The Mico Team
+ *  Copyright (c) 1997-2010 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -96,20 +96,27 @@ public:
 
   void _add_ref () { _ref(); }
   void _remove_ref () {
-    if (_deref()) {
-      delete this;
+    bool tbd = false;
+    {
+      MICOMT::AutoLock l(lock_);
+      if (_deref()) {
+        tbd = true;
+      }
+      else if (!_destructing && _count_refs () == -1) {
+        // orphaned circular graph
+        _add_ref ();
+        _release_members ();
+        tbd = true;
+      }
     }
-    else if (!_destructing && _count_refs () == -1) {
-      // orphaned circular graph
-      _add_ref ();
-      _release_members ();
+    if (tbd)
       delete this;
-    }
   }
   ULong _refcount_value () { return _refcnt(); }
 
 private:
   void operator= (const DefaultValueRefCountBase &);
+  MICOMT::Mutex lock_;
 };
 
 // begin-mico-extension
