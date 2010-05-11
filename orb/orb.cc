@@ -86,6 +86,10 @@
 #include <mico/memtrace.h>
 #endif
 
+#if defined(HAVE_SOLARIS_ATOMICS)
+#include <atomic.h>
+#endif // HAVE_SOLARIS_ATOMICS
+
 #endif // FAST_PCH
 
 #ifdef _POCKET_PC
@@ -2282,17 +2286,18 @@ CORBA::ORB::create_local_interface_tc
 CORBA::ORB::MsgId
 CORBA::ORB::new_msgid ()
 {
+    // kcg: we do not check for msgid collision here. We hope
+    // it does not happen and if it does, then we'll assert in
+    // ORB::add_invoke method before really bad things happen
+#if defined(HAVE_GCC_ATOMICS)
+    return __sync_add_and_fetch(&_theid, 1);
+#elif defined(HAVE_SOLARIS_ATOMICS)
+    return atomic_inc_ulong_nv(&_theid);
+#else
     MICOMT::AutoLock l(_theid_lock);
-    MICOMT::AutoRDLock l2(_invokes);
-
-    while (_invokes.count (++_theid) > 0) {
-	if (MICO::Logger::IsLogged(MICO::Logger::Warning)) {
-	    MICOMT::AutoDebugLock lock;
-	    MICO::Logger::Stream(MICO::Logger::Warning)
-		<< "Oops: msgid colision" << endl;
-	}
-    }
+    _theid++;
     return _theid;
+#endif
 }
 
 CORBA::ORBMsgId
