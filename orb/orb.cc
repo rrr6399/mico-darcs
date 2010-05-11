@@ -629,6 +629,17 @@ CORBA::ORBInvokeRec::timedout(Boolean val)
 static CORBA::ORB_ptr orb_instance = CORBA::ORB::_nil();
 static MICO::IIOPProxy *iiop_proxy_instance = 0;
 
+#ifdef HAVE_THREADS
+namespace CORBA {
+void
+ORB_cleanup_invocation_map(void* value)
+{
+    assert(!CORBA::is_nil(orb_instance));
+    orb_instance->remove_empty_invocations_map();
+}
+}
+#endif // HAVE_THREADS
+
 CORBA::ORB::ORB (int &argc, char **argv, const char *rcfile)
     :_init_refs_lock(FALSE, MICOMT::Mutex::Recursive)
 {
@@ -640,6 +651,7 @@ CORBA::ORB::ORB (int &argc, char **argv, const char *rcfile)
 #else // HAVE_THREADS
     MICOMT::Thread::create_key(_current_rec_key, NULL);
     threading_initialized_ = FALSE;
+    MICOMT::Thread::create_key(_invokes_key, ORB_cleanup_invocation_map);
 #endif // HAVE_THREADS
     _rcfile = rcfile;
     _wait_for_completion = FALSE;
@@ -673,10 +685,13 @@ CORBA::ORB::~ORB ()
     assert(this->_disp != NULL);
     delete _disp;
     delete _tmpl;
-    MICOMT::AutoWRLock l(_invokes);
+#ifndef HAVE_THREADS
     map<MsgId, ORBInvokeRec *, less<MsgId> >::iterator i;
     for (i = _invokes.begin(); i != _invokes.end(); ++i)
 	delete (*i).second;
+#else // HAVE_THREADS
+    while (this->remove_empty_invocations_map());
+#endif // HAVE_THREADS
     if (iiop_proxy_instance != NULL) {
 	delete iiop_proxy_instance;
 	iiop_proxy_instance = NULL;
@@ -689,6 +704,8 @@ CORBA::ORB::~ORB ()
 #ifdef HAVE_THREADS
     MICO::MTManager::free();
     MICOMT::Thread::delete_key(_current_rec_key);
+    while (this->remove_empty_invocations_map());
+    MICOMT::Thread::delete_key(_invokes_key);
 
     assert(this->dispatcher_factory_ != NULL);
     delete this->dispatcher_factory_;
@@ -1610,8 +1627,7 @@ CORBA::ORB::poll_next_response ()
     ORBInvokeRec *rec;
     ORBRequest *orbreq;
 
-    MICOMT::AutoRDLock l(_invokes);
-
+#ifndef HAVE_THREADS
 #ifdef USE_ORB_CACHE
     if (_cache_used) {
       if (_cache_rec->request_type() == RequestInvoke &&
@@ -1632,6 +1648,48 @@ CORBA::ORB::poll_next_response ()
 	    return TRUE;
 	}
     }
+#else // HAVE_THREADS
+    // first try to search thread's own request map
+    MICOMT::Locked<InvokeMap>* map = static_cast<MICOMT::Locked<InvokeMap>*>
+        (MICOMT::Thread::get_specific(_invokes_key));
+    if (map != NULL) {
+        AutoLock l(*map);
+        for (InvokeMap::iterator i = map->begin();
+             i != map->end();
+             i++) {
+            rec = (*i).second;
+            orbreq = rec->request ();
+            if (rec->request_type() == RequestInvoke &&
+                rec->completed() &&
+                !strcmp (orbreq->type(), "local")) {
+                // found a local request that has completed
+                return TRUE;
+            }
+        }
+    }
+    // let's try to search whole global map now
+    {
+        MICOMT::AutoLock l(_invokes);
+        for (ThreadIDInvokeMap::iterator i = _invokes.begin();
+             i != _invokes.end();
+             i++) {
+            MICOMT::Locked<InvokeMap>* map = (*i).second;
+            AutoLock l2(*map);
+            for (InvokeMap::iterator j = map->begin();
+                 j != map->end();
+                 j++) {
+                rec = (*j).second;
+                orbreq = rec->request ();
+                if (rec->request_type() == RequestInvoke &&
+                    rec->completed() &&
+                    !strcmp (orbreq->type(), "local")) {
+                    // found a local request that has completed
+                    return TRUE;
+                }
+            }
+        }
+    }
+#endif // HAVE_THREADS
     return FALSE;
 }
 
@@ -1643,8 +1701,7 @@ CORBA::ORB::get_next_response (Request_out req)
     ORBInvokeRec *rec;
     ORBRequest *orbreq;
 
-    MICOMT::AutoRDLock l(_invokes);
-
+#ifndef HAVE_THREADS
 #ifdef USE_ORB_CACHE
     if (_cache_used) {
       if (_cache_rec->request_type() == RequestInvoke &&
@@ -1669,6 +1726,52 @@ CORBA::ORB::get_next_response (Request_out req)
 	    return;
 	}
     }
+#else // HAVE_THREADS
+    // first try to search thread's own request map
+    MICOMT::Locked<InvokeMap>* map = static_cast<MICOMT::Locked<InvokeMap>*>
+        (MICOMT::Thread::get_specific(_invokes_key));
+    if (map != NULL) {
+        AutoLock l(*map);
+        for (InvokeMap::iterator i = map->begin();
+             i != map->end();
+             i++) {
+            rec = (*i).second;
+            orbreq = rec->request ();
+            if (rec->request_type() == RequestInvoke &&
+                rec->completed() &&
+                !strcmp (orbreq->type(), "local")) {
+                // found a local request that has completed
+                req = Request::_duplicate
+                    (((MICO::LocalRequest *)orbreq)->request());
+                return;
+            }
+        }
+    }
+    // let's try to search whole global map now
+    {
+        MICOMT::AutoLock l(_invokes);
+        for (ThreadIDInvokeMap::iterator i = _invokes.begin();
+             i != _invokes.end();
+             i++) {
+            MICOMT::Locked<InvokeMap>* map = (*i).second;
+            AutoLock l2(*map);
+            for (InvokeMap::iterator j = map->begin();
+                 j != map->end();
+                 j++) {
+                rec = (*j).second;
+                orbreq = rec->request ();
+                if (rec->request_type() == RequestInvoke &&
+                    rec->completed() &&
+                    !strcmp (orbreq->type(), "local")) {
+                    // found a local request that has completed
+                    req = Request::_duplicate
+                        (((MICO::LocalRequest *)orbreq)->request());
+                    return;
+                }
+            }
+        }
+    }
+#endif // HAVE_THREADS
     req = Request::_nil();
 }
 
@@ -2226,16 +2329,33 @@ CORBA::ORB::add_invoke (ORBInvokeRec *rec)
 	MICO::Logger::Stream (MICO::Logger::ORB)
 	    << "ORB::add_invoke (MsgId="<< rec->id() << ")" << endl;
     }
-    MICOMT::AutoWRLock l(_invokes);
-
+#ifndef HAVE_THREADS
+    // kcg: if this assert ever fails, then we need to implement
+    // new msgid colision checking into ORB::new_msgid method
+    assert(_invokes.count(rec->id()) == 0);
     _invokes[rec->id()] = rec;
+#else // HAVE_THREADS
+    MICOMT::Locked<InvokeMap>* map = static_cast<MICOMT::Locked<InvokeMap>*>
+        (MICOMT::Thread::get_specific(_invokes_key));
+    if (map == NULL) {
+        map = new MICOMT::Locked<InvokeMap>();
+        MICOMT::Thread::set_specific(_invokes_key, map);
+        MICOMT::AutoLock lock(_invokes);
+        _invokes[MICOMT::Thread::self()] = map;
+    }
+    {
+        AutoLock l2(*map);
+        // kcg: if this assert ever fails, then we need to implement
+        // new msgid colision checking into ORB::new_msgid method
+        assert(map->count(rec->id()) == 0);
+        (*map)[rec->id()] = rec;
+    }
+#endif // HAVE_THREADS
 }
 
 CORBA::ORBInvokeRec *
 CORBA::ORB::get_invoke (MsgId id)
 {
-    MICOMT::AutoRDLock l(_invokes);
-
 #ifdef USE_ORB_CACHE
     if (_cache_used && _cache_rec->id() == id && _cache_rec->active() )
 	return _cache_rec;
@@ -2246,12 +2366,38 @@ CORBA::ORB::get_invoke (MsgId id)
 	MICO::Logger::Stream (MICO::Logger::ORB)
 	    << "ORB::get_invoke (MsgId="<< id << ")" << endl;
     }
+#ifndef HAVE_THREADS
     map<MsgId, ORBInvokeRec *, less<MsgId> >::iterator i;
     i = _invokes.find (id);
     if (i == _invokes.end()) {
 	return NULL;
     }
     CORBA::ORBInvokeRec *rec = (*i).second;
+#else // HAVE_THREADS
+    MICOMT::Locked<InvokeMap>* map = static_cast<MICOMT::Locked<InvokeMap>*>
+        (MICOMT::Thread::get_specific(_invokes_key));
+    CORBA::ORBInvokeRec* rec = NULL;
+    if (map != NULL) {
+        AutoLock l(*map);
+        InvokeMap::iterator i = map->find(id);
+        if (i != map->end()) {
+            rec = (*i).second;
+            return rec;
+        }
+    }
+    AutoLock l(_invokes);
+    for (ThreadIDInvokeMap::iterator i = _invokes.begin();
+         i != _invokes.end();
+         i++) {
+        Locked<InvokeMap>* map = (*i).second;
+        AutoLock l2(*map);
+        InvokeMap::iterator i = map->find(id);
+        if (i != map->end()) {
+            rec = (*i).second;
+            return rec;
+        }
+    }
+#endif // HAVE_THREADS
     return rec;
 }
 
@@ -2271,14 +2417,39 @@ CORBA::ORB::del_invoke (MsgId id)
 	MICO::Logger::Stream (MICO::Logger::ORB)
 	    << "ORB::del_invoke (MsgId="<< id << ")" << endl;
     }
-    MICOMT::AutoWRLock l(_invokes);
-
+#ifndef HAVE_THREADS
     map<MsgId, ORBInvokeRec *, less<MsgId> >::iterator i;
     i = _invokes.find (id);
     if (i != _invokes.end()) {
 	delete (*i).second;
 	_invokes.erase (i);
     }
+#else // HAVE_THREADS
+    MICOMT::Locked<InvokeMap>* map = static_cast<MICOMT::Locked<InvokeMap>*>
+        (MICOMT::Thread::get_specific(_invokes_key));
+    if (map != NULL) {
+        AutoLock l(*map);
+        InvokeMap::iterator i = map->find(id);
+        if (i != map->end()) {
+            delete (*i).second;
+            map->erase(i);
+            return;
+        }
+    }
+    AutoLock l(_invokes);
+    for (ThreadIDInvokeMap::iterator i = _invokes.begin();
+         i != _invokes.end();
+         i++) {
+        Locked<InvokeMap>* map = (*i).second;
+        AutoLock l2(*map);
+        InvokeMap::iterator i = map->find(id);
+        if (i != map->end()) {
+            delete (*i).second;
+            map->erase(i);
+            return;
+        }
+    }
+#endif // HAVE_THREADS
 }
 
 void
@@ -3233,6 +3404,27 @@ CORBA::ORB::validate_connection
     return oa->validate_connection(obj, inconsistent_policies);
 }
 
+
+#ifdef HAVE_THREADS
+CORBA::Boolean
+CORBA::ORB::remove_empty_invocations_map()
+{
+    // kcg: removes just one empty invocation map
+    // it is intended to be called by thread cleanup
+    // method
+    MICOMT::AutoLock l(_invokes);
+    for (ThreadIDInvokeMap::iterator i = _invokes.begin();
+         i != _invokes.end();
+         i++) {
+        if ((*i).second->empty()) {
+            delete (*i).second;
+            _invokes.erase(i);
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+#endif // HAVE_THREADS
 
 /************************** PrincipalCurrent *************************/
 
