@@ -258,7 +258,9 @@ private:
     IOR *_tmpl;
 
     MsgId _theid;
+#if !defined(HAVE_GCC_ATOMICS) && !defined(HAVE_SOLARIS_ATOMICS)
     MICOMT::Mutex _theid_lock;
+#endif // !HAVE_GCC_ATOMICS && !HAVE_SOLARIS_ATOMICS
 #ifndef HAVE_THREADS
     std::stack<MsgId> _currentid;
 #else // HAVE_THREADS
