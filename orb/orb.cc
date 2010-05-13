@@ -639,7 +639,7 @@ void
 ORB_cleanup_invocation_map(void* value)
 {
     assert(!CORBA::is_nil(orb_instance));
-    orb_instance->remove_empty_invocations_map();
+    orb_instance->remove_thread_invocations_map(value);
 }
 }
 #endif // HAVE_THREADS
@@ -693,8 +693,6 @@ CORBA::ORB::~ORB ()
     map<MsgId, ORBInvokeRec *, less<MsgId> >::iterator i;
     for (i = _invokes.begin(); i != _invokes.end(); ++i)
 	delete (*i).second;
-#else // HAVE_THREADS
-    while (this->remove_empty_invocations_map());
 #endif // HAVE_THREADS
     if (iiop_proxy_instance != NULL) {
 	delete iiop_proxy_instance;
@@ -708,7 +706,6 @@ CORBA::ORB::~ORB ()
 #ifdef HAVE_THREADS
     MICO::MTManager::free();
     MICOMT::Thread::delete_key(_current_rec_key);
-    while (this->remove_empty_invocations_map());
     MICOMT::Thread::delete_key(_invokes_key);
 
     assert(this->dispatcher_factory_ != NULL);
@@ -3412,7 +3409,7 @@ CORBA::ORB::validate_connection
 
 #ifdef HAVE_THREADS
 CORBA::Boolean
-CORBA::ORB::remove_empty_invocations_map()
+CORBA::ORB::remove_thread_invocations_map(void* thrmap)
 {
     // kcg: removes just one empty invocation map
     // it is intended to be called by thread cleanup
@@ -3421,7 +3418,7 @@ CORBA::ORB::remove_empty_invocations_map()
     for (ThreadIDInvokeMap::iterator i = _invokes.begin();
          i != _invokes.end();
          i++) {
-        if ((*i).second->empty()) {
+        if ((*i).second == thrmap) {
             delete (*i).second;
             _invokes.erase(i);
             return TRUE;

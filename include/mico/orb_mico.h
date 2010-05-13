@@ -575,7 +575,7 @@ public:
 
 #ifdef HAVE_THREADS
     Boolean
-    remove_empty_invocations_map();
+    remove_thread_invocations_map(void*);
 #endif // HAVE_THREADS
     // end-mico-extension
 
