@@ -2252,7 +2252,7 @@ PInterceptor::PI::_receive_exception_ip
 {
     if (cri != NULL) {
 	// any client interceptor registered?
-	cri->reply_status(PortableInterceptor::USER_EXCEPTION);
+	cri->reply_status(reply_status);
 	cri->icept_oper(PInterceptor::RECEIVE_EXCEPTION);
 	cri->exception(exception->_clone());
 	cri->set_reply_service_context_list(reply_scl);
@@ -2271,7 +2271,7 @@ PInterceptor::PI::_receive_exception_ip
 {
     if (cri != NULL) {
 	// any client interceptor registered?
-	cri->reply_status(PortableInterceptor::USER_EXCEPTION);
+	cri->reply_status(reply_status);
 	cri->icept_oper(PInterceptor::RECEIVE_EXCEPTION);
 	cri->exception(exception->_clone());
 	cri->contexts(contexts);
