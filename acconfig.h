@@ -159,3 +159,6 @@
 
 /* Define if you have libumem available on your system */
 #undef HAVE_UMEM
+
+/* Define if your C++ compiler and OS support forced unwind exception */
+#undef HAVE_FORCED_UNWIND_EXCEPTION
