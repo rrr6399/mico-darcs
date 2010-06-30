@@ -68,6 +68,9 @@ MICOSL3_SL3IPC::IPCAcceptingContext::S_ctx_index_ = 0;
 MICOSL3_SL3IPC::IPCCredsMapper*
 MICOSL3_SL3IPC::IPCCredsMapper::mapper_ = NULL;
 
+string
+process_name_ = "";
+
 //
 // module initialization
 //
@@ -637,11 +640,15 @@ MICOSL3_SL3IPC::IPCInitiatingContext::IPCInitiatingContext
     name.the_name[0] = L"anonymous";
     // env attributes
     PrinAttributeList env_attr;
-    env_attr.length(2);
+    env_attr.length(3);
     PrinAttribute a1;
     a1.the_type = "SL3:TransportMechanism";
     a1.the_value = L"IPC";
     env_attr[0] = a1;
+    a1.the_type = "SL3:ChannelIdentifier";
+    wstring channel_id = L"IPC:" + str2wstr(process_name_) + L":" + wxdec(OSMisc::getpid());
+    a1.the_value = channel_id.c_str();
+    env_attr[1] = a1;
 //      a1.the_type = "SL3:ChannelIdentifier";
 //      wstring channel_id = L"IPCv4:"
 //  	+ MICOSL3Utils::Address::addr_to_wstring(client)
@@ -652,7 +659,7 @@ MICOSL3_SL3IPC::IPCInitiatingContext::IPCInitiatingContext
     wstring time = wxdec(OSMisc::gettime().tv_sec);
     //    wstring time = wxdec(::time(0));
     a1.the_value = time.c_str();
-    env_attr[1] = a1;
+    env_attr[2] = a1;
     environmental_attributes_ = env_attr;
     // pricipals
     SimplePrincipal* c_principal
@@ -730,11 +737,15 @@ MICOSL3_SL3IPC::IPCAcceptingContext::IPCAcceptingContext
     name.the_name[0] = L"anonymous";
     // env attributes
     PrinAttributeList env_attr;
-    env_attr.length(2);
+    env_attr.length(3);
     PrinAttribute a1;
     a1.the_type = "SL3:TransportMechanism";
     a1.the_value = L"IPC";
     env_attr[0] = a1;
+    a1.the_type = "SL3:ChannelIdentifier";
+    wstring channel_id = L"IPC:" + str2wstr(process_name_) + L":" + wxdec(OSMisc::getpid());
+    a1.the_value = channel_id.c_str();
+    env_attr[1] = a1;
 //      a1.the_type = "SL3:ChannelIdentifier";
 //      wstring channel_id = L"IPCv4:"
 //  	+ MICOSL3Utils::Address::addr_to_wstring(client)
@@ -745,7 +756,7 @@ MICOSL3_SL3IPC::IPCAcceptingContext::IPCAcceptingContext
     wstring time = wxdec(OSMisc::gettime().tv_sec);
     //    wstring time = wxdec(::time(0));
     a1.the_value = time.c_str();
-    env_attr[1] = a1;
+    env_attr[2] = a1;
     environmental_attributes_ = env_attr;
     // pricipals
     SimplePrincipal* c_principal
@@ -827,6 +838,8 @@ MICOSL3_SL3IPC::ORBInitializer::post_init
     assert(curator_impl != NULL);
     CredentialsAcquirerFactory_ptr fact = new CredentialsAcquirerFactory_impl;
     curator_impl->register_acquirer_factory(fact);
+    StringSeq_var args = info->arguments();
+    process_name_ = args[(CORBA::ULong)0].in();
 }
 
 
