@@ -33,6 +33,10 @@
 #include <CORBA-SMALL.h>
 #include <mico/os-misc.h>
 
+#ifdef HAVE_FORCED_UNWIND_EXCEPTION
+#include <cxxabi-forced.h>
+#endif // HAVE_FORCED_UNWIND_EXCEPTION
+
 using namespace std;
 
 //
@@ -177,6 +181,18 @@ MICOMT::Thread::_thr_startup(void *arg)
         __mtdebug_unlock();
         //throw;
     }
+#ifdef HAVE_FORCED_UNWIND_EXCEPTION
+    catch (__cxxabiv1::__forced_unwind&) {
+        // this is a needed hack for platforms which are using special
+        // exception for POSIX thread cancellation implementation
+        // E.g. GNU C++/GNU libc
+        // If we would not rethrow here, we'd get a core dump together
+        // with a message "FATAL: exception not rethrown" while
+        // terminating thread. (e.g. using Thread::terminate which is using
+        // pthread_cancel function)
+        throw;
+    }
+#endif // HAVE_FORCED_UNWIND_EXCEPTION
     catch (...) {
         __mtdebug_lock();
         cerr << "thread: " << this->id() << " uncaught unknown exception"

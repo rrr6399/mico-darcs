@@ -677,6 +677,35 @@ else
 fi
 ])
 
+dnl
+dnl
+dnl check for GNU C++/GLIBC system forced unwind exception support
+dnl
+dnl
+AC_DEFUN(AC_CHECK_FORCED_UNWIND,
+[AC_MSG_CHECKING(for forced unwind exception support)
+AC_CACHE_VAL(ac_cv_have_forced_unwind_exception,
+[AC_TRY_COMPILE([#include <cxxabi-forced.h>],[
+  try {
+   ;
+  }
+  catch (__cxxabiv1::__forced_unwind&) {
+    throw;
+  }
+  catch (...) {
+  }
+  return 0;
+],
+eval "ac_cv_have_forced_unwind_exception=yes",
+eval "ac_cv_have_forced_unwind_exception=no")])
+if test X"$ac_cv_have_forced_unwind_exception" = X"yes"; then
+  AC_DEFINE(HAVE_FORCED_UNWIND_EXCEPTION)
+  AC_MSG_RESULT(yes)
+else
+  AC_MSG_RESULT(no)
+fi
+])
+
 # Configure paths for GTK+
 # Owen Taylor     97-11-3
 
