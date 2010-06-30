@@ -1420,6 +1420,7 @@ MICOSSL::SSLProfile::operator= (const SSLProfile &ip)
 void
 MICOSSL::SSLProfile::encode (CORBA::DataEncoder &ec) const
 {
+    CORBA::Boolean port_zeroed = FALSE;
 #ifdef USE_CSIV2
     // here we have the only one chance to 
     // tweak port in TAG_CSI_SEC_MECH_LIST
@@ -1462,6 +1463,7 @@ MICOSSL::SSLProfile::encode (CORBA::DataEncoder &ec) const
 		    addr.host_name = iaddr->host();
 		    addr.port = iaddr->port();
 		    iaddr->port(0);
+                    port_zeroed = TRUE;
 		    if (MICO::Logger::IsLogged(MICO::Logger::Security))
 			MICO::Logger::Stream(MICO::Logger::Security)
 			    << "addr: " << addr.host_name << ":"
@@ -1527,6 +1529,17 @@ MICOSSL::SSLProfile::encode (CORBA::DataEncoder &ec) const
 	}
     }
 #endif
+    if (!port_zeroed) {
+	CORBA::MultiComponent* comps = _prof->components();
+        MICOSSL::SSLComponent* ssl_comp = NULL;
+        ssl_comp = dynamic_cast<MICOSSL::SSLComponent*>
+            (comps->component(CORBA::Component::TAG_SSL_SEC_TRANS));
+        if (ssl_comp != NULL
+            && ssl_comp->port() == iaddr->port()) {
+            // needs to zero port in iaddr
+            iaddr->port(0);
+        }
+    }
     _prof->encode (ec);
 }
 
