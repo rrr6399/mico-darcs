@@ -18,7 +18,7 @@ clean:
 	$(RM) -f *.o core main hello.h hello.cc *.ref *~ .depend
 
 check:
-	@./hello|grep -v "Establish" > log
+	@./hello|grep -v "Establish"|grep -v "ChannelIdentifier" > log
 	@if cmp expected-output log >/dev/null; then : ; \
 	else echo "FAILED:"; echo "===============================" ; \
 	diff -u expected-output log ; \
