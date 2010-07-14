@@ -47,8 +47,8 @@ ifeq ($(USE_PCH_DIR), yes)
 	-mkdir pch
 endif
 	for i in $(ADMDIRS); do $(MAKE) -C $$i adm || exit 1; done
-	for i in $(LIBDIRS); do $(MAKE) -C $$i lib || exit 1; done
-	for i in $(PRGDIRS); do $(MAKE) -C $$i prg || exit 1; done
+	for i in $(LIBDIRS); do $(MAKE) -C $$i .depend && $(MAKE) -C $$i lib || exit 1; done
+	for i in $(PRGDIRS); do $(MAKE) -C $$i .depend && $(MAKE) -C $$i prg || exit 1; done
 
 extra:
 	for i in $(EXTRADIRS); do $(MAKE) -C $$i prg || exit 1; done
