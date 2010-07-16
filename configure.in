@@ -692,8 +692,8 @@ if test X"$GXX" = Xyes; then
   # kcg: GCC 4.1.x requires -fno-strict-aliasing
   GCC_STRICT_ALIASING="no"
   case $gccversion in
-    # we need to avoid 4.0.x
-    *4.0*)
+    # we need to avoid 4.0.x but still support 4.4.0
+    *4.0.0*|*4.0.1*|*4.0.2*|*4.0.3*|*4.0.4*)
       ;;
     *4.*)
       GCC_STRICT_ALIASING="yes"
