@@ -56,13 +56,13 @@ goto build
 
 	@nmake clean %buildtype%%target%
 	@IF EXIST "%VS80COMNTOOLS%vsvars32.bat" (
-	mt.exe -manifest %name%.dll.manifest -outputresource:%name%.dll;#1
+	mt.exe -manifest %name%.dll.manifest -outputresource:%name%.dll;#2
 	)
 	@IF EXIST "%VS90COMNTOOLS%vsvars32.bat" (
-	mt.exe -manifest %name%.dll.manifest -outputresource:%name%.dll;#1
+	mt.exe -manifest %name%.dll.manifest -outputresource:%name%.dll;#2
 	)
 	@IF EXIST "%VS100COMNTOOLS%vsvars32.bat" (
-	mt.exe -manifest %name%.dll.manifest -outputresource:%name%.dll;#1
+	mt.exe -manifest %name%.dll.manifest -outputresource:%name%.dll;#2
 	)
 
 	@copy %name%.dll ..\..\win32-bin
