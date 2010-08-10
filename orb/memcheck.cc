@@ -3,7 +3,7 @@
 #include <string.h>
 #include <assert.h>
 #ifdef _WIN32
-#include <mico/config-win32.h>
+#include <mico/config-win.h>
 #else // _WIN32
 #include <mico/config.h>
 #endif // _WIN32

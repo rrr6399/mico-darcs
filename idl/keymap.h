@@ -1,7 +1,7 @@
 // -*- c++ -*-
 //
 //  MICO --- an Open Source CORBA implementation
-//  Copyright (c) 1997-2003 by The Mico Team
+//  Copyright (c) 1997-2010 by The Mico Team
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 #define __KEYMAP_H__
 
 #if defined(_WIN32) && !defined(__MINGW32__)
-#include <mico/config-win32.h>
+#include <mico/config-win.h>
 #else
 #include <mico/config.h>
 #endif

@@ -1,6 +1,7 @@
 /*
  *  Code Set Converters for MICO
  *  Copyright (C) 1997 Marcus Mueller & Thomas Holubar
+ *  Copyright (c) 1998-2010 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -27,7 +28,7 @@
 #define _TYPES_H
 
 #if defined(_WIN32) && !defined(__MINGW32__)
-#include <mico/config-win32.h>
+#include <mico/config-win.h>
 #elif defined (_POCKET_PC)
 #include <mico/config-ppc.h>
 #else
