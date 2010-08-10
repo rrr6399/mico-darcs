@@ -158,10 +158,10 @@
 #define SIZEOF_LONG 4
 
 /* The number of bytes in a long double.  */
-#define SIZEOF_LONG_DOUBLE 12
+#define SIZEOF_LONG_DOUBLE 8
 
 /* The number of bytes in a long long.  */
-/* #define SIZEOF_LONG_LONG 8 */
+#define SIZEOF_LONG_LONG 8
 
 /* The number of bytes in a short.  */
 #define SIZEOF_SHORT 2
