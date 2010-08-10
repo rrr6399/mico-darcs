@@ -1,5 +1,5 @@
 #if defined(_WIN32) && !defined(__MINGW32__)
-#include <mico/config-win32.h>
+#include <mico/config-win.h>
 #include <io.h>
 #include <malloc.h>
 #include <stdlib.h>

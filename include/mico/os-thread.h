@@ -1,7 +1,7 @@
 /* -*- mode: c++; c-basic-offset: 4; -*-
  *
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2001 by The Mico Team
+ *  Copyright (c) 1997-2010 by The Mico Team
  * 
  *  os-thread wrapper
  *  Copyright (C) 1999 Andreas Schultz                                 
@@ -29,7 +29,7 @@
 #define __OS_THREAD_H__
 
 #if defined(_WIN32) && !defined(__MINGW32__)
-#include <mico/config-win32.h>
+#include <mico/config-win.h>
 #else
 #include <mico/config.h>
 #endif

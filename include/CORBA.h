@@ -53,11 +53,7 @@
   #else
     #error unknown (Windows-)Compiler
   #endif
-  #if !defined(_WIN64)
-    #include <mico/config-win32.h>
-  #else
-    #include <mico/config-win64.h>
-  #endif
+  #include <mico/config-win.h>
 #elif defined (_POCKET_PC)
   #include <mico/config-ppc.h>
 #else

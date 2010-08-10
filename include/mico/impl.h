@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2009 by The Mico Team
+ *  Copyright (c) 1997-2010 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -25,7 +25,7 @@
 #define __mico_impl_h__
 
 #if defined(_WIN32) && !defined(__MINGW32__)
-#include <mico/config-win32.h>
+#include <mico/config-win.h>
 #else
 #include <mico/config.h>
 #endif
