@@ -2625,7 +2625,7 @@ MICO::CodesetIORInterceptor_impl::establish_components(PortableInterceptor::IORI
 	try {
 	    info->add_ior_component_to_profile
 		(component, CORBA::IORProfile::TAG_INTERNET_IOP);
-	} catch (CORBA::BAD_PARAM& ex) {
+	} catch (CORBA::BAD_PARAM&) {
 	    if (MICO::Logger::IsLogged(MICO::Logger::ORB))
 		MICO::Logger::Stream(MICO::Logger::ORB)
 		    << "IOR: can't find IIOP profile" << endl;
@@ -2633,7 +2633,7 @@ MICO::CodesetIORInterceptor_impl::establish_components(PortableInterceptor::IORI
 	try {
 	    info->add_ior_component_to_profile
 		(component, CORBA::IORProfile::TAG_SSL_INTERNET_IOP);
-	} catch (CORBA::BAD_PARAM& ex) {
+	} catch (CORBA::BAD_PARAM&) {
 	    if (MICO::Logger::IsLogged(MICO::Logger::ORB))
 		MICO::Logger::Stream(MICO::Logger::ORB)
 		    << "IOR: can't find SSL IIOP profile" << endl;

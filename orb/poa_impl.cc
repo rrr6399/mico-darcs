@@ -2369,7 +2369,7 @@ MICOPOA::POA_impl::find_POA (const char * cname,
 #endif
     child = _find_POA (cname, activate_it);
 #ifdef HAVE_EXCEPTIONS
-  } catch (CORBA::SystemException_catch & sex) {
+  } catch (CORBA::SystemException_catch &) {
     mico_throw (CORBA::OBJ_ADAPTER (1, CORBA::COMPLETED_NO));
   }
 #endif
@@ -3407,7 +3407,7 @@ MICOPOA::POA_impl::invoke (CORBA::ORBMsgId id,
 #endif
 	iter = poa->_find_POA (cname, FALSE);
 #ifdef HAVE_EXCEPTIONS
-      } catch (CORBA::SystemException_catch & sex) {
+      } catch (CORBA::SystemException_catch &) {
 	InvocationRecord_var ir = new InvocationRecord (id, &por, req, pr);
 	CORBA::ServerRequest_ptr svr = ir->make_dyn_req (poa);
 	CORBA::Exception * ex =
@@ -3551,7 +3551,7 @@ MICOPOA::POA_impl::local_invoke (InvocationRecord_ptr ir)
 #endif // HAVE_EXCEPTIONS
       poa = _find_POA (cname, TRUE);
 #ifdef HAVE_EXCEPTIONS
-    } catch (CORBA::SystemException_catch & sex) {
+    } catch (CORBA::SystemException_catch &) {
       CORBA::ServerRequest_ptr svr = ir->make_dyn_req (this);
       CORBA::Exception * ex =
 	new CORBA::OBJ_ADAPTER (1, CORBA::COMPLETED_NO);
@@ -3747,7 +3747,7 @@ MICOPOA::POA_impl::builtin_invoke (InvocationRecord_ptr ir,
     
     return false;
 #ifdef HAVE_EXCEPTIONS
-  } catch (CORBA::SystemException_catch & sex) {
+  } catch (CORBA::SystemException_catch &) {
       // kcg: here exception should be already set
       // on svr, so no need to do so again
       // in addition we cannot create svr for ir again,
