@@ -522,7 +522,8 @@ void NamingContext_impl::list (CORBA::ULong how_many,
 			       CosNaming::BindingIterator_out bi)
 {
   MICOMT::AutoLock lock(table);
-  CORBA::ULong num = table.size () < how_many ? table.size () : how_many;
+  assert(table.size() < UINT_MAX);
+  CORBA::ULong num = (CORBA::ULong)table.size () < how_many ? (CORBA::ULong)table.size () : how_many;
   bl = new CosNaming::BindingList (num);
   bl->length (num);
   bi = CosNaming::BindingIterator::_nil ();
@@ -536,7 +537,7 @@ void NamingContext_impl::list (CORBA::ULong how_many,
     (*bl)[l].binding_type = (*i).second.btype;
   }
   if (how_many < table.size ()) {
-    CORBA::ULong rn = table.size () - how_many;
+    CORBA::ULong rn = (CORBA::ULong)(table.size () - how_many);
     CosNaming::BindingList rest (rn);
     rest.length (rn);
     for (l = 0; l < rn; l++, i++) {
@@ -926,7 +927,9 @@ char *
 NamingContextExt_impl::to_url (const char * addr,
 			       const char * sn)
 {
-  CORBA::String_var uesn = mico_url_encode ((CORBA::Octet *) sn, strlen(sn));
+  size_t snlen = strlen(sn);
+  assert(snlen < UINT_MAX);
+  CORBA::String_var uesn = mico_url_encode ((CORBA::Octet *) sn, (CORBA::ULong)snlen);
   string res = "corbaname:";
   res += addr;
   res += '#';
