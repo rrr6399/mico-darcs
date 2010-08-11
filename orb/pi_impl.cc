@@ -1339,8 +1339,8 @@ PInterceptor::ServerRequestInfo_impl::set_oa(CORBA::ObjectAdapter* oa)
 	try {
 	    PortableServer::ObjectId_var oid = poa->reference_to_id(object_);
 	    object_id_ = oid;
-	} catch (PortableServer::POA::WrongAdapter_catch& ex) {
-	} catch (PortableServer::POA::WrongPolicy_catch& ex) {
+	} catch (PortableServer::POA::WrongAdapter_catch&) {
+	} catch (PortableServer::POA::WrongPolicy_catch&) {
 	}
     }
 }
