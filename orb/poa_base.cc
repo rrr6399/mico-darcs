@@ -1,6 +1,7 @@
 /*
  *  MICO --- an Open Source CORBA implementation
  *  Copyright (C) 1998 Frank Pilhofer
+ *  Copyright (c) 1999-2010 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -487,7 +488,9 @@ PortableServer::string_to_ObjectId (const char * s)
     mico_throw (CORBA::BAD_PARAM());
   }
 
-  CORBA::ULong len = strlen (s);
+  size_t slen = strlen(s);
+  assert(slen < UINT_MAX);
+  CORBA::ULong len = (CORBA::ULong)slen;
   
   PortableServer::ObjectId *oid = new PortableServer::ObjectId;
   oid->length (len);

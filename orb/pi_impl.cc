@@ -705,7 +705,9 @@ PInterceptor::RequestInfo_impl::sanylist_to_parlist
  const StaticAnyList& args,
  CORBA::Boolean valid_out)
 {
-    CORBA::ULong length = args.size();
+    mico_vec_size_type args_size = args.size();
+    assert(args_size < UINT_MAX);
+    CORBA::ULong length = (CORBA::ULong)args_size;
     parlst.length(length);
     Dynamic::Parameter param;
     for (CORBA::ULong i=0; i<length; i++) {
@@ -1407,8 +1409,9 @@ PInterceptor::ServerRequestInfo_impl::adapter_id()
     const char* id = object_adapter_->get_oaid();
     if (id == NULL)
 	return retval;		
-    int length = strlen(id);
-    retval->length(length);
+    size_t length = strlen(id);
+    assert(length < UINT_MAX);
+    retval->length((CORBA::ULong)length);
     for (int i=0; i<length; i++)
 	(*retval)[i] = id[i];
     return retval;

@@ -421,7 +421,9 @@ mico_url_encode (const CORBA::Octet * ptr, CORBA::ULong len)
 CORBA::Octet *
 mico_url_decode (const char * ptr, CORBA::ULong & len)
 {
-  CORBA::Octet * str = (CORBA::Octet *) CORBA::string_alloc (strlen (ptr));
+  size_t lptr = strlen(ptr);
+  assert(lptr < UINT_MAX);
+  CORBA::Octet * str = (CORBA::Octet *) CORBA::string_alloc ((CORBA::ULong)lptr);
   CORBA::Octet * res = str;
   
   len = 0;
@@ -634,7 +636,8 @@ CORBA::Boolean
 MICOGetOpt::parse (const vector<string> &argv, vector<int> &erase,
 		   CORBA::Boolean ignore)
 {
-    for (mico_vec_size_type i = 0; i < argv.size(); ++i) {
+  assert(argv.size() < INT_MAX);
+  for (int i = 0; i < argv.size(); ++i) {
 	string arg = argv[i];
 	if (arg == "--") {
 	    erase.push_back (i);
@@ -645,7 +648,7 @@ MICOGetOpt::parse (const vector<string> &argv, vector<int> &erase,
 	}
 	OptMap::const_iterator it = _in_opts.find (arg);
 	if (it == _in_opts.end()) {
-	    int pos = 0;
+	    mico_vec_size_type pos = 0;
 	    if (arg.length() > 2) {
 		// -Oval ??
 		arg = arg.substr (0, 2);
@@ -753,10 +756,10 @@ ASN1::Codec::parse_oid(const char* __oid)
 	__str = __s_tmp;
     vector<unsigned int> __buf;
     string __s1;
-    int __ix = 0;
+    string::size_type __ix = 0;
     for (;;) {
 	__ix = __str.find('.');
-	if (__ix > 0) {
+	if (__ix != string::npos) {
 	    __s1 = __str.substr(0, __ix);
 	    __str = __str.substr(__ix + 1, __str.length());
 	    __buf.push_back(atoi(__s1.c_str()));
@@ -807,7 +810,7 @@ ASN1::Codec::decode_oid(CORBA::OctetSeq& __oid)
     ostrstream __sstr;
 #endif // HAVE_ANSI_CPLUSPLUS_HEADERS
     __sstr << "oid:" << __first << "." << __second << ".";
-    int __x = __buf.size();
+    string::size_type __x = __buf.size();
     for (__i = 0; __i < __x-1; __i++) {
 	__sstr << __buf[__i] << ".";
     }
@@ -824,7 +827,7 @@ ASN1::Codec::encode_oid(const char* __o)
     vector<unsigned char> __buf;
     __buf.push_back(6); // OID Tag
     __buf.push_back(0); // temporary length
-    int __oid_len = __oid.size();
+    mico_vec_size_type __oid_len = __oid.size();
     int __len = 1;
     __buf.push_back(40 * __oid[0] + __oid[1]);
     for (int __i=2; __i<__oid_len; __i++) {
@@ -853,7 +856,9 @@ ASN1::Codec::encode_oid(const char* __o)
     }
     __buf[1] = __len;
     CORBA::OctetSeq* __ret = new CORBA::OctetSeq;
-    __ret->length(__buf.size());
+    mico_vec_size_type buf_size = __buf.size();
+    assert(buf_size < UINT_MAX);
+    __ret->length((CORBA::ULong)buf_size);
     for (CORBA::ULong __j=0; __j<__buf.size(); __j++)
 	(*__ret)[__j] = __buf[__j];
     return __ret;

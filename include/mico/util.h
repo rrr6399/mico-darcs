@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2001 by The Mico Team
+ *  Copyright (c) 1997-2010 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -115,14 +115,16 @@ template<class V>
 inline CORBA::Long
 mico_vec_compare (V v1, V v2)
 {
-    int len = v1.size() < v2.size() ? v1.size() : v2.size();
-    for (int i = 0; i < len; ++i) {
+    typename V::size_type len = v1.size() < v2.size() ? v1.size() : v2.size();
+    for (typename V::size_type i = 0; i < len; ++i) {
 	if (v1[i] < v2[i])
 	    return -1;
 	if (v2[i] < v1[i])
 	    return 1;
     }
-    return v1.size() - v2.size();
+    typename V::size_type sdiff = v1.size() - v2.size();
+    assert(sdiff < INT_MAX);
+    return (CORBA::Long)sdiff;
 }
 
 static inline CORBA::Long

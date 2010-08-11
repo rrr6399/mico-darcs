@@ -182,7 +182,8 @@ template<class T>
 inline MICO_ULong
 StringSequenceTmpl<T>::length () const
 {
-    return vec.size ();
+    // The MICO_ULong cast is needed for Win64/VC++ 10.0
+    return (MICO_ULong)vec.size ();
 }
 
 template<class T>
@@ -528,7 +529,8 @@ template<class T>
 inline MICO_ULong
 WStringSequenceTmpl<T>::length () const
 {
-    return vec.size ();
+    // The MICO_ULong cast is needed for Win64/VC++ 10.0
+    return (MICO_ULong)vec.size();
 }
 
 template<class T>
@@ -876,7 +878,8 @@ template<class T, class T_ptr>
 inline MICO_ULong
 IfaceSequenceTmpl<T,T_ptr>::length () const
 {
-    return vec.size ();
+    // The MICO_ULong cast is needed for Win64/VC++ 10.0
+    return (MICO_ULong)vec.size ();
 }
 
 template<class T, class T_ptr>

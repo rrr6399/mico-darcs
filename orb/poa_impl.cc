@@ -663,8 +663,10 @@ MICOPOA::POAObjectReference::make_ref ()
    * quoted). If poa-name == id, then we collapse both.
    */
 
-  CORBA::ULong idlength, length = poaname.length();
-  CORBA::Long i, j = poaname.length();
+  string::size_type poaname_len = poaname.length();
+  assert(poaname_len < UINT_MAX);
+  CORBA::ULong idlength, length = (CORBA::ULong)poaname_len;
+  string::size_type i, j = poaname.length();
   CORBA::Boolean samename = FALSE;
   const char * iddata = oid.get_data (idlength);
   
@@ -1073,7 +1075,8 @@ MICOPOA::POAObjectReference::next_descendant_poa (const char * fqn,
     }
   }
 
-  res = CORBA::string_alloc (i);
+  assert(i < UINT_MAX);
+  res = CORBA::string_alloc ((CORBA::ULong)i);
   assert (res);
 
   for (i=0, j=0; pstr[i] && pstr[i] != '/'; i++, j++) {
@@ -1122,7 +1125,8 @@ MICOPOA::UniqueIdGenerator::new_id ()
 
   if (uid == NULL) {
     ulen = 1;
-    uid  = CORBA::string_alloc (ulen);
+    assert(ulen < UINT_MAX);
+    uid  = CORBA::string_alloc ((CORBA::ULong)ulen);
     assert (uid);
     uid[0] = '0';
     uid[1] = 0;
@@ -1136,7 +1140,9 @@ MICOPOA::UniqueIdGenerator::new_id ()
     }
     if (i == ulen) {
       CORBA::string_free (uid);
-      uid = CORBA::string_alloc (++ulen);
+      ulen++;
+      assert(ulen < UINT_MAX);
+      uid = CORBA::string_alloc ((CORBA::ULong)ulen);
       assert (uid);
       for (i=0; i<ulen-1; i++) {
 	uid[i] = '0';
@@ -1148,7 +1154,9 @@ MICOPOA::UniqueIdGenerator::new_id ()
       uid[i] = uid[i] + 1;
     }
   }
-  id = CORBA::string_alloc (ulen + pfxlen);
+  size_t sum = ulen + pfxlen;
+  assert(sum < UINT_MAX);
+  id = CORBA::string_alloc ((CORBA::ULong)sum);
   assert (id);
   if (prefix) strcpy (id, prefix);
   strcpy (id+pfxlen, uid);
@@ -1168,13 +1176,17 @@ MICOPOA::UniqueIdGenerator::state ()
   }
 
   if (uid == NULL) {
-    res = CORBA::string_alloc (pfxlen + 1);
+    pfxlen++;
+    assert(pfxlen < UINT_MAX);
+    res = CORBA::string_alloc ((CORBA::ULong)pfxlen);
     strcpy (res+1, prefix);
     res[0] = ':';
     return res;
   }
     
-  res = CORBA::string_alloc (ulen + pfxlen + 1);
+  size_t sum = ulen + pfxlen + 1;
+  assert(sum < UINT_MAX);
+  res = CORBA::string_alloc ((CORBA::ULong)sum);
   strcpy (res, uid);
   if (prefix) strcpy (res+ulen+1, prefix);
   res[ulen] = ':';
@@ -1201,7 +1213,8 @@ MICOPOA::UniqueIdGenerator::state (const char * st)
   if (*st && *st != ':') {
     for (ulen=0; st[ulen] && st[ulen] != ':'; ulen++);
     assert (st[ulen] == ':');
-    uid = CORBA::string_alloc (ulen);
+    assert(ulen < UINT_MAX);
+    uid = CORBA::string_alloc ((CORBA::ULong)ulen);
     for (int i=0; i<ulen; i++) {
       uid[i] = st[i];
     }
@@ -1547,7 +1560,9 @@ MICOPOA::POA_impl::the_children ()
   POAMap::iterator it = children.begin ();
   CORBA::ULong i = 0;
 
-  res->length (children.size());
+  mico_vec_size_type chsize = children.size();
+  assert(chsize < UINT_MAX);
+  res->length ((CORBA::ULong)chsize);
   while (it != children.end()) {
     (*res)[i++] = PortableServer::POA::_duplicate ((*it++).second);
   }
@@ -1571,8 +1586,10 @@ CORBA::OctetSeq*
 MICOPOA::POA_impl::id()
 {
   string t_str = this->get_oaid();
+  string::size_type t_str_len = t_str.length();
+  assert(t_str_len < UINT_MAX);
   CORBA::OctetSeq* retval = new CORBA::OctetSeq;
-  retval->length(t_str.length());
+  retval->length((CORBA::ULong)t_str_len);
   for (CORBA::ULong i=0; i<retval->length(); i++) {
     (*retval)[i] = t_str[i];
   }

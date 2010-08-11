@@ -29,6 +29,7 @@
 #endif // __COMO__
 #include <stdio.h>
 #include <string.h>
+#include <cassert>
 
 #include "uni_unicode.h"
 #include "uni_base64.h"
@@ -777,7 +778,7 @@ uni_slong uni_fromUTF8(char *dest, const char *utf8, uni_uword *chars, uni_uword
     for(ci=si=di=0; ci < *(chars); ci++)
       switch(utf8[si])
       {
-        case '\0' :
+        case '\0' : {
           if(di!=0)
           {
             RC = uni_ucs4arraytoutf7
@@ -790,9 +791,11 @@ uni_slong uni_fromUTF8(char *dest, const char *utf8, uni_uword *chars, uni_uword
           }
           *chars = ci;
           *utf_read = si+1;
-	  *written = strlen (dest) + 1;
-        return(C_OK);
-
+	  size_t dest_len = strlen(dest);
+	  assert(dest_len < UINT_MAX);
+	  *written = ((uni_uword)dest_len) + 1;
+          return(C_OK);
+        }
         case '\r': case '\n' :
           utf7array[di++] = fromCRLF(utf8,&si,*chars,line_type);
         break;
@@ -823,7 +826,9 @@ uni_slong uni_fromUTF8(char *dest, const char *utf8, uni_uword *chars, uni_uword
       }
 
     *utf_read = si;
-    *written = strlen (dest) + 1;
+    size_t dest_len = strlen(dest);
+    assert(dest_len < UINT_MAX);
+    *written = ((uni_uword)dest_len) + 1;
     return(C_OK);
   }
 
@@ -1076,7 +1081,8 @@ cont:         dest[di++] = ';';
             {
               sprintf(buffer, "&#%lu;", character);
               strcpy(&dest[di], buffer);
-              di += strlen(buffer);
+	      assert(strlen(buffer) < UINT_MAX);
+              di += (uni_uword)strlen(buffer);
             }
           break;
         }

@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2007 by The Mico Team
+ *  Copyright (c) 1997-2010 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -267,7 +267,8 @@ CORBA::DataEncoder::value_begin (const string &url,
     if (repoids.size() == 1) {
 	put_string (repoids[0]);
     } else if (repoids.size() > 1) {
-	seq_begin (repoids.size());
+        assert(repoids.size() < UINT_MAX);
+	seq_begin ((CORBA::ULong)repoids.size());
 	for (mico_vec_size_type i = 0; i < repoids.size(); ++i)
 	    put_string (repoids[i]);
 	seq_end();
@@ -1331,7 +1332,9 @@ void
 MICO::CDREncoder::put_string (const char *s)
 {
   if (!conv) {
-    CORBA::ULong len = strlen (s) + 1;
+    size_t slen = strlen(s);
+    assert(slen < UINT_MAX);
+    CORBA::ULong len = (CORBA::ULong)slen + 1;
     put_ulong (len);
     put_octets (s, len);
     return;
@@ -1343,7 +1346,9 @@ MICO::CDREncoder::put_string (const char *s)
 void
 MICO::CDREncoder::put_string_raw (const char *s)
 {
-    CORBA::ULong len = strlen (s) + 1;
+    size_t slen = strlen(s);
+    assert(slen < UINT_MAX);
+    CORBA::ULong len = (CORBA::ULong)slen + 1;
     put_ulong (len);
     put_octets (s, len);
 }
@@ -1352,7 +1357,9 @@ void
 MICO::CDREncoder::put_wstring (const wchar_t *s)
 {
     if (!conv) {
-      CORBA::ULong len = xwcslen (s) + 1;
+      size_t slen = xwcslen(s);
+      assert(slen < UINT_MAX);
+      CORBA::ULong len = (CORBA::ULong)slen + 1;
       put_ulong (len);
       while (len--) {
 	put_ushort ((CORBA::UShort) *s++);

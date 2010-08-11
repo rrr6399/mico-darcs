@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2001 by The Mico Team
+ *  Copyright (c) 1997-2010 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -56,7 +56,7 @@ CORBA::Context::~Context ()
 CORBA::Boolean
 CORBA::Context::match (const char *value, const char *pattern)
 {
-    ULong l = strlen (pattern);
+    size_t l = strlen (pattern);
     if (l > 0 && pattern[l-1] == '*')
 	return !strncmp (value, pattern, l-1);
 

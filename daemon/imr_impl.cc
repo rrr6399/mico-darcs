@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2001 by The Mico Team
+ *  Copyright (c) 1997-2010 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -80,8 +80,8 @@ ImplementationDef_impl::ImplementationDef_impl (const char *asstring)
 	CORBA::ULong len = _objs.length();
 	_objs.length (len+1);
 
-	int pos = rid.rfind ("#");
-	if (pos >= 0) {
+	string::size_type pos = rid.rfind ("#");
+	if (pos != string::npos) {
 	    _objs[len].repoid = CORBA::string_dup (rid.substr(0,pos).c_str());
 
 	    CORBA::ORB::ObjectTag_var tag =
@@ -333,7 +333,9 @@ CORBA::ImplRepository::ImplDefSeq *
 ImplRepository_impl::find_all ()
 {
     ImplDefSeq *res = new ImplDefSeq;
-    res->length (defs.size());
+    mico_vec_size_type defs_size = defs.size();
+    assert(defs_size < UINT_MAX);
+    res->length ((CORBA::ULong)defs_size);
 
     int idx = 0;
     for (ListImplDef::iterator i = defs.begin(); i != defs.end(); ++i) {

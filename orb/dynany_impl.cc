@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2005 by The Mico Team
+ *  Copyright (c) 1997-2010 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -762,7 +762,9 @@ DynAny_impl::current_component ()
 CORBA::ULong
 DynAny_impl::component_count ()
 {
-    return _elements.size();
+    mico_vec_size_type esize = _elements.size();
+    assert(esize < UINT_MAX);
+    return (CORBA::ULong)esize;
 }
 
 CORBA::Boolean
@@ -1290,9 +1292,11 @@ DynamicAny::NameValuePairSeq*
 DynStruct_impl::get_members ()
 {
     DynamicAny::NameValuePairSeq *seq = new DynamicAny::NameValuePairSeq;
-    seq->length (_elements.size());
+    mico_vec_size_type esize = _elements.size();
+    assert(esize < UINT_MAX);
+    seq->length ((CORBA::ULong)esize);
     CORBA::TypeCode_ptr tc = _type->unalias ();
-    for (CORBA::ULong i = 0; i < _elements.size(); ++i) {
+    for (CORBA::ULong i = 0; i < esize; ++i) {
 	(*seq)[i].id = tc->member_name (i);
 	CORBA::Any_var a = _elements[i]->to_any ();
 	(*seq)[i].value = a.in();
@@ -1319,9 +1323,11 @@ DynamicAny::NameDynAnyPairSeq*
 DynStruct_impl::get_members_as_dyn_any ()
 {
     DynamicAny::NameDynAnyPairSeq *seq = new DynamicAny::NameDynAnyPairSeq;
-    seq->length (_elements.size());
+    mico_vec_size_type esize = _elements.size();
+    assert(esize < UINT_MAX);
+    seq->length ((CORBA::ULong)esize);
     CORBA::TypeCode_ptr tc = _type->unalias ();
-    for (CORBA::ULong i = 0; i < _elements.size(); ++i) {
+    for (CORBA::ULong i = 0; i < esize; ++i) {
 	(*seq)[i].id = tc->member_name (i);
 	(*seq)[i].value = _elements[i]->copy();
     }
@@ -1436,16 +1442,19 @@ DynUnion_impl::update_element (CORBA::Long idx)
 	// XXX what to do for implicit default case ???
     }
     _member_idx = nidx;
-
-    if (_index >= (CORBA::Long)_elements.size())
-	_index = _elements.size()-1;
+    mico_vec_size_type esize = _elements.size();
+    assert(esize < INT_MAX);   
+    if (_index >= (CORBA::Long)esize)
+        _index = ((CORBA::Long)esize)-1;
 }
 
 CORBA::ULong
 DynUnion_impl::component_count ()
 {
     update_element (1);
-    return _elements.size();
+    mico_vec_size_type esize = _elements.size();
+    assert(esize < UINT_MAX);
+    return (CORBA::ULong)esize;
 }
 
 void
@@ -2160,9 +2169,11 @@ DynamicAny::AnySeq*
 DynArray_impl::get_elements ()
 {
     DynamicAny::AnySeq *seq = new DynamicAny::AnySeq;
-    seq->length (_elements.size());
+    mico_vec_size_type esize = _elements.size();
+    assert(esize < UINT_MAX);
+    seq->length ((CORBA::ULong)esize);
 
-    for (CORBA::ULong i = 0; i < _elements.size(); ++i) {
+    for (CORBA::ULong i = 0; i < esize; ++i) {
 	CORBA::Any_var el = _elements[i]->to_any ();
 	(*seq)[i] = el.in();
     }
@@ -2183,9 +2194,11 @@ DynamicAny::DynAnySeq*
 DynArray_impl::get_elements_as_dyn_any ()
 {
     DynamicAny::DynAnySeq *seq = new DynamicAny::DynAnySeq;
-    seq->length (_elements.size());
+    mico_vec_size_type esize = _elements.size();
+    assert(esize < UINT_MAX);
+    seq->length ((CORBA::ULong)esize);
 
-    for (CORBA::ULong i = 0; i < _elements.size(); ++i)
+    for (CORBA::ULong i = 0; i < esize; ++i)
 	(*seq)[i] = _elements[i]->copy();
     return seq;
 }
@@ -2410,9 +2423,11 @@ DynValue_impl::get_members ()
   }
 
     DynamicAny::NameValuePairSeq *seq = new DynamicAny::NameValuePairSeq;
-    seq->length (_elements.size());
+    mico_vec_size_type esize = _elements.size();
+    assert(esize < UINT_MAX);
+    seq->length ((CORBA::ULong)esize);
     CORBA::TypeCode_ptr tc = _type->unalias ();
-    for (CORBA::ULong i = 0; i < _elements.size(); ++i) {
+    for (CORBA::ULong i = 0; i < esize; ++i) {
         update_element (i);
 	(*seq)[i].id = tc->member_name_inherited (i);
 	CORBA::Any_var a = _elements[i]->to_any ();
@@ -2446,9 +2461,11 @@ DynValue_impl::get_members_as_dyn_any ()
   }
 
     DynamicAny::NameDynAnyPairSeq *seq = new DynamicAny::NameDynAnyPairSeq;
-    seq->length (_elements.size());
+    mico_vec_size_type esize = _elements.size();
+    assert(esize < UINT_MAX);
+    seq->length ((CORBA::ULong)esize);
     CORBA::TypeCode_ptr tc = _type->unalias ();
-    for (CORBA::ULong i = 0; i < _elements.size(); ++i) {
+    for (CORBA::ULong i = 0; i < esize; ++i) {
         update_element (i);
 	(*seq)[i].id = tc->member_name_inherited (i);
 	(*seq)[i].value = _elements[i]->copy();

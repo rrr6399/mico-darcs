@@ -2,7 +2,7 @@
 /*
  *  MICO --- an Open Source CORBA implementation
  *  Copyright (C) 1998 Frank Pilhofer
- *  Copyright (c) 1999-2008 by The Mico Team
+ *  Copyright (c) 1999-2010 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -331,7 +331,8 @@ public:
   void state (const char *);
 
 private:
-  int ulen, pfxlen;
+  int ulen;
+  size_t pfxlen;
   char * uid;
   char * prefix;
 };

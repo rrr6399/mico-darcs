@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2007 by The Mico Team
+ *  Copyright (c) 1997-2010 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -1778,8 +1778,8 @@ CORBA::Boolean
 CORBA::StaticRequest::copy (StaticAnyList *dst, StaticAnyList *src,
 			    CORBA::Flags f)
 {
-    int dst_count = dst->size();
-    int src_count = src->size();
+    mico_vec_size_type dst_count = dst->size();
+    mico_vec_size_type src_count = src->size();
 
     StaticAny *dst_any, *src_any;
     for (int d = 0, s = 0;; ++d, ++s) {
@@ -1818,8 +1818,9 @@ CORBA::StaticRequest::get_in_args (NVList_ptr iparams, Context_ptr &ctx)
 	return FALSE;
 
     CORBA::NamedValue_ptr nv;
+    assert(_args.size() < UINT_MAX);
     for (mico_vec_size_type i0 = 0; i0 < _args.size(); ++i0) {
-	nv = iparams->item (i0);
+        nv = iparams->item ((CORBA::ULong)i0);
 	if (_args[i0]->flags() != nv->flags())
 	    return FALSE;
 	if (_args[i0]->flags() & (CORBA::ARG_IN|CORBA::ARG_INOUT)) {
@@ -1892,8 +1893,9 @@ CORBA::StaticRequest::get_out_args (Any *res, NVList_ptr oparams,
     }
 
     CORBA::NamedValue_ptr nv;
+    assert(_args.size() < UINT_MAX);
     for (mico_vec_size_type i0 = 0; i0 < _args.size(); ++i0) {
-	nv = oparams->item(i0);
+        nv = oparams->item((CORBA::ULong)i0);
 	if (_args[i0]->flags() != nv->flags())
 	    return FALSE;
 	if (_args[i0]->flags() & (CORBA::ARG_OUT|CORBA::ARG_INOUT)) {
@@ -1964,8 +1966,9 @@ CORBA::StaticRequest::set_out_args (Any *res, NVList_ptr oparams)
     }
 
     CORBA::NamedValue_ptr nv;
+    assert(_args.size() < UINT_MAX);
     for (mico_vec_size_type i0 = 0; i0 < _args.size(); ++i0) {
-	nv = oparams->item(i0);
+        nv = oparams->item((CORBA::ULong)i0);
 	if (_args[i0]->flags() != nv->flags())
 	    return FALSE;
 	if (_args[i0]->flags() & (CORBA::ARG_OUT|CORBA::ARG_INOUT)) {

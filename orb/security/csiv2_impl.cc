@@ -1604,7 +1604,9 @@ CORBA::OctetSeq*
 CSIv2::SecurityManager_impl::string2octet_seq(string str)
 {
     CORBA::OctetSeq* seq = new CORBA::OctetSeq;
-    seq->length(str.length());
+    string::size_type str_len = str.length();
+    assert(str_len < UINT_MAX);
+    seq->length((CORBA::ULong)str_len);
     for (CORBA::ULong i=0; i<str.length(); i++)
 	(*seq)[i] = (CORBA::Octet)str[i];
     return seq;
@@ -3189,7 +3191,7 @@ CSIv2::Component::print(ostream& out) const
 			    ostringstream ostr;
 			    dispenser->_ior()->print(ostr);
 			    atlas_iordump = ostr.str();
-			    CORBA::ULong pos = 0;
+			    string::size_type pos = 0;
 			    while ((pos = atlas_iordump.find('\n')) != string::npos) {
 				string nstr = atlas_iordump.substr(0, pos);
 				out << "                               " << nstr << endl;
