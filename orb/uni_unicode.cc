@@ -28,6 +28,7 @@
 #pragma no_pch
 #endif // __COMO__
 #include <string.h>
+#include <cassert>
 #include "uni_unicode.h"
 #include "uni_base64.h"
 #include "uni_errors.h"
@@ -422,7 +423,9 @@ C_EXPORT uni_slong uni_ucs4toutf7 (char *utf7, uni_ulong ucs4)
     RC = uni_base64encode(&utf7[1], &ucs2, sizeof(ucs2), false, NULL);
     if(RC == C_OK)
     {
-      RC = strlen(utf7);
+      size_t utf7len = strlen(utf7);
+      assert(utf7len < INT_MAX);
+      RC = (uni_slong)utf7len;
       utf7[RC]   = '-';
       utf7[RC+1] = '\0';
       return(C_OK);
@@ -481,7 +484,9 @@ C_EXPORT uni_slong uni_ucs4arraytoutf7(char *utf7, uni_ulong *ucs4, uni_ubyte le
 			      false, NULL);
       if(RC != C_OK) return(RC);
 
-      write += strlen(&utf7[write]);
+      size_t len = strlen(&utf7[write]);
+      assert(len < UCHAR_MAX);
+      write += (uni_ubyte)len;
       utf7[write++]   = '-';
     }
     else return(C_ERROR);

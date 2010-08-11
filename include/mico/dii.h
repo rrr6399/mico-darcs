@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2007 by The Mico Team
+ *  Copyright (c) 1997-2010 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -111,7 +111,11 @@ public:
     typedef CORBA::Bounds_catch Bounds_catch;
 
     ULong count () const
-    { MICO_OBJ_CHECK (this); return _vec.size(); }
+    {
+      MICO_OBJ_CHECK (this);
+      // The ULong cast is needed for Win64/VC++ 10.0
+      return (ULong)_vec.size();
+    }
 
     NamedValue_ptr add (Flags);
     NamedValue_ptr add_item (const char *, Flags);
@@ -153,7 +157,11 @@ public:
     typedef CORBA::Bounds_catch Bounds_catch;
 
     ULong count () const
-    { MICO_OBJ_CHECK (this); return _vec.size(); }
+    {
+      MICO_OBJ_CHECK (this);
+      // The ULong cast is needed for Win64/VC++ 10.0
+      return (ULong)_vec.size();
+    }
 
     void add (TypeCode_ptr tc);
     void add_consume (TypeCode_ptr tc);
@@ -190,7 +198,11 @@ public:
     typedef CORBA::Bounds_catch Bounds_catch;
 
     ULong count () const
-    { MICO_OBJ_CHECK (this); return _vec.size(); }
+    {
+      MICO_OBJ_CHECK (this);
+      // The ULong cast is needed for Win64/VC++ 10.0
+      return (ULong)_vec.size();
+    }
 
     void add (const char *ctxt);
     void add_consume (char *ctxt);

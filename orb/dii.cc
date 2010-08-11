@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2007 by The Mico Team
+ *  Copyright (c) 1997-2010 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -106,6 +106,7 @@ CORBA::NamedValue_ptr
 CORBA::NVList::add (Flags flags)
 {
     MICO_OBJ_CHECK (this);
+    assert(_vec.size() < UINT_MAX);
 
     _vec.push_back (new NamedValue ("", flags));
     return _vec.back();
@@ -115,6 +116,7 @@ CORBA::NamedValue_ptr
 CORBA::NVList::add_item (const char *name, Flags flags)
 {
     MICO_OBJ_CHECK (this);
+    assert(_vec.size() < UINT_MAX);
 
     _vec.push_back (new NamedValue (name, flags));
     return _vec.back();
@@ -123,6 +125,7 @@ CORBA::NVList::add_item (const char *name, Flags flags)
 CORBA::NamedValue_ptr
 CORBA::NVList::add_value (const char *name, const Any &val, Flags flags)
 {
+    assert(_vec.size() < UINT_MAX);
     _vec.push_back (new NamedValue (name, val, flags));
     return _vec.back();
 }
@@ -131,6 +134,7 @@ CORBA::NamedValue_ptr
 CORBA::NVList::add_item_consume (char *name, Flags flags)
 {
     MICO_OBJ_CHECK (this);
+    assert(_vec.size() < UINT_MAX);
 
     _vec.push_back (new NamedValue (name, flags));
     CORBA::string_free (name);
@@ -140,6 +144,7 @@ CORBA::NVList::add_item_consume (char *name, Flags flags)
 CORBA::NamedValue_ptr
 CORBA::NVList::add_value_consume (char *name, Any *val, Flags flags)
 {
+    assert(_vec.size() < UINT_MAX);
     _vec.push_back (new NamedValue (name, *val, flags));
     delete val;
     CORBA::string_free (name);
@@ -285,11 +290,13 @@ CORBA::Principal::operator== (const Principal &p) const
 void
 CORBA::Principal::encode (DataEncoder &ec) const
 {
-    ec.seq_begin (_rep.size());
+    // The ULong cast is needed for Win64/VC++ 10.0
+    ec.seq_begin ((ULong)_rep.size());
     {
 	if (_rep.size() > 0) {
+            assert (_rep.size() < UINT_MAX);
 	    assert (_rep.size() < 2 || &_rep[0] + 1 == &_rep[1]);
-	    ec.put_octets (&_rep[0], _rep.size());
+	    ec.put_octets (&_rep[0], (ULong)_rep.size());
 	}
     }
     ec.seq_end ();
@@ -349,7 +356,9 @@ CORBA::Principal::get_property (const char *prop_name)
     if (!strcmp ("peer-info", prop_name)) {
 	Any *a = new Any;
         if (_rep.size() > 0) {
-            OctetSeq os (_rep.size(), _rep.size(), &_rep[0], FALSE);
+            // The ULong cast is needed for Win64/VC++ 10.0
+            assert(_rep.size() < UINT_MAX);
+            OctetSeq os ((ULong)_rep.size(), (ULong)_rep.size(), &_rep[0], FALSE);
             *a <<= os;
         } else {
             *a <<= OctetSeq();
@@ -401,6 +410,7 @@ CORBA::ContextList::add (const char *ctxt)
     if (!ctxt)
 	mico_throw (CORBA::BAD_PARAM());
 
+    assert(_vec.size() < UINT_MAX);
     _vec.push_back (ctxt);
 }
 
@@ -412,6 +422,7 @@ CORBA::ContextList::add_consume (char *ctxt)
     if (!ctxt)
 	mico_throw (CORBA::BAD_PARAM());
 
+    assert(_vec.size() < UINT_MAX);
     _vec.push_back (ctxt);
     CORBA::string_free (ctxt);
 }
@@ -453,6 +464,7 @@ CORBA::ExceptionList::add (TypeCode_ptr tc)
 {
     MICO_OBJ_CHECK (this);
 
+    assert(_vec.size() < UINT_MAX);
     _vec.push_back (TypeCode::_duplicate (tc));
 }
 
@@ -461,6 +473,7 @@ CORBA::ExceptionList::add_consume (TypeCode_ptr tc)
 {
     MICO_OBJ_CHECK (this);
 
+    assert(_vec.size() < UINT_MAX);
     _vec.push_back (tc);
 }
 
@@ -1089,8 +1102,11 @@ MICO::LocalRequest::get_in_args (StaticAnyList *iparams,
 	return FALSE;
 
     CORBA::NamedValue_ptr nv;
+    // cast to CORBA::ULong to avoid warning
+    // on Win64/VC++ platform about cast from
+    // size_t to ULong with possible loss of data
     for (mico_vec_size_type i0 = 0; i0 < iparams->size(); ++i0) {
-	nv = args->item(i0);
+        nv = args->item((CORBA::ULong)i0);
 	if ((*iparams)[i0]->flags() != nv->flags())
 	    return FALSE;
 	if ((*iparams)[i0]->flags() & (CORBA::ARG_IN|CORBA::ARG_INOUT)) {
@@ -1236,7 +1252,10 @@ MICO::LocalRequest::set_out_args (CORBA::StaticAny *res,
 
     CORBA::NamedValue_ptr nv;
     for (mico_vec_size_type i0 = 0; i0 < oparams->size(); ++i0) {
-	nv = args->item(i0);
+        // cast to CORBA::ULong to avoid warning
+        // on Win64/VC++ platform about cast from
+        // size_t to ULong with possible loss of data
+        nv = args->item((CORBA::ULong)i0);
 	if ((*oparams)[i0]->flags() != nv->flags())
 	    return FALSE;
 	if ((*oparams)[i0]->flags() & (CORBA::ARG_OUT|CORBA::ARG_INOUT)) {

@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2001 by The Mico Team
+ *  Copyright (c) 1997-2010 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -128,7 +128,10 @@ public:
     { return _current_id && id == _current_id; }
 
     CORBA::ULong size () const
-    { return _invokes.size(); }
+    {
+      // The CORBA::ULong cast is needed for Win64/VC++ 10.0
+      return (CORBA::ULong)_invokes.size();
+    }
 
     // dispatcher callback
     virtual void callback (CORBA::Dispatcher *,

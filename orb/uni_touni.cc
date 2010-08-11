@@ -30,6 +30,7 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
+#include <cassert>
 
 #include "uni_unicode.h"
 #include "uni_base64.h"
@@ -962,7 +963,8 @@ uni_slong uni_toUTF8  (char *utf8, const char *src, uni_uword chars,
       {
         RC = uni_ucs4toutf8(&utf8[di], (uni_ubyte)src[si]);
         if(RC != C_OK) return(RC);
-        di += strlen(&utf8[di]);
+	assert(strlen(&utf8[di]) < UINT_MAX);
+        di += (uni_uword)strlen(&utf8[di]);
       }
 
     utf8[di] = '\0';
@@ -1011,7 +1013,8 @@ uni_slong uni_toUTF8  (char *utf8, const char *src, uni_uword chars,
 	      return(C_OK);
 	    }
             if(RC != C_OK) return(RC);
-            di += strlen(&utf8[di]);
+	    assert(strlen(&utf8[di]) < UINT_MAX);
+            di += (uni_uword)strlen(&utf8[di]);
             si += read;
           } while(carry!=0);
       else
@@ -1048,7 +1051,8 @@ uni_slong uni_toUTF8  (char *utf8, const char *src, uni_uword chars,
 	  return(C_OK);
 	}
         if(RC != C_OK) return(RC);
-        di += strlen(&utf8[di]);
+	assert(strlen(&utf8[di]) < UINT_MAX);
+        di += (uni_uword)strlen(&utf8[di]);
         si += read;
       }
     }
@@ -1076,7 +1080,8 @@ uni_slong uni_toUTF8  (char *utf8, const char *src, uni_uword chars,
       {
         RC = uni_ucs4toutf8(&utf8[di], ucs4[si]);
         if(RC != C_OK) return(RC);
-        di += strlen(&utf8[di]);
+	assert(strlen(&utf8[di]) < UINT_MAX);
+        di += (uni_uword)strlen(&utf8[di]);
       }
     }
 
@@ -1110,7 +1115,8 @@ uni_slong uni_toUTF8  (char *utf8, const char *src, uni_uword chars,
             {
               RC = uni_ucs4toutf8(&utf8[di], c);
               if(RC != C_OK) return(RC);
-              di += strlen(&utf8[di]);
+	      assert(strlen(&utf8[di]) < UINT_MAX);
+              di += (uni_uword)strlen(&utf8[di]);
             }
           }
           else
@@ -1209,7 +1215,8 @@ uni_slong uni_toUTF8  (char *utf8, const char *src, uni_uword chars,
         default:
           RC = uni_ucs4toutf8(&utf8[di], 0x0400 + (uni_ubyte)src[si] - 0xA0);
           if(RC != C_OK) return(RC);
-          di += strlen(&utf8[di]);
+	  assert(strlen(&utf8[di]) < UINT_MAX);
+          di += (uni_uword)strlen(&utf8[di]);
       }
     }
 
@@ -1239,7 +1246,8 @@ uni_slong uni_toUTF8  (char *utf8, const char *src, uni_uword chars,
         default:
           RC = uni_ucs4toutf8(&utf8[di], 0x0600 + (uni_ubyte)src[si] - 0xA0);
           if(RC != C_OK) return(RC);
-          di += strlen(&utf8[di]);
+	  assert(strlen(&utf8[di]) < UINT_MAX);
+          di += (uni_uword)strlen(&utf8[di]);
       }
     }
 
@@ -1293,7 +1301,8 @@ uni_slong uni_toUTF8  (char *utf8, const char *src, uni_uword chars,
         {
           RC = uni_ucs4toutf8(&utf8[di], c);
           if(RC != C_OK) return(RC);
-          di += strlen(&utf8[di]);
+	  assert(strlen(&utf8[di]) < UINT_MAX);
+          di += (uni_uword)strlen(&utf8[di]);
         }
       }
     }
@@ -1332,7 +1341,8 @@ uni_slong uni_toUTF8  (char *utf8, const char *src, uni_uword chars,
         {
           RC = uni_ucs4toutf8(&utf8[di], c);
           if(RC != C_OK) return(RC);
-          di += strlen(&utf8[di]);
+	  assert(strlen(&utf8[di]) < UINT_MAX);
+          di += (uni_uword)strlen(&utf8[di]);
         }
       }
     }
@@ -1366,7 +1376,8 @@ uni_slong uni_toUTF8  (char *utf8, const char *src, uni_uword chars,
 
         RC = uni_ucs4toutf8(&utf8[di], c);
         if(RC != C_OK) return(RC);
-        di += strlen(&utf8[di]);
+	assert(strlen(&utf8[di]) < UINT_MAX);
+        di += (uni_uword)strlen(&utf8[di]);
       }
     }
 
@@ -1484,7 +1495,8 @@ uni_slong uni_toUTF8  (char *utf8, const char *src, uni_uword chars,
     {
       RC = uni_ucs4toutf8(&utf8[di], c);
       if(RC != C_OK) return(RC);
-      di += strlen(&utf8[di]);
+      assert(strlen(&utf8[di]) < UINT_MAX);
+      di += (uni_uword)strlen(&utf8[di]);
     }
   }
 

@@ -1404,7 +1404,7 @@ MICOSL3_SecurityLevel3::TargetCredsHolder::release_credentials(const char* id)
     while (!key_stack.empty()) {
 	string key = key_stack.top();
 	key_stack.pop();
-	long i = creds_map_.erase(key);
+	TargetCredentialsMap::size_type i = creds_map_.erase(key);
 	assert(i == 1);
     }
 }
@@ -1500,7 +1500,7 @@ MICOSL3_SecurityLevel3::ClientCredsHolder::release_credentials(const char* id)
     while (!key_stack.empty()) {
 	string key = key_stack.top();
 	key_stack.pop();
-	long i = creds_map_.erase(key);
+	TargetCredsHolder::TargetCredentialsMap::size_type i = creds_map_.erase(key);
 	assert(i == 1);
     }
     this->current_creds(SecurityLevel3::ClientCredentials::_nil());

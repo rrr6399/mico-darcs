@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2001 by The Mico Team
+ *  Copyright (c) 1997-2010 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -355,7 +355,9 @@ CORBA::Buffer::put2 (const void *p)
 	*b++ = *((const Octet * &)p)++;
 	*b++ = *(const Octet *)p;
     }
-    _wptr = b - _buf;
+    size_t t = b - _buf;
+    assert(t < UINT_MAX);
+    _wptr = (ULong)t;
 }
 
 void
@@ -373,7 +375,9 @@ CORBA::Buffer::put4 (const void *p)
 	*b++ = *((const Octet * &)p)++;
 	*b++ = *(const Octet *)p;
     }
-    _wptr = b - _buf;
+    size_t t = b - _buf;
+    assert(t < UINT_MAX);
+    _wptr = (ULong)t;
 }
 
 void
@@ -395,7 +399,9 @@ CORBA::Buffer::put8 (const void *p)
 	*b++ = *((const Octet * &)p)++;
 	*b++ = *(const Octet *)p;
     }
-    _wptr = b - _buf;
+    size_t t = b - _buf;
+    assert(t < UINT_MAX);
+    _wptr = (ULong)t;
 }
 
 // put 16 bytes with 8 byte alignment
@@ -427,7 +433,9 @@ CORBA::Buffer::put16 (const void *p)
 	*b++ = *((const Octet * &)p)++;
 	*b++ = *(const Octet *)p;
     }
-    _wptr = b - _buf;
+    size_t t = b - _buf;
+    assert(t < UINT_MAX);
+    _wptr = (ULong)t;
 }
 
 void

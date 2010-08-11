@@ -1,7 +1,7 @@
 // -*- c++ -*-
 //
 //  MICO SL3 --- an Open Source SL3 implementation
-//  Copyright (C) 2002, 2003, 2004 ObjectSecurity Ltd.
+//  Copyright (C) 2002, 2003, 2004, 2010 ObjectSecurity Ltd.
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Library General Public
@@ -628,10 +628,11 @@ namespace MICOSL3_SecurityLevel3
 
 	void
 	release_credentials(const char* id);
-    private:
+
 	typedef std::map<std::string, SecurityLevel3::TargetCredentials_var, std::less<std::string> > TargetCredentialsMap;
 	typedef std::map<std::string, SecurityLevel3::TargetCredentials_var, std::less<std::string> >::iterator
 	TargetCredentialsMapIterator;
+    private:
 	TargetCredentialsMap creds_map_;
     };
 

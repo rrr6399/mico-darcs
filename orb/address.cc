@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2009 by The Mico Team
+ *  Copyright (c) 1997-2010 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -83,8 +83,8 @@ CORBA::Address::parse (const char *_a)
 
     string rest, proto, a = _a;
 
-    Long pos = a.find (":");
-    if (pos < 0) {
+    string::size_type pos = a.find (":");
+    if (pos == string::npos) {
 	proto = a;
 	rest = "";
     } else {
@@ -326,7 +326,7 @@ MICO::InetAddress::resolve_host () const
         {
             MICOMT::AutoLock lock(S_netdb_lock_);
             hent = ::gethostbyaddr ((char *)&_ipaddr.front(),
-                                    _ipaddr.size(), AF_INET);
+                                    (int)_ipaddr.size(), AF_INET);
 #else // HAVE_THREADS
 	struct hostent *hent = ::gethostbyaddr ((char *)&_ipaddr.front(),
 						_ipaddr.size(), AF_INET);
@@ -715,8 +715,8 @@ CORBA::Address *
 MICO::InetAddressParser::parse (const char *str, const char *proto) const
 {
     string s (str);
-    CORBA::Long pos = s.find (":");
-    if (pos < 0)
+    string::size_type pos = s.find (":");
+    if (pos == string::npos)
 	return 0;
 
     MICO::InetAddress::Family family;

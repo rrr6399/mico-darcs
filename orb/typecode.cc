@@ -967,8 +967,10 @@ CORBA::TypeCode::member_index (const Any &a)
 	mico_throw (CORBA::TypeCode::BadKind());
 
     for (mico_vec_size_type i = 0; i < labelvec.size(); ++i) {
-	if (a == *labelvec[i])
-	    return i;
+         if (a == *labelvec[i]) {
+            assert(i < INT_MAX);
+	    return (CORBA::Long)i;
+	 }
     }
     return defidx;
 }
@@ -982,8 +984,10 @@ CORBA::TypeCode::member_index (const char *s)
 	mico_throw (CORBA::TypeCode::BadKind());
 
     for (mico_vec_size_type i = 0; i < namevec.size(); ++i) {
-	if (!strcmp (s, namevec[i].c_str()))
-	    return i;
+         if (!strcmp (s, namevec[i].c_str())) {
+            assert(i < INT_MAX);
+	    return (CORBA::Long)i;
+	 }
     }
     return -1;
 }
@@ -997,7 +1001,8 @@ CORBA::TypeCode::member_count () const
 	  tckind == tk_enum || tckind == tk_except ||
 	  tckind == tk_value))
 	mico_throw (CORBA::TypeCode::BadKind());
-    return namevec.size();
+    assert(namevec.size() < UINT_MAX);
+    return (CORBA::ULong)namevec.size();
 }
 
 const char *
@@ -1238,6 +1243,7 @@ CORBA::TypeCode::member_visibility_inherited (ULong idx) const
 CORBA::Long
 CORBA::TypeCode::param_count () const
 {
+    assert(namevec.size() < INT_MAX);
     switch (tckind) {
     case tk_string:
     case tk_wstring:
@@ -1253,14 +1259,14 @@ CORBA::TypeCode::param_count () const
     case tk_value_box:
 	return 2;
     case tk_enum:
-	return 1 + namevec.size();
+        return 1 + (CORBA::Long)namevec.size();
     case tk_except:
     case tk_struct:
-	return 1 + 2 * namevec.size();
+	return 1 + 2 * (CORBA::Long)namevec.size();
     case tk_union:
-	return 2 + 3 * namevec.size();
+	return 2 + 3 * (CORBA::Long)namevec.size();
     case tk_value:
-	return 3 + 3 * namevec.size();
+	return 3 + 3 * (CORBA::Long)namevec.size();
     default:
 	return 0;
     }
@@ -1744,7 +1750,8 @@ CORBA::TypeCode::encode (DataEncoder &ec, MapTCPos *_omap) const
 	ec.encaps_begin (state);
         ec.put_string (repoid);
         ec.put_string (tcname);
-        ec.put_ulong (namevec.size());
+	assert(namevec.size() < UINT_MAX);
+        ec.put_ulong ((CORBA::ULong)namevec.size());
         assert (namevec.size() == tcvec.size());
         for (mico_vec_size_type i = 0; i < namevec.size(); ++i) {
             ec.put_string (namevec[i]);
@@ -1761,7 +1768,8 @@ CORBA::TypeCode::encode (DataEncoder &ec, MapTCPos *_omap) const
         ec.put_string (tcname);
         discriminator->encode (ec, omap);
         ec.put_long (defidx);
-        ec.put_ulong (namevec.size());
+	assert(namevec.size() < UINT_MAX);
+        ec.put_ulong ((CORBA::ULong)namevec.size());
         assert (namevec.size() == tcvec.size() &&
                 namevec.size() == labelvec.size());
         for (mico_vec_size_type i = 0; i < namevec.size(); ++i) {
@@ -1795,7 +1803,8 @@ CORBA::TypeCode::encode (DataEncoder &ec, MapTCPos *_omap) const
 	ec.encaps_begin (state);
         ec.put_string (repoid);
         ec.put_string (tcname);
-        ec.put_ulong (namevec.size());
+	assert(namevec.size() < UINT_MAX);
+        ec.put_ulong ((CORBA::ULong)namevec.size());
         for (mico_vec_size_type i = 0; i < namevec.size(); ++i)
             ec.put_string (namevec[i]);
 	ec.encaps_end (state);
@@ -1840,7 +1849,8 @@ CORBA::TypeCode::encode (DataEncoder &ec, MapTCPos *_omap) const
 	} else {
 	    content->encode (ec, omap);
 	}
-        ec.put_ulong (namevec.size());
+	assert(namevec.size() < UINT_MAX);
+        ec.put_ulong ((CORBA::ULong)namevec.size());
         assert (namevec.size() == tcvec.size());
         assert (namevec.size() == visvec.size());
         for (mico_vec_size_type i = 0; i < namevec.size(); ++i) {
@@ -2375,7 +2385,8 @@ CORBA::TypeCodeChecker::level ()
 CORBA::ULong
 CORBA::TypeCodeChecker::level_count () const
 {
-    return levelvec.size();
+    assert(levelvec.size() < UINT_MAX);
+    return (CORBA::ULong)levelvec.size();
 }
 
 void

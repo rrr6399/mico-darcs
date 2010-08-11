@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2006 by The Mico Team
+ *  Copyright (c) 1997-2010 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -150,7 +150,8 @@ CORBA::IOR::from_string (const char *_ior)
     if (ior.find ("IOR:") != 0)
 	return FALSE;
 
-    ULong len = ior.length();
+    string::size_type len = ior.length();
+    assert(len < UINT_MAX);
     if (((len-4) & 1) != 0)
 	return FALSE;
 
@@ -185,14 +186,16 @@ CORBA::IOR::compare (const IOR &ior) const
      * set of profiles cannot differ by oid.
      * beware: the IIOP module passes in IORs with empty oids...
      */
-    int len = tags.size() < ior.tags.size() ? tags.size() : ior.tags.size();
+    mico_vec_size_type len = tags.size() < ior.tags.size() ? tags.size() : ior.tags.size();
     CORBA::Long r;
-    for (int i = 0; i < len; ++i) {
+    for (mico_vec_size_type i = 0; i < len; ++i) {
 	r = tags[i]->compare (*ior.tags[i]);
 	if (r)
 	    return r;
     }
-    return tags.size() - ior.tags.size();
+    mico_vec_size_type sdiff = tags.size() - ior.tags.size();
+    assert(sdiff < INT_MAX);
+    return (CORBA::Long)sdiff;
 }
 
 CORBA::Long
@@ -203,16 +206,19 @@ CORBA::IOR::compare_reachable (const IOR &ior) const
      * set of profiles cannot differ by oid.
      * beware: the IIOP module passes in IORs with empty oids...
      */
-    int ilen = tags.size();
-    int jlen = ior.tags.size();
+    mico_vec_size_type ilen = tags.size();
+    mico_vec_size_type jlen = ior.tags.size();
     CORBA::Long r;
-    for (int i = 0, j = 0;; ++i, ++j) {
+    for (mico_vec_size_type i = 0, j = 0;; ++i, ++j) {
 	while (i < ilen && !tags[i]->reachable())
 	    ++i;
 	while (j < jlen && !ior.tags[j]->reachable())
 	    ++j;
-	if (i == ilen)
-	    return j-jlen;
+	if (i == ilen) {
+            mico_vec_size_type tmp = j-jlen;
+	    assert(tmp < INT_MAX);
+	    return (CORBA::Long)tmp;
+	}
 	if (j == jlen)
 	    return 1;
 	r = tags[i]->compare (*ior.tags[j]);
@@ -379,7 +385,8 @@ CORBA::IOR::addressing_disposition (GIOP::AddressingDisposition disp)
 void
 CORBA::IOR::add_profile (IORProfile *prof)
 {
-    int i = tags.size();
+    assert(tags.size() < INT_MAX);
+    int i = (int)tags.size();
     while (--i >= 0 && *prof < *tags[i])
 	;
     tags.insert (tags.begin()+(i+1), prof);
@@ -433,8 +440,9 @@ CORBA::IOR::encode (DataEncoder &ec) const
 
     ec.struct_begin ();
     ec.put_string_raw (oid.c_str());
-    ec.seq_begin (tags.size());
-    for (ULong i = 0; i < tags.size(); ++i) {
+    assert(tags.size() < UINT_MAX);
+    ec.seq_begin ((CORBA::ULong)tags.size());
+    for (ULong i = 0; i < (CORBA::ULong)tags.size(); ++i) {
 	ec.struct_begin ();
 	ec.put_ulong (tags[i]->encode_id());
 	// profiles are encapsulated
@@ -1472,7 +1480,8 @@ MICO::UnknownProfile::encode (CORBA::DataEncoder &ec) const
     // XXX vector elements need not be continuous ...
     // seek back one byte to overwrite byteorder octet
     ec.buffer()->wseek_rel (-1);
-    ec.put_octets (&tagdata[0], tagdata.size());
+    assert(tagdata.size() < UINT_MAX);
+    ec.put_octets (&tagdata[0], (CORBA::ULong)tagdata.size());
 }
 
 const CORBA::Address *
@@ -1523,7 +1532,8 @@ MICO::UnknownProfile::print (ostream &o) const
     o << " Components:  ";
 
     MICO::CDRDecoder dc;
-    dc.buffer()->put (&tagdata[0], tagdata.size());
+    assert(tagdata.size() < UINT_MAX);
+    dc.buffer()->put (&tagdata[0], (CORBA::ULong)tagdata.size());
 
     // get byteorder octet from encapsulated sequence
     CORBA::Octet bo;
@@ -1532,7 +1542,8 @@ MICO::UnknownProfile::print (ostream &o) const
     dc.byteorder (bo ? CORBA::LittleEndian : CORBA::BigEndian);
 
     char buf[16];
-    CORBA::ULong len, l, c=16;
+    CORBA::ULong len, l;
+    size_t c=16;
     dc.seq_begin (len);
 
     for (CORBA::ULong i = 0; i < len; ++i) {
@@ -1662,17 +1673,17 @@ CORBA::MultiComponent::~MultiComponent ()
 CORBA::Long
 CORBA::MultiComponent::compare (const MultiComponent &mc) const
 {
-    int len = _comps.size() < mc._comps.size()
+    mico_vec_size_type len = _comps.size() < mc._comps.size()
         ? _comps.size()
         : mc._comps.size();
 
     CORBA::Long r;
-    for (int i = 0; i < len; ++i) {
+    for (mico_vec_size_type i = 0; i < len; ++i) {
 	r = _comps[i]->compare (*mc._comps[i]);
 	if (r)
 	    return r;
     }
-    return _comps.size() - mc._comps.size();
+    return (CORBA::Long)(_comps.size() - mc._comps.size());
 }
 
 CORBA::Boolean
@@ -1690,7 +1701,8 @@ CORBA::MultiComponent::operator== (const MultiComponent &mc) const
 void
 CORBA::MultiComponent::add_component (Component *c)
 {
-    int i = _comps.size();
+    assert(_comps.size() < INT_MAX);
+    int i = (int)_comps.size();
     while (--i >= 0 && *c < *_comps[i])
 	;
     _comps.insert (_comps.begin()+(i+1), c);
@@ -1721,8 +1733,8 @@ void
 CORBA::MultiComponent::encode (DataEncoder &ec) const
 {
     CORBA::DataEncoder::EncapsState state;
-
-    ec.seq_begin (_comps.size());
+    assert(_comps.size() < UINT_MAX);
+    ec.seq_begin ((CORBA::ULong)_comps.size());
     for (mico_vec_size_type i = 0; i < _comps.size(); ++i) {
 	ec.struct_begin ();
 	ec.put_ulong (_comps[i]->id());
@@ -1778,7 +1790,7 @@ CORBA::MultiComponent::print (ostream &o) const
 CORBA::ULong
 CORBA::MultiComponent::size () const
 {
-    return _comps.size();
+    return (CORBA::ULong)_comps.size();
 }
 
 
@@ -1923,7 +1935,8 @@ MICO::UnknownComponent::encode (CORBA::DataEncoder &ec) const
     // XXX vector elements need not be continuous ...
     // seek back one byte to overwrite byteorder octet
     ec.buffer()->wseek_rel (-1);
-    ec.put_octets (&tagdata[0], tagdata.size());
+    assert(tagdata.size() < UINT_MAX);
+    ec.put_octets (&tagdata[0], (CORBA::ULong)tagdata.size());
 }
 
 MICO::UnknownComponent::ComponentId

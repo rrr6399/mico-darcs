@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2007 by The Mico Team
+ *  Copyright (c) 1997-2010 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -171,7 +171,9 @@ mico_bio_write (BIO *b, const char *in, int len)
 static int
 mico_bio_puts (BIO *b, const char *out)
 {
-    return mico_bio_write (b, out, strlen (out));
+    size_t outlen = strlen(out);
+    assert(outlen < INT_MAX);
+    return mico_bio_write (b, out, (int)outlen);
 }
 
 static long

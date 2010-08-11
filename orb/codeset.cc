@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2009 by The Mico Team
+ *  Copyright (c) 1997-2010 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -1069,7 +1069,9 @@ MICO::GIOP_1_0_CodeSetCoder::put_string (CORBA::DataEncoder & encoder,
 {
   assert (_isok);
 
-  CORBA::ULong length = strlen (data);
+  size_t data_len = strlen(data);
+  assert(data_len < UINT_MAX);
+  CORBA::ULong length = (CORBA::ULong)data_len;
 
   if (bound > 0 && length > bound) {
     return FALSE;
@@ -1532,7 +1534,9 @@ MICO::GIOP_1_1_CodeSetCoder::put_string (CORBA::DataEncoder & encoder,
 					 const char * data,
 					 CORBA::ULong bound)
 {
-  CORBA::ULong length = strlen (data);
+  size_t data_len = strlen(data);
+  assert(data_len < UINT_MAX);
+  CORBA::ULong length = (CORBA::ULong)data_len;
 
   assert (_isok);
 
@@ -2137,7 +2141,9 @@ MICO::GIOP_1_2_CodeSetCoder::put_wstring (CORBA::DataEncoder & encoder,
 					  const CORBA::WChar * data,
 					  CORBA::ULong bound)
 {
-  CORBA::ULong length = xwcslen (data);
+  size_t data_len = xwcslen(data);
+  assert(data_len < UINT_MAX);
+  CORBA::ULong length = (CORBA::ULong)data_len;
 
   assert (_w_isok);
 
@@ -2240,7 +2246,9 @@ MICO::CodesetComponent::encode (CORBA::DataEncoder &ec) const
 	    // native_code_set
 	    ec.put_ulong (_native_cs);
 	    // conversion_code_sets
-	    ec.seq_begin (_conv_cs.size());
+	    mico_vec_size_type _conv_cs_size = _conv_cs.size();
+	    assert(_conv_cs_size < UINT_MAX);
+	    ec.seq_begin ((CORBA::ULong)_conv_cs_size);
 	    for (mico_vec_size_type i = 0; i < _conv_cs.size(); ++i)
 		ec.put_ulong (_conv_cs[i]);
 	    ec.seq_end ();
@@ -2253,7 +2261,9 @@ MICO::CodesetComponent::encode (CORBA::DataEncoder &ec) const
 	    // native_code_set
 	    ec.put_ulong (_native_wcs);
 	    // conversion_code_sets
-	    ec.seq_begin (_conv_wcs.size());
+	    mico_vec_size_type _conv_wcs_size = _conv_wcs.size();
+	    assert(_conv_wcs_size < UINT_MAX);
+	    ec.seq_begin ((CORBA::ULong)_conv_wcs_size);
 	    for (mico_vec_size_type i = 0; i < _conv_wcs.size(); ++i)
 		ec.put_ulong (_conv_wcs[i]);
 	    ec.seq_end ();

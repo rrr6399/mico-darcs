@@ -158,7 +158,8 @@ template<class T, int TID>
 inline MICO_ULong
 SequenceTmpl<T,TID>::length () const
 {
-    return vec.size ();
+  // The MICO_ULong cast is needed for Win64/VC++ 10.0
+  return (MICO_ULong)vec.size ();
 }
 
 template<class T, int TID>
@@ -181,7 +182,8 @@ T *
 SequenceTmpl<T,TID>::get_buffer (MICO_Boolean orphan)
 {
     if (orphan) {
-	T *b = allocbuf (vec.capacity());
+        // The MICO_ULong cast is needed for Win64/VC++ 10.0
+        T *b = allocbuf ((MICO_ULong)vec.capacity());
 	for (mico_vec_size_type i = 0; i < vec.size(); ++i)
 	    b[i] = vec[i];
 	vec.erase (vec.begin(), vec.end());
@@ -266,7 +268,8 @@ public:
 
     MICO_ULong length () const
     {
-	return vec.size ();
+        // The MICO_ULong cast is needed for Win64/VC++ 10.0
+	return (MICO_ULong)vec.size();
     }
 
     T &operator[] (MICO_ULong idx)

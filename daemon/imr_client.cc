@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2001 by The Mico Team
+ *  Copyright (c) 1997-2010 by The Mico Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -223,19 +223,20 @@ imr_create (const vector<string> &args, CORBA::ImplRepository_ptr imr)
 
     CORBA::ImplementationDef::ObjectInfoList objs;
 
+    assert(args.size() < UINT_MAX);
     if (args.size() > 3) {
-	objs.length (args.size() - 3);
+        objs.length ((CORBA::ULong)args.size() - 3);
 	for (vector<string>::size_type i = 3; i < args.size(); ++i) {
-	    int pos = args[i].rfind ("#");
-	    if (pos >= 0) {
-		objs[i-3].repoid =
+            string::size_type pos = args[i].rfind ("#");
+	    if (pos != string::npos) {
+                objs[(CORBA::ULong)i-3].repoid =
 		    CORBA::string_dup (args[i].substr(0,pos).c_str());
 
 		CORBA::ORB::ObjectTag_var tag =
 		    CORBA::ORB::string_to_tag (args[i].substr(pos+1).c_str());
-		objs[i-3].tag = *tag;
+		objs[(CORBA::ULong)i-3].tag = *tag;
 	    } else {
-		objs[i-3].repoid = CORBA::string_dup (args[i].c_str());
+                objs[(CORBA::ULong)i-3].repoid = CORBA::string_dup (args[i].c_str());
 	    }
 	}
     }

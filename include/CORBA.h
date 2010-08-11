@@ -33,6 +33,7 @@
 #include <sys/types.h>
 #include <errno.h>
 #endif
+#include <limits.h>
 
 /***************************** config *******************************/
 

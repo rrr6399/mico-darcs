@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2001 by The Mico Team
+ *  Copyright (c) 1997-2010 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -160,6 +160,7 @@ MICO::RequestQueue::~RequestQueue ()
 void
 MICO::RequestQueue::add (ReqQueueRec *r)
 {
+    assert(_invokes.size() < INT_MAX);
     _invokes.push_back (r);
 }
 
@@ -205,7 +206,8 @@ void
 MICO::RequestQueue::fail ()
 {
     // make pending invokes fail ...
-    int sz = _invokes.size();
+    // The int cast is needed for Win64/VC++ 10.0
+    int sz = (int)_invokes.size();
     while (--sz >= 0 && _invokes.size() > 0) {
         ReqQueueRec *inv = _invokes.front();
         _invokes.pop_front();

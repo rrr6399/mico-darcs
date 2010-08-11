@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2006 by The Mico Team
+ *  Copyright (c) 1997-2010 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -335,9 +335,9 @@ Container_impl::lookup (const char* search_name)
    * searched for in enclosing scopes.
    */
 
-  CORBA::ULong pos;
+  string::size_type pos;
 
-  if ((pos = scoped_name.rfind ("::")) != (CORBA::ULong) -1) {
+  if ((pos = scoped_name.rfind ("::")) != string::npos) {
     string identifier;
     identifier  = scoped_name.substr (pos+2);
     scoped_name = scoped_name.substr (0, pos);

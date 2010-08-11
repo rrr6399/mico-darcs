@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2008 by The Mico Team
+ *  Copyright (c) 1997-2010 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -1278,9 +1278,10 @@ CORBA::ORB::http_to_object (const char * str)
    * For simplicity, speak HTTP/0.9
    */
   CORBA::Long written = 0;
+  assert(abs_path.length() < INT_MAX);
   if (trans->write ("GET ", 4) != 4
       || (written = trans->write ((void *) abs_path.c_str(),
-				  abs_path.length())) < 0
+				  (CORBA::Long)abs_path.length())) < 0
       || (CORBA::ULong)written != abs_path.length()
       || trans->write ("\r\n\r\n", 4) != 4) {
     delete trans;
@@ -1317,7 +1318,7 @@ CORBA::ORB::http_to_object (const char * str)
   // only use the last line, some http servers send headers even in
   // response to http 0.9 requests
 
-  for (int i = data.length()-1; i >= 0; --i) {
+  for (string::size_type i = data.length()-1; i >= 0; --i) {
       if (data[i] == '\r' || data[i] == '\n') {
           data = data.substr (i+1);
           break;
@@ -1447,7 +1448,9 @@ CORBA::ORB::tag_to_string (const ObjectTag &oid)
 CORBA::ORB::ObjectTag *
 CORBA::ORB::string_to_tag (const char *s)
 {
-    CORBA::ULong len = strlen (s);
+    size_t slen = strlen(s);
+    assert(slen < UINT_MAX);
+    CORBA::ULong len = (CORBA::ULong)slen;
 
     CORBA::ORB::ObjectTag *oid = new CORBA::ORB::ObjectTag;
     oid->length (len);
@@ -1837,7 +1840,9 @@ CORBA::ORB::list_initial_services ()
     MICO_OBJ_CHECK (this);
 
     ObjectIdList_ptr idlist = new ObjectIdList;
-    idlist->length (_init_refs.size());
+    mico_vec_size_type _init_refs_size = _init_refs.size();
+    assert(_init_refs_size < UINT_MAX);
+    idlist->length ((CORBA::ULong)_init_refs_size);
 
     int j;
     InitialRefMap::iterator i;
@@ -2016,7 +2021,7 @@ void
 CORBA::ORB::terminal_id (const CORBA::Octet *val, CORBA::ULong len)
 {
     _terminal_id.length(len);
-    for (size_t i = 0; i < len; ++i) {
+    for (CORBA::ULong i = 0; i < len; ++i) {
         _terminal_id[i] = val[i];
     }
 }
@@ -3257,7 +3262,9 @@ void __mtdebug_init();
 CORBA::ORB_ptr
 CORBA::ORB_init (int &argc, char **argv, const char *_id)
 {
-    CORBA::ULong pi_init_size = PInterceptor::PI::initializers().size();
+    mico_vec_size_type pi_isize = PInterceptor::PI::initializers().size();
+    assert(pi_isize < UINT_MAX);
+    CORBA::ULong pi_init_size = (CORBA::ULong)pi_isize;
     PortableInterceptor::backup_initializers();
 #ifdef HAVE_THREADS
     MICOMT::_init();
@@ -3309,7 +3316,7 @@ CORBA::ORB_init (int &argc, char **argv, const char *_id)
     char path[256];
     GetModuleFileName(0, path, 255);
     string xpath(path);
-    int pos = xpath.find_last_of("\\");
+    string::size_type pos = xpath.find_last_of("\\");
     if (pos != string::npos)	
 	xpath.erase(pos, xpath.length());
     xpath += "\\.micorc";
@@ -3547,12 +3554,12 @@ CORBA::ORB_init (int &argc, char **argv, const char *_id)
 #ifdef USE_CSIV2
 	else if (arg == "-ORBGSSClientUser") {
 	    string s = val;
-	    int index = s.find_first_of(',');
+	    string::size_type index = s.find_first_of(',');
 	    client_user_name = s.substr(0, index);
 	    client_user_passwd = s.substr(index+1, s.length());
 	} else if (arg == "-ORBGSSServerUser") {
 	    string s = val;
-	    int index = s.find_first_of(',');
+	    string::size_type index = s.find_first_of(',');
 	    string name = s.substr(0, index);
 	    string passwd = s.substr(index+1, s.length());
 	    server_users.push_back(name);
@@ -3567,7 +3574,7 @@ CORBA::ORB_init (int &argc, char **argv, const char *_id)
 	    tls_user_list[tls_user_list.length()-1] = name;
 	} else if (arg == "-ORBUserIdentity") {
 	    string s = val;
-	    int index = s.find_first_of(',');
+	    string::size_type index = s.find_first_of(',');
 	    string t_str;
 	    t_str = s.substr(0, index);
 	    t_user_id.user_name = t_str.c_str();
@@ -3964,7 +3971,9 @@ CORBA::ORB_init (int &argc, char **argv, const char *_id)
     // set plugging status, terminal identifier, and redirect address
     orb_instance->plugged(plugged);
     if (!terminal_id_str.empty()) {
-	ULong len = terminal_id_str.length();
+        string::size_type term_len = terminal_id_str.length();
+        assert(term_len < UINT_MAX);
+	ULong len = (ULong)term_len;
 	const Octet *str = mico_url_decode(terminal_id_str.c_str(), len);
 	orb_instance->terminal_id(str, len);
     }

@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2005 by The Mico Team
+ *  Copyright (c) 1997-2010 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -2854,7 +2854,7 @@ CORBA::Any::coerce (CORBA::Any &dst) const
 	    return FALSE;
 	const char *s;
 	src >>= CORBA::Any::to_string (s, 0);
-	CORBA::WString_var w = CORBA::wstring_alloc (strlen (s));
+	CORBA::WString_var w = CORBA::wstring_alloc ((CORBA::ULong)strlen (s));
 	for (size_t i = 0; i < strlen (s); i++)
 	    w[(CORBA::ULong)i] = s[i] & 0xff;
 	w[(CORBA::ULong)strlen(s)] = 0;
@@ -2876,7 +2876,7 @@ CORBA::Any::coerce (CORBA::Any &dst) const
 	    return FALSE;
 	const wchar_t *w;
 	src >>= CORBA::Any::to_wstring (w, 0);
-	CORBA::String_var s = CORBA::string_alloc (xwcslen (w));
+	CORBA::String_var s = CORBA::string_alloc ((CORBA::ULong)xwcslen (w));
 	for (size_t i = 0; i < xwcslen (w); i++) {
 	    if (w[i] & ~0xff)
 		return FALSE;
