@@ -27,7 +27,7 @@
 
 /***************************** C headers ****************************/
 
-#include <mico/assert.h>
+#include <cassert>
 #include <stddef.h> // for wchar_t
 #ifndef _POCKET_PC
 #include <sys/types.h>
