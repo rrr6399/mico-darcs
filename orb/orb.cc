@@ -2584,6 +2584,19 @@ CORBA::ORB::invoke_async (Object_ptr obj,
 	rec->oa (oa);
         oa->invoke (rec, obj, req, pr, response_exp);
 	if (!response_exp) {
+#ifndef HAVE_THREADS
+            // XXX has to be changed for MT
+            //_currentid = 0;
+            if (!_currentid.empty()) {
+	        _currentid.pop();
+            }
+#else // HAVE_THREADS
+            stack<CORBA::ORBInvokeRec*>* invs = static_cast<stack<CORBA::ORBInvokeRec*>*>
+	        (MICOMT::Thread::get_specific(_current_rec_key));
+            if (invs != NULL && !invs->empty()) {
+	        invs->pop();
+            }
+#endif // HAVE_THREADS
 #ifdef USE_SL3
           del_invoke(rec->id());
 #else // USE_SL3
