@@ -29,12 +29,12 @@
 
 #include <cassert>
 #include <cstdlib>
-#include <stddef.h> // for wchar_t
+#include <cstddef> // for wchar_t
 #ifndef _POCKET_PC
 #include <sys/types.h>
-#include <errno.h>
+#include <cerrno>
 #endif
-#include <limits.h>
+#include <climits>
 
 /***************************** config *******************************/
 
