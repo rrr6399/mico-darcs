@@ -637,7 +637,7 @@ MICOGetOpt::parse (const vector<string> &argv, vector<int> &erase,
 		   CORBA::Boolean ignore)
 {
   assert(argv.size() < INT_MAX);
-  for (int i = 0; i < argv.size(); ++i) {
+  for (mico_vec_size_type i = 0; i < argv.size(); ++i) {
 	string arg = argv[i];
 	if (arg == "--") {
 	    erase.push_back (i);
@@ -776,13 +776,13 @@ char*
 ASN1::Codec::decode_oid(CORBA::OctetSeq& __oid)
 {
     assert(__oid[0] == 6); // OID Tag = 6
-    int __len = __oid[1] + 2;
+    mico_vec_size_type __len = __oid[1] + 2;
     vector<unsigned int> __buf;
     vector<unsigned int> __big_num;
     string __res;
     int __first = __oid[2] / 40; // first number can be 0/1/2
     int __second = __oid[2] - __first * 40;
-    int __i;
+    mico_vec_size_type __i;
     for (__i=3; __i<__len; __i++) {
 	if (__oid[__i] < 127) {
 	    if (__big_num.size () == 0)
@@ -830,7 +830,7 @@ ASN1::Codec::encode_oid(const char* __o)
     mico_vec_size_type __oid_len = __oid.size();
     int __len = 1;
     __buf.push_back(40 * __oid[0] + __oid[1]);
-    for (int __i=2; __i<__oid_len; __i++) {
+    for (mico_vec_size_type __i=2; __i<__oid_len; __i++) {
 	if (__oid[__i] < 127) {
 	    __buf.push_back(__oid[__i]);
 	    __len++;

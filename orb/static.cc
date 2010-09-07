@@ -1782,7 +1782,7 @@ CORBA::StaticRequest::copy (StaticAnyList *dst, StaticAnyList *src,
     mico_vec_size_type src_count = src->size();
 
     StaticAny *dst_any, *src_any;
-    for (int d = 0, s = 0;; ++d, ++s) {
+    for (mico_vec_size_type d = 0, s = 0;; ++d, ++s) {
 	dst_any = 0;
 	for ( ; d < dst_count; ++d) {
 	    dst_any = (*dst)[d];
