@@ -671,18 +671,18 @@ MICOPOA::POAObjectReference::make_ref ()
   const char * iddata = oid.get_data (idlength);
   
   if (idlength == length) {
-    for (i=0; i < (CORBA::Long) idlength; i++) {
+    for (i=0; i < idlength; i++) {
       if (iddata[i] != poaname[i]) {
 	break;
       }
     }
-    if (i == (CORBA::Long) idlength) {
+    if (i == idlength) {
       samename = TRUE;
     }
   }
 
   if (!samename) {
-    for (i=0; i < (CORBA::Long) idlength; i++) {
+    for (i=0; i < idlength; i++) {
       if (iddata[i] == '/' || iddata[i] == '\\') {
 	length++;
       }
@@ -696,7 +696,7 @@ MICOPOA::POAObjectReference::make_ref ()
 
   if (!samename) {
     key[j++] = '/';
-    for (i=0; i < (CORBA::Long) idlength; i++, j++) {
+    for (i=0; i < idlength; i++, j++) {
       if (iddata[i] == '/' || iddata[i] == '\\') {
 	key[j++] = '\\';
       }
@@ -704,7 +704,7 @@ MICOPOA::POAObjectReference::make_ref ()
     }
   }
 
-  assert (j == (CORBA::Long) length);
+  assert (j == length);
 
   /*
    * Generate a Mobile Object Key if necessary.
@@ -1125,7 +1125,6 @@ MICOPOA::UniqueIdGenerator::new_id ()
 
   if (uid == NULL) {
     ulen = 1;
-    assert(ulen < UINT_MAX);
     uid  = CORBA::string_alloc ((CORBA::ULong)ulen);
     assert (uid);
     uid[0] = '0';
@@ -1141,7 +1140,7 @@ MICOPOA::UniqueIdGenerator::new_id ()
     if (i == ulen) {
       CORBA::string_free (uid);
       ulen++;
-      assert(ulen < UINT_MAX);
+      assert(ulen < INT_MAX);
       uid = CORBA::string_alloc ((CORBA::ULong)ulen);
       assert (uid);
       for (i=0; i<ulen-1; i++) {
@@ -1213,7 +1212,7 @@ MICOPOA::UniqueIdGenerator::state (const char * st)
   if (*st && *st != ':') {
     for (ulen=0; st[ulen] && st[ulen] != ':'; ulen++);
     assert (st[ulen] == ':');
-    assert(ulen < UINT_MAX);
+    assert(ulen < INT_MAX);
     uid = CORBA::string_alloc ((CORBA::ULong)ulen);
     for (int i=0; i<ulen; i++) {
       uid[i] = st[i];

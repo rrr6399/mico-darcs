@@ -1412,7 +1412,7 @@ PInterceptor::ServerRequestInfo_impl::adapter_id()
     size_t length = strlen(id);
     assert(length < UINT_MAX);
     retval->length((CORBA::ULong)length);
-    for (int i=0; i<length; i++)
+    for (CORBA::ULong i=0; i<(CORBA::ULong)length; i++)
 	(*retval)[i] = id[i];
     return retval;
 }
