@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2008 by The Mico Team
+ *  Copyright (c) 1997-2010 by The Mico Team
  * 
  *  OSThread: An abstract Thread class for MICO
  *  Copyright (C) 1999 Andy Kersting & Andreas Schultz
@@ -118,6 +118,11 @@ MICOMT::CondVar::timedwait(MICO_ULong tmout)
     int addusec = (tmout % 1000) * 1000;
     timeout.tv_sec  = now.tv_sec + addsec;
     timeout.tv_nsec = (now.tv_usec + addusec) * 1000;
+    // fix nsec overflow. nsec value must be below 1 second
+    // otherwise pthreads rejects timeout value
+    const long sec_ns = 1000000000L;
+    timeout.tv_sec += timeout.tv_nsec / sec_ns;
+    timeout.tv_nsec %= sec_ns;
     int result;
     assert((result = pthread_cond_timedwait(&_cond, &_mutex->_mutex, &timeout)) != EINVAL);
     return (result == ETIMEDOUT);
