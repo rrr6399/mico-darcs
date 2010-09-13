@@ -159,3 +159,12 @@
 
 /* Define if you have libumem available on your system */
 #undef HAVE_UMEM
+
+/* Define if you have GNU C++ which supports atomic functions */
+#undef HAVE_GCC_ATOMICS
+
+/* Define if you have Solaris OS which supports atomic functions in libc (atomic.h)*/
+#undef HAVE_SOLARIS_ATOMICS
+
+/* Define if your C++ compiler and OS support forced unwind exception */
+#undef HAVE_FORCED_UNWIND_EXCEPTION

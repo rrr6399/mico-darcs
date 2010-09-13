@@ -1353,6 +1353,31 @@ AC_MSG_RESULT($have_ansi_cplusplus_headers)
 AC_CHECK_HEADERS(cxxabi.h)
 AC_CHECK_FUNCS([__cxa_demangle])
 
+# GNU C++ atomic variables support
+AC_MSG_CHECKING([for GNU C++ atomic functions])
+AC_TRY_LINK([], [int foo, bar; bar = __sync_val_compare_and_swap(&foo, 0, 1);],
+                [HAVE_GCC_ATOMICS=yes; AC_MSG_RESULT(yes)],
+                [HAVE_GCC_ATOMICS=no; AC_MSG_RESULT(no)])
+if test X"$HAVE_GCC_ATOMICS" = Xyes; then
+  AC_DEFINE(HAVE_GCC_ATOMICS)
+fi
+
+# Solaris C++ atomic variables support
+AC_CHECK_HEADERS(atomic.h)
+AC_CHECK_FUNCS([atomic_inc_ulong_nv])
+AC_CHECK_FUNCS([atomic_inc_ulong])
+AC_CHECK_FUNCS([atomic_dec_ulong_nv])
+AC_MSG_CHECKING([for Solaris C atomic functions])
+if test X"$ac_cv_header_atomic_h" = Xyes -a X"$ac_cv_func_atomic_inc_ulong_nv" = Xyes -a X"$ac_cv_func_atomic_inc_ulong" = Xyes -a X"$ac_cv_func_atomic_dec_ulong_nv" = Xyes ; then
+  AC_DEFINE(HAVE_SOLARIS_ATOMICS)
+  AC_MSG_RESULT(yes)
+else
+  AC_MSG_RESULT(no)
+fi
+
+# GNU C++/GLIBC forced unwind exception support
+AC_CHECK_FORCED_UNWIND
+
 #
 # Checks for typedefs, structures, and compiler characteristics.
 #
