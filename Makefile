@@ -38,7 +38,7 @@ INSTALLDIRS = admin orb ir daemon idl cpp auxdir coss ccm tools include man demo
 MINLIBDIRS = orb ir idl
 MINPRGDIRS = cpp idl
 
-all .NOTPARALLEL: dep system
+all .NOTPARALLEL: system
 
 world .NOTPARALLEL: system extra
 
