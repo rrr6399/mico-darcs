@@ -2289,7 +2289,7 @@ CORBA::ORB::new_msgid ()
 #if defined(HAVE_GCC_ATOMICS)
     return __sync_add_and_fetch(&_theid, 1);
 #elif defined(HAVE_SOLARIS_ATOMICS)
-    return atomic_inc_ulong_nv(&_theid);
+    return atomic_inc_32_nv((uint32_t*)&_theid);
 #else
     MICOMT::AutoLock l(_theid_lock);
     _theid++;

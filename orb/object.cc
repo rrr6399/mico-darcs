@@ -123,7 +123,7 @@ CORBA::ServerlessObject::_ref ()
     __sync_fetch_and_add(&refs, 1);
 #elif defined(HAVE_SOLARIS_ATOMICS)
     _check();
-    atomic_inc_ulong((ULong*)&refs);
+    atomic_inc_32((uint32_t*)&refs);
 #else
     MICOMT::AutoLock lock(refslock);
     _check ();
@@ -137,7 +137,7 @@ CORBA::ServerlessObject::_deref ()
 #if defined(HAVE_GCC_ATOMICS)
     return _check_nothrow() && __sync_sub_and_fetch(&refs, 1) <= 0;
 #elif defined(HAVE_SOLARIS_ATOMICS)
-    return _check_nothrow() && atomic_dec_ulong_nv((ULong*)&refs) <= 0;
+    return _check_nothrow() && atomic_dec_32_nv((uint32_t*)&refs) <= 0;
 #else
     MICOMT::AutoLock lock(refslock);
     return _check_nothrow() && --refs <= 0;
