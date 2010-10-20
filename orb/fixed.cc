@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2005 by The Mico Team
+ *  Copyright (c) 1997-2010 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -35,6 +35,7 @@
 #else
 #include <iostream.h>
 #endif
+#include <cstdio>
 #include <ctype.h>
 #include <mico/os-math.h>
 #include <mico/template_impl.h>
