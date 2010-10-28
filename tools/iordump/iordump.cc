@@ -18,10 +18,10 @@ using namespace std;
 void
 usage (const char * argv0)
 {
-  printf ("usage:\n");
-  printf ("  %s               -- reads IOR from stdin\n", argv0);
-  printf ("  %s IOR           -- reads IOR from command line\n", argv0);
-  printf ("  %s repoid [tag]  -- binds to repoid using tag\n", argv0);
+  cout << "usage:\n" << endl;
+  cout << "  " << argv0 << "               -- reads IOR from stdin\n" << endl;
+  cout << "  " << argv0 << " IOR           -- reads IOR from command line\n" << endl;
+  cout << "  " << argv0 << " repoid [tag]  -- binds to repoid using tag\n" << endl;
 }
 
 int
@@ -55,7 +55,7 @@ main (int argc, char *argv[])
 #endif
 
     if (CORBA::is_nil (obj)) {
-      printf ("error: illegal object reference: `%s'\n", ref);
+      cerr << "error: illegal object reference: `" << ref << "'" << endl;
       exit (1);
     }
   }
@@ -70,11 +70,10 @@ main (int argc, char *argv[])
 
     if (CORBA::is_nil (obj)) {
       if (argc == 3) {
-	printf ("error: cannot bind to `%s' using tag `%s'\n",
-		argv[1], argv[2]);
+				cerr << "error: cannot bind to `"<< argv[1] << "' using tag `"<< argv[2] << "'"  << endl;
       }
       else {
-	printf ("error: cannot bind to `%s'\n", argv[1]);
+				cerr << "error: cannot bind to `"<< argv[1] << "'" << endl;
       }
       exit (1);
     }
@@ -92,12 +91,12 @@ main (int argc, char *argv[])
 #endif
 
     if (CORBA::is_nil (obj)) {
-      printf ("error: illegal object reference: `%s'\n", argv[1]);
+      cerr << "error: illegal object reference: `" << argv[1] << "'" << endl;
       exit (1);
     }
 
     if (!obj->_ior()) {
-      printf ("error: locality-constrained object: `%s'\n", argv[1]);
+      cout << "error: locality-constrained object: `"<< argv[1] << "'" << endl;
       exit (1);
     }
   }
