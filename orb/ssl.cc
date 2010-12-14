@@ -1052,7 +1052,10 @@ MICOSSL::SSLTransport::close ()
 	// ret value should be either 1 in case of success
 	// or 0 in case of already closed connection
 	// (i.e. client exists before closing connection properly)
-	assert(ret == 1 || ret == 0);
+        // kcg: it seems that from 0.9.8o 01 Jun 2010 version at least
+        // on SunOS we also get -1 in case of already closen
+        // connection, so I relaxed a bit this post-condition
+	assert(ret == 1 || ret == 0 || ret == -1);
     }
     _transp->close ();
     _closed = TRUE;
