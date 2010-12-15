@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2001 by The Mico Team
+ *  Copyright (c) 1997-2010 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -35,7 +35,11 @@ public:
                 CORBA::CodeSetCoder *c = 0, CORBA::Boolean dofree_c = TRUE,
 		ValueState *vs = 0, CORBA::Boolean dofree_vs = TRUE);
     ~CDREncoder ();
-    
+
+    using CORBA::DataEncoder::reset;
+    void reset(CORBA::Buffer *b, CORBA::Boolean dofree_b,
+               CORBA::CodeSetCoder *c, CORBA::Boolean dofree_c);
+
     CORBA::DataEncoder *clone () const;
     CORBA::DataEncoder *clone (CORBA::Buffer *,
     			       CORBA::Boolean dofree_b = TRUE,

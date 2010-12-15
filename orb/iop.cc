@@ -137,12 +137,15 @@ MICO::GIOPInContext::_retn ()
     assert (_delete_buf);
     assert (_delete_dc);
     _delete_buf = FALSE;
-    //_delete_dc = FALSE;
-    _delete_dc = TRUE;
-    //return _dc;
+    // //_delete_dc = FALSE;
+    // _delete_dc = TRUE;
+    // //return _dc;
 
-    //FIXME: has to be rechecked fot MT
-    return _dc->clone (_buf, TRUE, _dc->converter(), FALSE);
+    // //FIXME: has to be rechecked fot MT
+    // return _dc->clone (_buf, TRUE, _dc->converter(), FALSE);
+    _delete_dc = FALSE;
+    _dc->free_buf();
+    return _dc;
 }
 
 
@@ -220,6 +223,9 @@ MICO::GIOPCodec::GIOPCodec (CORBA::DataDecoder *_dc,
 	 MICO::Logger::Stream (MICO::Logger::GIOP)
 	     << "GIOPCodec::GIOPCodec(): " << this << endl;
      }
+#ifdef HAVE_THREADS
+     MICOMT::Thread::create_key(request_key_, NULL);
+#endif // HAVE_THREADS
 }
 
 MICO::GIOPCodec::~GIOPCodec ()
@@ -233,6 +239,9 @@ MICO::GIOPCodec::~GIOPCodec ()
 	MICO::Logger::Stream (MICO::Logger::GIOP)
 	    << "GIOPCodec::~GIOPCodec: " << this << endl;
     }
+#ifdef HAVE_THREADS
+    MICOMT::Thread::delete_key(request_key_);
+#endif // HAVE_THREADS
 }
 
 CORBA::Boolean
@@ -1302,8 +1311,33 @@ MICO::GIOPCodec::get_invoke_request (GIOPInContext &in,
 	// if there are no arguments aligning might fail ...
 	dc->buffer()->ralign (dc->max_alignment());
 
+#ifndef HAVE_THREADS
     req = new GIOPRequest (opname, in._retn(), this);
     req->context (&ctx);
+#else // HAVE_THREADS
+    if (MICO::MTManager::thread_per_connection()) {
+        // with TPC we are sure the thread serves still the same
+        // connection and hence also does have the same codec and
+        // codeset properties. So GIOPRequest caching is possible
+        GIOPRequest* r = static_cast<GIOPRequest*>
+            (MICOMT::Thread::get_specific(request_key_));
+        if (r != NULL) {
+            r->reset(opname, in._retn());
+            r->context(&ctx);
+            req = GIOPRequest::_duplicate(r);
+        }
+        else {
+            r = new GIOPRequest (opname, in._retn(), this);
+            r->context (&ctx);
+            MICOMT::Thread::set_specific(request_key_, r);
+            req = GIOPRequest::_duplicate(r);
+        }
+    }
+    else {
+        req = new GIOPRequest (opname, in._retn(), this);
+        req->context (&ctx);
+    }
+#endif // HAVE_THREADS
 
     return TRUE;
 }
@@ -1649,6 +1683,28 @@ MICO::GIOPRequest::~GIOPRequest ()
     CORBA::release (_codec);
     delete _idc;
     delete _oec;
+}
+
+void
+MICO::GIOPRequest::reset(const char *op, CORBA::DataDecoder *indata)
+{
+    _obuf.reset();
+
+    CORBA::CodeSetCoder *conv = indata->converter();
+    CORBA::CodeSetCoder *rconv = conv;
+
+    _opname = op;
+    if (_idc != NULL)
+        delete _idc;
+    _idc = indata;
+    _istart = _idc->buffer()->rpos();
+
+    if (_oec != NULL)
+        _oec->reset(&_obuf, FALSE, rconv, FALSE);
+    else
+        _oec = _idc->encoder (&_obuf, FALSE, rconv, FALSE);
+    _ostart = 0;
+    _is_except = FALSE;
 }
 
 const char *

@@ -91,6 +91,9 @@ class GIOPCodec : public CORBA::ServerlessObject {
     CORBA::Codeset::CodesetId _wcsid;
     CORBA::Boolean _codesets_sent;
 
+#ifdef HAVE_THREADS
+    MICOMT::Thread::ThreadKey request_key_;
+#endif // HAVE_THREADS
     CORBA::ULong put_header (GIOPOutContext &out, GIOP::MsgType);
     void put_size (GIOPOutContext &out, CORBA::ULong key);
     void put_contextlist (GIOPOutContext &out,
@@ -265,7 +268,9 @@ class GIOPRequest : public CORBA::ORBRequest {
 public:
     GIOPRequest (const char *op, CORBA::DataDecoder *indata, GIOPCodec *);
     ~GIOPRequest ();
-    
+
+    void reset(const char *op, CORBA::DataDecoder *indata);
+
     const char *op_name();
     CORBA::UShort version () const
     { return _codec->version (); }

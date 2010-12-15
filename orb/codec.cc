@@ -80,6 +80,25 @@ CORBA::DataEncoder::~DataEncoder ()
 }
 
 void
+CORBA::DataEncoder::reset(Buffer* b, Boolean dofree_b,
+                          CodeSetCoder* c, Boolean dofree_c,
+                          ValueState* vs, Boolean dofree_vs)
+{
+    if (dofree_buf && buf)
+	delete buf;
+    if (dofree_conv && conv)
+        delete conv;
+    if (dofree_vstate && vstate)
+	delete vstate;
+    buf = b;
+    dofree_buf = dofree_b;
+    conv = c;
+    dofree_conv = dofree_c;
+    vstate = vs;
+    dofree_vstate = dofree_vs;
+}
+
+void
 CORBA::DataEncoder::put_buffer (const Buffer &b)
 {
     buf->put (b.data(), b.length());
@@ -992,6 +1011,13 @@ MICO::CDREncoder::CDREncoder (CORBA::Buffer *b, CORBA::Boolean dofree_b,
 
 MICO::CDREncoder::~CDREncoder ()
 {
+}
+
+void
+MICO::CDREncoder::reset(CORBA::Buffer *b, CORBA::Boolean dofree_b,
+                        CORBA::CodeSetCoder *c, CORBA::Boolean dofree_c)
+{
+    DataEncoder::reset(b, dofree_b, c, dofree_c, NULL, 1);
 }
 
 void
