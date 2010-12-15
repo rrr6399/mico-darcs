@@ -1572,6 +1572,12 @@ MICOSSL::SSLProfile::objectkey (CORBA::Octet *o, CORBA::Long l)
     _prof->objectkey (o, l);
 }
 
+void
+MICOSSL::SSLProfile::objectkey_nc (CORBA::Octet *o, CORBA::Long l)
+{
+    _prof->objectkey_nc (o, l);
+}
+
 const CORBA::Octet *
 MICOSSL::SSLProfile::objectkey (CORBA::Long &l) const
 {

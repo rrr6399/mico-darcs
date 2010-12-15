@@ -142,6 +142,7 @@ public:
     ProfileId id () const;
     ProfileId encode_id () const;
     void objectkey (CORBA::Octet *, CORBA::Long length);
+    void objectkey_nc (CORBA::Octet *, CORBA::Long length);
     const CORBA::Octet *objectkey (CORBA::Long &length) const;
     CORBA::Boolean reachable ();
     void print (std::ostream &) const;

@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2001 by The Mico Team
+ *  Copyright (c) 1997-2010 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -140,6 +140,7 @@ public:
     virtual ProfileId id () const = 0;
     virtual ProfileId encode_id () const = 0;
     virtual void objectkey (Octet *, Long length) = 0;
+    virtual void objectkey_nc (Octet *, Long length) = 0;
     virtual const Octet *objectkey (Long &length) const = 0;
     virtual Boolean reachable () = 0;
     virtual void print (std::ostream &) const = 0;
@@ -212,6 +213,7 @@ public:
     const char *objid () const;
     void objid (const char *);
     void objectkey (Octet *, ULong len);
+    void objectkey_nc (Octet *, ULong len);
     void encode (DataEncoder &) const;
     Boolean decode (DataDecoder &);
     std::string stringify () const; // uses CDREncoder

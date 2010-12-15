@@ -1190,15 +1190,13 @@ MICO::GIOPCodec::get_target (GIOPInContext &in, CORBA::Object_ptr obj)
 	CORBA::ULong objkeylen;
 	CORBA::Octet *objkey;
 
-	obj->_ior()->add_profile (new GIOPSimpleProf);
-
 	check (dc->seq_begin (objkeylen));
         check (dc->buffer()->length() >= objkeylen);
 	objkey = dc->buffer()->data();
 	dc->buffer()->rseek_rel (objkeylen);
 	check (dc->seq_end ());
 
-	obj->_ior()->objectkey (objkey, objkeylen);
+	obj->_ior()->objectkey_nc (objkey, objkeylen);
 	obj->_ior()->addressing_disposition (GIOP::KeyAddr);
     } else {
 	check (dc->union_begin());
@@ -2096,13 +2094,24 @@ MICO::GIOPSimpleProf::objectkey (CORBA::Octet *o, CORBA::Long l)
     memcpy (_objkey, o, l);
 }
 
+void
+MICO::GIOPSimpleProf::objectkey_nc (CORBA::Octet *o, CORBA::Long l)
+{
+    if (_objkey)
+        delete[] _objkey;
+    _objkey_nc = o;
+    _length = l;
+}
+
 const CORBA::Octet *
 MICO::GIOPSimpleProf::objectkey (CORBA::Long &l) const
 {
     l = _length;
-    if (!_objkey)
-	return (const CORBA::Octet *)"";
-    return _objkey;
+    if (_objkey)
+        return _objkey;
+    if (_objkey_nc)
+        return _objkey_nc;
+    return (const CORBA::Octet *)"";
 }
 
 CORBA::Boolean
@@ -5080,6 +5089,17 @@ IIOPServer_cleanup_idrecmap(void* value)
         map->erase(map->begin(), map->end());
     }
 }
+
+void
+IIOPServer_cleanup_target_obj(void* value)
+{
+    CORBA::Object_ptr obj = static_cast<CORBA::Object*>
+        (value);
+    if (!CORBA::is_nil(obj)) {
+        CORBA::release(obj);
+    }
+}
+
 }
 #endif // HAVE_THREADS
 
@@ -5109,6 +5129,13 @@ MICO::IIOPServer::IIOPServer (CORBA::ORB_ptr orb, CORBA::UShort iiop_ver,
 
     // we only register as an OA to be notified of shutdown...
     _orb->register_oa (this);
+
+#ifndef HAVE_THREADS
+    target_obj_ = new CORBA::Object(new CORBA::IOR());
+    target_obj_->_ior()->add_profile(new GIOPSimpleProf());
+#else // HAVE_THREADS
+    MICOMT::Thread::create_key(target_obj_key_, IIOPServer_cleanup_target_obj);
+#endif // HAVE_THREADS
 }
 
 MICO::IIOPServer::~IIOPServer ()
@@ -5748,8 +5775,19 @@ MICO::IIOPServer::handle_invoke_request (GIOPConn *conn, GIOPInContext &in)
     CORBA::Boolean resp;
     CORBA::ORBRequest *req;
     CORBA::Principal_ptr pr = conn->transport()->get_principal();
-    CORBA::Object_ptr obj = new CORBA::Object (new CORBA::IOR);
-
+#ifndef HAVE_THREADS
+    CORBA::Object_ptr obj = CORBA::Object::_duplicate(target_obj_);
+#else // HAVE_THREADS
+    CORBA::Object_ptr throbj = static_cast<CORBA::Object*>
+        (MICOMT::Thread::get_specific(MICO::IIOPServer::target_obj_key_));
+    if (CORBA::is_nil(throbj)) {
+        CORBA::Object_ptr tobj = new CORBA::Object(new CORBA::IOR());
+        tobj->_ior()->add_profile(new GIOPSimpleProf());
+        MICOMT::Thread::set_specific(target_obj_key_, tobj);
+        throbj = tobj;
+    }
+    CORBA::Object_ptr obj = CORBA::Object::_duplicate(throbj);
+#endif // HAVE_THREADS
     // XXX take care, get_invoke_request() does a in._retn()
     if (!conn->codec()->get_invoke_request (in, req_id, resp, obj, req, pr)) {
 	CORBA::release (obj);
@@ -5816,7 +5854,20 @@ CORBA::Boolean
 MICO::IIOPServer::handle_locate_request (GIOPConn *conn, GIOPInContext &in)
 {
     CORBA::ULong req_id;
-    CORBA::Object_ptr obj = new CORBA::Object (new CORBA::IOR);
+    //CORBA::Object_ptr obj = new CORBA::Object (new CORBA::IOR);
+#ifndef HAVE_THREADS
+    CORBA::Object_ptr obj = CORBA::Object::_duplicate(target_obj_);
+#else // HAVE_THREADS
+    CORBA::Object_ptr throbj = static_cast<CORBA::Object*>
+        (MICOMT::Thread::get_specific(MICO::IIOPServer::target_obj_key_));
+    if (CORBA::is_nil(throbj)) {
+        CORBA::Object_ptr tobj = new CORBA::Object(new CORBA::IOR());
+        tobj->_ior()->add_profile(new GIOPSimpleProf());
+        MICOMT::Thread::set_specific(target_obj_key_, tobj);
+        throbj = tobj;
+    }
+    CORBA::Object_ptr obj = CORBA::Object::_duplicate(throbj);
+#endif // HAVE_THREADS
 
     if (!conn->codec()->get_locate_request (in, req_id, obj)) {
 	CORBA::release (obj);
