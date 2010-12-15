@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2001 by The Mico Team
+ *  Copyright (c) 1997-2010 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -108,6 +108,10 @@ public:
                  CodeSetCoder *c = 0, Boolean dofree_c = TRUE,
 		 ValueState *vs = 0, Boolean dofree_vs = TRUE);
     virtual ~DataEncoder ();
+
+    virtual void reset(Buffer* b, Boolean dofree_b = TRUE,
+                       CodeSetCoder* c = 0, Boolean dofree_c = TRUE,
+                       ValueState* vs = 0, Boolean dofree_vs = TRUE);
 
     virtual DataEncoder *clone () const = 0;
     virtual DataEncoder *clone (Buffer *b, Boolean dofree_b = TRUE,
@@ -423,6 +427,9 @@ public:
     { return buf; }
 
     void buffer (Buffer *, Boolean dofree = TRUE);
+
+    void free_buf()
+    { dofree_buf = TRUE; }
 
     virtual ByteOrder byteorder () const;
     virtual void byteorder (ByteOrder);
