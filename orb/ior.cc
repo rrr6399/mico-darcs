@@ -434,6 +434,14 @@ CORBA::IOR::objectkey (Octet *key, ULong keylen)
 }
 
 void
+CORBA::IOR::objectkey_nc (Octet *key, ULong keylen)
+{
+    for (mico_vec_size_type i = 0; i < tags.size(); ++i) {
+	tags[i]->objectkey_nc (key, keylen);
+    }
+}
+
+void
 CORBA::IOR::encode (DataEncoder &ec) const
 {
     CORBA::DataEncoder::EncapsState state;
@@ -706,11 +714,25 @@ MICO::LocalProfile::objectkey (CORBA::Octet *o, CORBA::Long l)
     memcpy (objkey, o, length);
 }
 
+void
+MICO::LocalProfile::objectkey_nc (CORBA::Octet *o, CORBA::Long l)
+{
+    if (objkey != NULL)
+        delete[] objkey;
+    objkey_nc = o;
+    length = l;
+}
+
 const CORBA::Octet *
 MICO::LocalProfile::objectkey (CORBA::Long &l) const
 {
     l = length;
-    return objkey;
+    if (objkey != NULL) {
+        return objkey;
+    }
+    else {
+        return objkey_nc;
+    }
 }
 
 CORBA::Boolean
@@ -989,6 +1011,12 @@ MICO::IIOPProfile::objectkey (CORBA::Octet *o, CORBA::Long l)
 	}
 	object_reg->reged = TRUE;
     }
+}
+
+void
+MICO::IIOPProfile::objectkey_nc (CORBA::Octet *o, CORBA::Long l)
+{
+    return this->objectkey(o, l);
 }
 
 const CORBA::Octet *
@@ -1293,6 +1321,12 @@ MICO::UIOPProfile::objectkey (CORBA::Octet *o, CORBA::Long l)
     memcpy (objkey, o, length);
 }
 
+void
+MICO::UIOPProfile::objectkey_nc (CORBA::Octet *o, CORBA::Long l)
+{
+    return this->objectkey(o, l);
+}
+
 const CORBA::Octet *
 MICO::UIOPProfile::objectkey (CORBA::Long &l) const
 {
@@ -1504,6 +1538,11 @@ MICO::UnknownProfile::encode_id () const
 
 void
 MICO::UnknownProfile::objectkey (CORBA::Octet *, CORBA::Long)
+{
+}
+
+void
+MICO::UnknownProfile::objectkey_nc (CORBA::Octet *, CORBA::Long)
 {
 }
 
@@ -2086,6 +2125,11 @@ MICO::MultiCompProfile::encode_id () const
 
 void
 MICO::MultiCompProfile::objectkey (CORBA::Octet *, CORBA::Long length)
+{
+}
+
+void
+MICO::MultiCompProfile::objectkey_nc (CORBA::Octet *, CORBA::Long length)
 {
 }
 

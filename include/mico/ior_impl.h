@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2005 by The Mico Team
+ *  Copyright (c) 1997-2010 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -43,6 +43,7 @@ class LocalProfile : public CORBA::IORProfile {
     std::string host;
     CORBA::Long pid;
     CORBA::Octet *objkey;
+    CORBA::Octet *objkey_nc;
     CORBA::ULong length;
     LocalAddress myaddr;
     ProfileId tagid;
@@ -59,6 +60,7 @@ public:
     ProfileId id () const;
     ProfileId encode_id () const;
     void objectkey (CORBA::Octet *, CORBA::Long length);
+    void objectkey_nc (CORBA::Octet *, CORBA::Long length);
     const CORBA::Octet *objectkey (CORBA::Long &length) const;
     CORBA::Boolean reachable ();
     void print (std::ostream &) const;
@@ -83,6 +85,7 @@ public:
 class IIOPProfile : public CORBA::IORProfile,
                     public MICO::ProfileIIOPVersionProvider {
     CORBA::Octet *objkey;
+    CORBA::Octet *objkey_nc;
     CORBA::ULong length;
     MICO::InetAddress myaddr;
     CORBA::MultiComponent comps;
@@ -109,6 +112,7 @@ public:
     ProfileId id () const;
     ProfileId encode_id () const;
     void objectkey (CORBA::Octet *, CORBA::Long length);
+    void objectkey_nc (CORBA::Octet *, CORBA::Long length);
     const CORBA::Octet *objectkey (CORBA::Long &length) const;
     CORBA::Boolean reachable ();
     void print (std::ostream &) const;
@@ -144,6 +148,7 @@ public:
 class UIOPProfile : public CORBA::IORProfile {
     std::string host;
     CORBA::Octet *objkey;
+    CORBA::Octet *objkey_nc;
     CORBA::ULong length;
     UnixAddress myaddr;
     ProfileId tagid;
@@ -165,6 +170,7 @@ public:
     ProfileId id () const;
     ProfileId encode_id () const;
     void objectkey (CORBA::Octet *, CORBA::Long length);
+    void objectkey_nc (CORBA::Octet *, CORBA::Long length);
     const CORBA::Octet *objectkey (CORBA::Long &length) const;
     CORBA::Boolean reachable ();
     void print (std::ostream &) const;
@@ -206,6 +212,7 @@ public:
     ProfileId id () const;
     ProfileId encode_id () const;
     void objectkey (CORBA::Octet *, CORBA::Long length);
+    void objectkey_nc (CORBA::Octet *, CORBA::Long length);
     const CORBA::Octet *objectkey (CORBA::Long &length) const;
     CORBA::Boolean reachable ();
     void print (std::ostream &) const;
@@ -243,6 +250,7 @@ public:
     ProfileId id () const;
     ProfileId encode_id () const;
     void objectkey (CORBA::Octet *, CORBA::Long length);
+    void objectkey_nc (CORBA::Octet *, CORBA::Long length);
     const CORBA::Octet *objectkey (CORBA::Long &length) const;
     CORBA::Boolean reachable ();
     void print (std::ostream &) const;

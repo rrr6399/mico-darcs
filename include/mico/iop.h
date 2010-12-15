@@ -314,6 +314,7 @@ public:
 class GIOPSimpleProf : public CORBA::IORProfile {
 public:
     CORBA::Octet *_objkey;
+    CORBA::Octet *_objkey_nc;
     CORBA::ULong _length;
 public:
     GIOPSimpleProf ();
@@ -326,6 +327,7 @@ public:
     ProfileId id () const;
     ProfileId encode_id () const;
     void objectkey (CORBA::Octet *, CORBA::Long length);
+    void objectkey_nc (CORBA::Octet *, CORBA::Long length);
     const CORBA::Octet *objectkey (CORBA::Long &length) const;
     CORBA::Boolean reachable ();
     void print (std::ostream &) const;
@@ -924,6 +926,11 @@ private:
     CORBA::UShort _iiop_ver;
     CORBA::ULong _max_message_size;
 
+#ifndef HAVE_THREADS
+    CORBA::Object_ptr target_obj_;
+#else // HAVE_THREADS
+    MICOMT::Thread::ThreadKey target_obj_key_;
+#endif // HAVE_THREADS
     IIOPServerInvokeRec *create_invoke();
     IIOPServerInvokeRec *pull_invoke_reqid (MsgId, GIOPConn *conn);
     IIOPServerInvokeRec *pull_invoke_orbid (CORBA::ORBMsgId);
