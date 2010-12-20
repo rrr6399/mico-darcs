@@ -221,7 +221,9 @@ public:
   bool in_poa (const char *);
   bool in_descendant_poa (const char *, const char *);
   char * next_descendant_poa (const char *, const char *);
-  
+
+  POA_impl* get_poa()
+  { return poa; }
 private:
   MICOMT::Mutex _ref_lock;
 
@@ -447,6 +449,10 @@ private:
 
   ObjectMap ActiveObjectMap;
   MICOMT::Mutex ObjectActivationLock;
+
+#ifdef HAVE_THREADS
+  MICOMT::Thread::ThreadKey por_key_;
+#endif // HAVE_THREADS
 
   std::vector<InvocationRecord_ptr> InvocationQueue;
   PortableServer::POAManager::State state;

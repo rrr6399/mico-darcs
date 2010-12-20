@@ -2275,6 +2275,10 @@ MICOPOA::POA_impl::POA_impl (CORBA::ORB_ptr porb)
   odm_manager_ = NULL;
 #endif // HAVE_SSL
 #endif // USE_CSL2
+
+#ifdef HAVE_THREADS
+  MICOMT::Thread::create_key(por_key_, NULL);
+#endif // HAVE_THREADS
 }
 
 MICOPOA::POA_impl::~POA_impl ()
@@ -3344,7 +3348,44 @@ MICOPOA::POA_impl::invoke (CORBA::ORBMsgId id,
 			   CORBA::Boolean response_exp)
 {
   assert (this == PortableServer::_the_root_poa);
-
+#ifdef HAVE_THREADS
+  // attempt the fastest way
+  POAObjectReference* thread_por = static_cast<POAObjectReference*>
+    (MICOMT::Thread::get_specific(por_key_));
+  CORBA::IORProfile* prof = NULL;
+  if (!destructed
+    && thread_por != NULL
+    && !CORBA::is_nil(obj)
+    && obj->_ior()
+    && (prof = obj->_ior()->profile())
+    && thread_por->get_poa()->servant_retention_policy->value()
+    == PortableServer::RETAIN) {
+    CORBA::ULong thread_objkey_len = thread_por->get_id().length();
+    const CORBA::Octet* thread_objkey = thread_por->get_id().get_buffer();
+    CORBA::Long objkey_len;
+    const CORBA::Octet* objkey = prof->objectkey(objkey_len);
+    const char* thread_poa_name = thread_por->poa_name();
+    unsigned int thread_poa_name_len = strlen(thread_poa_name);
+    if (strncmp((const char*)thread_poa_name,
+                (const char*)objkey, thread_poa_name_len) == 0) {
+      bool cont = true;
+      if (objkey[thread_poa_name_len] == '/') {
+        for (unsigned int i = 0; i < thread_objkey_len; i++) {
+          if (thread_objkey[i] != objkey[i + thread_poa_name_len + 1]) {
+            cont = false;
+            break;
+          }
+        }
+      }
+      if (cont) {
+        // thread saved POR is what we are looking for
+        InvocationRecord_var ir = new InvocationRecord (id, thread_por, req, pr);
+        thread_por->get_poa()->local_invoke (ir);
+        return TRUE;
+      }
+    }
+  }
+#endif // HAVE_THREADS
   /*
    * Decompose reference
    */
@@ -3427,11 +3468,37 @@ MICOPOA::POA_impl::invoke (CORBA::ORBMsgId id,
   /*
    * Okay, found responsible POA
    */
-
+  InvocationRecord_var ir = NULL;
+  if (poa == this) {
+    // optimized case for RootPOA
+#ifdef HAVE_THREADS
+    POAObjectReference* prev = static_cast<POAObjectReference*>
+      (MICOMT::Thread::get_specific(por_key_));
+    if (prev != NULL)
+      delete prev;
+    POAObjectReference* tpor = new POAObjectReference(por);
+    MICOMT::Thread::set_specific(por_key_, tpor);
+    //cerr << "saving POR ref(" << tpor << ") to RootPOA's TSS" << endl;
+#endif // HAVE_THREADS
+    ir = new InvocationRecord (id, &por, req, pr);
+    poa->local_invoke (ir);
+    return TRUE;
+  }
+#ifdef HAVE_THREADS
+  POAObjectReference* prev = static_cast<POAObjectReference*>
+    (MICOMT::Thread::get_specific(por_key_));
+  if (prev != NULL)
+    delete prev;
+  POAObjectReference* tpor = new POAObjectReference(poa, obj);
+  assert(tpor->is_legal());
+  MICOMT::Thread::set_specific(por_key_, tpor);
+  //cerr << "saving POR ref(" << tpor << ") to TSS" << endl;
+  ir = new InvocationRecord (id, tpor, req, pr);
+#else // HAVE_THREADS
   POAObjectReference por2(poa, obj);
   assert (por2.is_legal());
-  InvocationRecord_var ir = new InvocationRecord (id, &por2, req, pr);
-
+  ir = new InvocationRecord (id, &por2, req, pr);
+#endif // HAVE_THREADS
   poa->local_invoke (ir);
 
   return TRUE;
