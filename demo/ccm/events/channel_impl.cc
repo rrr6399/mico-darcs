@@ -1,7 +1,9 @@
 
-#include <iostream.h>
+#include <iostream>
 #include "channel.h"
 #include "message_impl.h"
+
+using namespace std;
 
 class MyEventChannel_impl : virtual public MyEventChannel
 {
