@@ -6,6 +6,7 @@
 #include "consumer.h"
 #include "message_impl.h"
 
+#include <cstdio>
 
 using namespace std;
 

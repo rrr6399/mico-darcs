@@ -2,6 +2,7 @@
 #include <coss/CosNaming.h>
 #include "account.h"
 
+#include <cstdio>
 
 using namespace std;
 

@@ -6,6 +6,7 @@
 
 #include "Printer_impl.h"
 
+#include <cstdio>
 
 Printer_impl::Printer_impl (const char *name)
 {

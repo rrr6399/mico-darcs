@@ -10,6 +10,7 @@
 #include <mico/CCM.h>
 #include <mico/CCMContainer.h>
 
+#include <cstdio>
 
 using namespace std;
 

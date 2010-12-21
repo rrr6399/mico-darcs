@@ -1,5 +1,7 @@
 #include "hello.h"
 
+#include <cstdio>
+
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
