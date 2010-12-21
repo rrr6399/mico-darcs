@@ -3,6 +3,9 @@
 #include <CORBA.h>
 #include <iostream>
 #include <string>
+
+#include <cstdio>
+
 #include <unistd.h>
 
 
