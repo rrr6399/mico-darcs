@@ -1,4 +1,4 @@
-all: .depend junk_client_2 junk_server
+all .NOTPARALLEL: .depend junk_client_2 junk_server
 
 DIR_PREFIX=../
 include ../../MakeVars

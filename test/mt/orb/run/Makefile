@@ -5,7 +5,7 @@ CXXFLAGS := -I../../../../include $(CXXFLAGS) #$(EHFLAGS)
 LDFLAGS  := -L../../../../orb $(LDFLAGS) 
 LDLIBS    = -lmico$(VERSION) $(CONFLIBS)
 
-all: .depend client server
+all .NOTPARALLEL: .depend client server
 
 client:	bench.o client.o
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $^ $(LDLIBS) -o $@

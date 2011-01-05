@@ -20,7 +20,7 @@
 #                mico@informatik.uni-frankfurt.de
 #
 
-all: .depend NsPublisher.o
+all .NOTPARALLEL: .depend NsPublisher.o
 
 DIR_PREFIX=../
 include ../../MakeVars

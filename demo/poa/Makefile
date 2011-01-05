@@ -1,12 +1,14 @@
 
-all: subs
-
 include ../MakeVars
 
 DIRS=hello-1 hello-2 inherit account-1 account-2 account-3
 
-subs:
-	for i in $(DIRS); do $(MAKE) -C $$i || exit 1; done
+.PHONY: all $(DIRS)
+
+all: $(DIRS)
+
+$(DIRS):
+	$(MAKE) --directory $@
 
 clean:
 	for i in $(DIRS); do $(MAKE) -C $$i clean || exit 1; done

@@ -26,7 +26,7 @@ CXXFLAGS := -I. -I../../include $(CXXFLAGS)
 LDLIBS    = -lmicoir$(VERSION) -lmico$(VERSION) $(CONFLIBS)
 LDFLAGS  := -L../../orb -L../../ir $(LDFLAGS)
 
-all: .depend irtest
+all .NOTPARALLEL: .depend irtest
 
 irtest: irtest.o ../../orb/$(LIBMICO) ../../ir/$(LIBMICOIR)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) irtest.o $(LDLIBS) -o irtest

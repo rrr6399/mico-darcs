@@ -1,12 +1,14 @@
 
-all: subs
-
 include ../MakeVars
 
 DIRS=abstract custom date tree tricky
 
-subs:
-	for i in $(DIRS); do $(MAKE) -C $$i || exit 1; done
+.PHONY: all $(DIRS)
+
+all: $(DIRS)
+
+$(DIRS):
+	$(MAKE) --directory $@
 
 run:
 	for i in $(DIRS); do $(MAKE) -C $$i run || exit 1; done

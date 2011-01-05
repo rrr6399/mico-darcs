@@ -29,7 +29,7 @@ CXXFLAGS := -I. -I../../../include $(CXXFLAGS) $(EHFLAGS)
 LDLIBS    = -lmico$(VERSION) $(CONFLIBS)
 LDFLAGS  := -L../../../orb $(LDFLAGS)
 
-all: .depend demo
+all .NOTPARALLEL: .depend demo
 
 demo: $(IDLFILE1).h $(IDLFILE1).o main.o ../../../orb/$(LIBMICO) \
       $(IDLFILE2).h $(IDLFILE2).o

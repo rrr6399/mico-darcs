@@ -20,7 +20,7 @@
 #                mico@informatik.uni-frankfurt.de
 #
 
-all: .depend stream_client stream_server req_client req_server
+all .NOTPARALLEL: .depend stream_client stream_server req_client req_server
 
 DIR_PREFIX=../
 include ../../MakeVars

@@ -1,5 +1,5 @@
 
-all: .depend prodcons
+all .NOTPARALLEL: .depend prodcons
 
 DIR_PREFIX=../
 include ../../MakeVars

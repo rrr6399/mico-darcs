@@ -20,7 +20,7 @@
 #                mico@informatik.uni-frankfurt.de
 #
 
-all: .depend Cart.jar client
+all .NOTPARALLEL: .depend Cart.jar client
 
 DIR_PREFIX=../../../
 

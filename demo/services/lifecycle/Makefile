@@ -20,7 +20,7 @@
 #                mico@informatik.uni-frankfurt.de
 #
 
-all: .depend TestServer DocumentsServer simple-test
+all .NOTPARALLEL: .depend TestServer DocumentsServer simple-test
 
 DIR_PREFIX=../
 include ../../MakeVars

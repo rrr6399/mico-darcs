@@ -38,10 +38,12 @@ DIRS := $(DIRS) atlas-tcpip atlas-relay-tcpip
 endif
 endif
 
-all: prg
+.PHONY: all $(DIRS)
 
-prg:
-	for i in $(DIRS); do $(MAKE) -C $$i || exit 1; done
+all: $(DIRS)
+
+$(DIRS):
+	$(MAKE) --directory $@
 
 check:
 	for i in $(DIRS); do $(MAKE) -C $$i check || exit 1; done

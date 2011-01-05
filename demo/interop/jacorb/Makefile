@@ -1,7 +1,7 @@
 
 IDLTARGET=Account
 
-all: .depend $(IDLTARGET).class Server.class $(IDLTARGET)Skeleton.class \
+all .NOTPARALLEL: .depend $(IDLTARGET).class Server.class $(IDLTARGET)Skeleton.class \
   Client.class ClientApplet.class client server
 
 DIR_PREFIX=../

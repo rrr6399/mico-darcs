@@ -27,10 +27,10 @@ LDFLAGS  := -L../../orb $(LDFLAGS)
 LDLIBS   := -lmico$(VERSION) $(CONFLIBS)
 
 ifeq ($(HAVE_EXCEPTIONS), yes)
-all: .depend diitest anytest transp diiclient diiserver siiclient siiserver \
+all .NOTPARALLEL: .depend diitest anytest transp diiclient diiserver siiclient siiserver \
   exc exs static
 else
-all: .depend diitest anytest transp diiclient diiserver  siiclient siiserver \
+all .NOTPARALLEL: .depend diitest anytest transp diiclient diiserver  siiclient siiserver \
   static
 endif
 

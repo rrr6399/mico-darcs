@@ -36,14 +36,12 @@ ifeq ($(THREADING_POLICIES), yes)
 DIRS := $(DIRS) threading
 endif
 
-.PHONY: all $(DIRS)
+.PHONY: $(DIRS)
 
-all: prg
-
-prg: $(DIRS)
+all: $(DIRS)
 
 $(DIRS):
-	$(MAKE) -j 1 --directory $@
+	$(MAKE) --directory $@
 
 clean:
 	for i in $(DIRS); do $(MAKE) -C $$i clean || exit 1; done

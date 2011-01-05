@@ -51,7 +51,7 @@ endif
 	for i in $(PRGDIRS); do $(MAKE) -C $$i .depend && $(MAKE) -C $$i prg || exit 1; done
 
 extra:
-	for i in $(EXTRADIRS); do $(MAKE) -C $$i prg || exit 1; done
+	for i in $(EXTRADIRS); do $(MAKE) -C $$i all || exit 1; done
 
 clean:
 	find . -name '*~' | xargs rm -f foobarbazbummbang

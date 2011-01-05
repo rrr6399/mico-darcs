@@ -20,7 +20,7 @@
 #                mico@informatik.uni-frankfurt.de
 #
 
-all: .depend server server2 server3 client client2
+all .NOTPARALLEL: .depend server server2 server3 client client2
 
 DIR_PREFIX=../
 include ../../MakeVars

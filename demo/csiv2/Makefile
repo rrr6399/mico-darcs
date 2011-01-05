@@ -1,13 +1,15 @@
 
-all: subs
-
 include ../MakeVars
 
 DIRS=hello-1 tls-hello-1 tls-hello-2 identity-1 tls-identity-1 interop
 RUNDIRS=hello-1 tls-hello-1 tls-hello-2 identity-1 tls-identity-1
 
-subs:
-	for i in $(DIRS); do $(MAKE) -C $$i || exit 1; done
+.PHONY: all $(DIRS)
+
+all: $(DIRS)
+
+$(DIRS):
+	$(MAKE) --directory $@
 
 clean:
 	for i in $(DIRS); do $(MAKE) -C $$i clean || exit 1; done

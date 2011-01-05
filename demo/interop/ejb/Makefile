@@ -20,7 +20,7 @@
 #                mico@informatik.uni-frankfurt.de
 #
 
-all: .depend client ConverterApp.ear
+all .NOTPARALLEL: .depend client ConverterApp.ear
 
 DIR_PREFIX=../
 include ../../MakeVars

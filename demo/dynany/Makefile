@@ -20,7 +20,7 @@
 #                mico@informatik.uni-frankfurt.de
 #
 
-all: .depend dynany dynanytest
+all .NOTPARALLEL: .depend dynany dynanytest
 
 include ../MakeVars
 

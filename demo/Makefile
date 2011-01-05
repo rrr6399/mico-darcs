@@ -72,10 +72,12 @@ ifeq ($(HAVE_BLUETOOTH), yes)
 DIRS := $(DIRS) ltp
 endif
 
-all: prg
+.PHONY: all $(DIRS)
 
-prg:
-	for i in $(DIRS); do $(MAKE) -C $$i || exit 1; done
+all: $(DIRS)
+
+$(DIRS):
+	$(MAKE) --directory $@
 
 run:
 	for i in $(RUNDIRS); do $(MAKE) -C $$i run || exit 1; done

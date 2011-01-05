@@ -20,7 +20,7 @@
 #                mico@informatik.uni-frankfurt.de
 #
 
-all: .depend POS_Client POS_Server
+all .NOTPARALLEL: .depend POS_Client POS_Server
 
 DIR_PREFIX=../
 include ../../MakeVars

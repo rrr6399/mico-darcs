@@ -5,7 +5,7 @@ CXXFLAGS := -I. -I../../../include $(CXXFLAGS) #$(EHFLAGS)
 LDFLAGS  := -L../../../libs $(LDFLAGS) 
 LDLIBS    = -lmicocoss$(VERSION) -lmico$(VERSION) $(CONFLIBS)
 
-all: .depend client server
+all .NOTPARALLEL: .depend client server
 
 client:	hello.o client.o
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $^ $(LDLIBS) -o $@

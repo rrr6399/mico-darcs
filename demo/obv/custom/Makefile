@@ -1,5 +1,5 @@
 
-all: .depend test
+all .NOTPARALLEL: .depend test
 
 DIR_PREFIX=../
 include ../../MakeVars

@@ -26,10 +26,12 @@ DIRS = tcpip user-pass-tcpip tls user-pass-tls \
   tls-anon user-pass-tls-anon tls-naming user-pass-tcpip-identity \
   user-pass-tls-plain-tls-client
 
-all: prg
+.PHONY: all $(DIRS)
 
-prg:
-	for i in $(DIRS); do $(MAKE) -C $$i || exit 1; done
+all: $(DIRS)
+
+$(DIRS):
+	$(MAKE) --directory $@
 
 clean:
 	for i in $(DIRS); do $(MAKE) -C $$i clean || exit 1; done

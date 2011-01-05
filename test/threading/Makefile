@@ -3,8 +3,12 @@ include ../../MakeVars
 
 DIRS = policy initref cmd-line
 
-all:
-	for i in $(DIRS); do $(MAKE) -C $$i || exit 1; done
+.PHONY: all $(DIRS)
+
+all: $(DIRS)
+
+$(DIRS):
+	$(MAKE) --directory $@
 
 clean:
 	for i in $(DIRS); do $(MAKE) -C $$i clean || exit 1; done
