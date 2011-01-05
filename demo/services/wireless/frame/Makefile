@@ -20,7 +20,7 @@
 #                mico@informatik.uni-frankfurt.de
 #
 
-all: .depend client server cliser gremlin frame consumer
+all .NOTPARALLEL: .depend client server cliser gremlin frame consumer
 
 DIR_PREFIX=../../
 include ../../../MakeVars

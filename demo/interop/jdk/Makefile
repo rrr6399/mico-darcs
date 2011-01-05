@@ -20,7 +20,7 @@
 #                mico@informatik.uni-frankfurt.de
 #
 
-all: .depend account_svr Account.class Client.class ClientApplet.class
+all .NOTPARALLEL: .depend account_svr Account.class Client.class ClientApplet.class
 
 DIR_PREFIX=../
 include ../../MakeVars

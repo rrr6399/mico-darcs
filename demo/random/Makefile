@@ -1,7 +1,7 @@
 # Makefile for a little mico client that reads random numbers from a
 # Corba-server. See client.cc for details.
 
-all: .depend client
+all .NOTPARALLEL: .depend client
 
 include ../MakeVars
 INSTALL_DIR     = random

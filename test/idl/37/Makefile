@@ -26,7 +26,7 @@ CXXFLAGS := -I. -I../../../include $(CXXFLAGS) $(EHFLAGS)
 LDLIBS    = -lmico$(VERSION) $(CONFLIBS)
 LDFLAGS  := -L../../../orb $(LDFLAGS)
 
-all: .depend client server
+all .NOTPARALLEL: .depend client server
 
 client: double.h double.o client.o ../../../orb/$(LIBMICO)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) double.o client.o $(LDLIBS) -o client

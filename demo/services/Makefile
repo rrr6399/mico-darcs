@@ -1,6 +1,4 @@
 
-all: subs
-
 include ../MakeVars
 
 DIRS=
@@ -41,8 +39,12 @@ ifeq ($(USE_WIRELESS), yes)
 DIRS := $(DIRS) wireless
 endif
 
-subs:
-	for i in $(DIRS); do $(MAKE) -C $$i || exit 1; done
+.PHONY: all $(DIRS)
+
+all: $(DIRS)
+
+$(DIRS):
+	$(MAKE) --directory $@
 
 clean:
 	for i in $(DIRS); do $(MAKE) -C $$i clean || exit 1; done

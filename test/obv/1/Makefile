@@ -26,7 +26,7 @@ CXXFLAGS := -I. -I../../../include $(CXXFLAGS) $(EHFLAGS)
 LDLIBS    = -lmico$(VERSION) $(CONFLIBS)
 LDFLAGS  := -L../../../orb $(LDFLAGS)
 
-all: .depend main
+all .NOTPARALLEL: .depend main
 
 main: val.h val.o val_impl.o main.o ../../../orb/$(LIBMICO)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) val.o val_impl.o main.o $(LDLIBS) -o main

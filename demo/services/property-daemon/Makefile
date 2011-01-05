@@ -20,7 +20,7 @@
 #                mico@informatik.uni-frankfurt.de
 #
 
-all: .depend set_properties get_properties
+all .NOTPARALLEL: .depend set_properties get_properties
 
 DIR_PREFIX=../
 include ../../MakeVars

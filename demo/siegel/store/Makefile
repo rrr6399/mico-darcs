@@ -20,7 +20,7 @@
 #                mico@informatik.uni-frankfurt.de
 #
 
-all: .depend store_server
+all .NOTPARALLEL: .depend store_server
 
 DIR_PREFIX=../
 include ../../MakeVars

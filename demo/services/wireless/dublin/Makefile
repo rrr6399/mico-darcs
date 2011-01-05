@@ -20,7 +20,7 @@
 #                mico@informatik.uni-frankfurt.de
 #
 
-all: .depend client server consumer
+all .NOTPARALLEL: .depend client server consumer
 
 DIR_PREFIX=../../
 include ../../../MakeVars

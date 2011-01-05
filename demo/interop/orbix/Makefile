@@ -20,7 +20,7 @@
 #                mico@informatik.uni-frankfurt.de
 #
 
-all: .depend grid_client
+all .NOTPARALLEL: .depend grid_client
 
 DIR_PREFIX=../
 include ../../MakeVars

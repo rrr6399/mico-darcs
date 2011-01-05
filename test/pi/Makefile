@@ -28,10 +28,12 @@ DIRS = poacurrent parameter-passing twoway-context twoway-request \
   dii-request location-forward dii-location-forward dii-except \
   dii-client-intercept-except dsi-except pi-init servant-locator
 
-all: prg
+.PHONY: all $(DIRS)
 
-prg:
-	for i in $(DIRS); do $(MAKE) -C $$i || exit 1; done
+all: $(DIRS)
+
+$(DIRS):
+	$(MAKE) --directory $@
 
 clean:
 	for i in $(DIRS); do $(MAKE) -C $$i clean || exit 1; done

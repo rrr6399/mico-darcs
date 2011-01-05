@@ -20,7 +20,7 @@
 #                mico@informatik.uni-frankfurt.de
 #
 
-all: .depend client server
+all .NOTPARALLEL: .depend client server
 
 include ../MakeVars
 

@@ -20,7 +20,7 @@
 #                mico@informatik.uni-frankfurt.de
 #
 
-all: .depend CorbaFriendlySession.jar client
+all .NOTPARALLEL: .depend CorbaFriendlySession.jar client
 
 DIR_PREFIX=../../../
 

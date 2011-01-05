@@ -38,7 +38,7 @@ endif
 endif
 endif
 
-all: .depend client server
+all .NOTPARALLEL: .depend client server
 
 CXXFLAGS  := $(X11_CXXFLAGS) $(CXXFLAGS)
 LDLIBS    := $(X11_LDLIBS) $(LDLIBS)

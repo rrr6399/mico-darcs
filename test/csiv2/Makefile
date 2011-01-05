@@ -5,7 +5,7 @@ CXXFLAGS := -I. -I../../include $(CXXFLAGS) $(EHFLAGS)
 LDLIBS    = -lmico$(VERSION) $(CONFLIBS)
 LDFLAGS  := -L../../orb $(LDFLAGS)
 
-all: .depend codec
+all .NOTPARALLEL: .depend codec
 
 codec:  codec.o ../../orb/$(LIBMICO)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) codec.o $(LDLIBS) -o codec

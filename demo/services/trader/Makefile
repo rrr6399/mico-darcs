@@ -20,7 +20,7 @@
 #                mico@informatik.uni-frankfurt.de
 #
 
-all: .depend client
+all .NOTPARALLEL: .depend client
 
 DIR_PREFIX=../
 include ../../MakeVars

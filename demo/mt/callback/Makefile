@@ -1,5 +1,5 @@
 
-all: .depend client server
+all .NOTPARALLEL: .depend client server
 
 DIR_PREFIX=../
 include ../../MakeVars

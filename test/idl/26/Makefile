@@ -29,7 +29,7 @@ CXXFLAGS := -I. -I../../../include $(CXXFLAGS) $(EHFLAGS)
 LDLIBS    = -lmico$(VERSION) $(CONFLIBS)
 LDFLAGS  := -L../../../orb $(LDFLAGS)
 
-all: .depend client server
+all .NOTPARALLEL: .depend client server
 
 client: $(IDLFILE1).h $(IDLFILE1).o $(IDLFILE2).h $(IDLFILE2).o \
           client.o base_impl.o derived_impl.o ../../../orb/$(LIBMICO)

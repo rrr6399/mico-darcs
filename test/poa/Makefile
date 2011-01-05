@@ -24,10 +24,12 @@ include ../../MakeVars
 
 DIRS = activator default-servant
 
-all: prg
+.PHONY: all $(DIRS)
 
-prg:
-	for i in $(DIRS); do $(MAKE) -C $$i || exit 1; done
+all: $(DIRS)
+
+$(DIRS):
+	$(MAKE) --directory $@
 
 clean:
 	for i in $(DIRS); do $(MAKE) -C $$i clean || exit 1; done

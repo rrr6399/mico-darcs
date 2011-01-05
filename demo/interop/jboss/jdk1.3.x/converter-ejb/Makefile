@@ -20,7 +20,7 @@
 #                mico@informatik.uni-frankfurt.de
 #
 
-all: .depend Converter.jar client
+all .NOTPARALLEL: .depend Converter.jar client
 
 DIR_PREFIX=../../../
 
