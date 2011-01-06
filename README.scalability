@@ -21,4 +21,9 @@ package which provides additional debugging facility. When installed
 libtcmalloc_minimal is detected and use automatically. If you don't
 like that, you can disable this by using --disable-tcmalloc configure
 option.
-
+If you use another OS than SunOS, Debian or RHEL, please consult your
+OS documentation for OS provided scalable version of library which
+provides malloc/free functionality. If you use Unix or Unix-like OS
+you can also attempt compiling and installing lib UMEM or Tcmalloc
+yourself. Download from http://labs.omniti.com/labs/portableumem or
+from http://goog-perftools.sourceforge.net/ then.
