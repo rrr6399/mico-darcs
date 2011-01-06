@@ -168,3 +168,6 @@
 
 /* Define if your C++ compiler and OS support forced unwind exception */
 #undef HAVE_FORCED_UNWIND_EXCEPTION
+
+/* Define if you have libtcmalloc_minimal available on your system */
+#undef HAVE_TCMALLOC

@@ -1,6 +1,6 @@
 #
 #  MICO --- an Open Source CORBA implementation
-#  Copyright (c) 1997-2010 by The Mico Team
+#  Copyright (c) 1997-2011 by The Mico Team
 #
 #  This library is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Library General Public
@@ -226,6 +226,10 @@ AC_ARG_ENABLE(threading-policies,
 AC_ARG_ENABLE(umem,
  [  --disable-umem          do not build against libumem if it is available],
  umem=$enableval, umem=yes)
+
+AC_ARG_ENABLE(tcmalloc,
+ [  --disable-tcmalloc      do not build against libtcmalloc_minimal if it is available],
+ tcmalloc=$enableval, tcmalloc=yes)
 
 AC_SUBST(HAVE_MINGW)
 AC_SUBST(HAVE_CYGWIN)
@@ -1288,6 +1292,18 @@ if test X"$use_threads" = Xyes -a X"$umem" = Xyes; then
       AC_DEFINE(HAVE_UMEM)
       SHLIBS="-lumem $SHLIBS"
     fi
+  fi
+  LIBS=$LIBS_BACKUP
+fi
+
+if test X"$use_threads" = Xyes -a X"$tcmalloc" = Xyes; then
+  LIBS_BACKUP=$LIBS
+  AC_CHECK_LIB(tcmalloc_minimal, open)
+  AC_CHECK_LIB(tcmalloc_minimal, malloc)
+  AC_CHECK_LIB(tcmalloc_minimal, free)
+  if test X"$ac_cv_lib_tcmalloc_minimal_open" = Xyes -a X"$ac_cv_lib_tcmalloc_minimal_malloc" = Xyes -a X"$ac_cv_lib_tcmalloc_minimal_free" = Xyes; then
+    AC_DEFINE(HAVE_TCMALLOC)
+    SHLIBS="-ltcmalloc_minimal $SHLIBS"
   fi
   LIBS=$LIBS_BACKUP
 fi
