@@ -1,0 +1,24 @@
+MICO scalability
+----------------
+In MICO 2.3.14 release we have switched to use thread per connection
+concurrency model by default on the server side to improve scalability
+of MICO. This was the first change in the long line of changes to make
+MICO scales well on boxes with more CPUs or with NUMA
+architecture. One thing we cannot do for you and that is your OS
+choice of malloc/free library. Please note that MICO is quite
+sensitive to scalability of your C++ standard library. Generally
+speaking standard libraries do not scale that well. To change that
+fact user usually needs to use some custom malloc/free library which
+is tuned for high CPU number SMP/NUMA boxes and which is used by the
+C++ standard library. In MICO 2.3.14 we have tested two of them: Sun's
+UMEM and Google's Tcmalloc. Sun's lib UMEM is installed by default on
+Solaris and MICO detects it and use automatically. If you don't like
+this, you can disable its usage by using --disable-umem configure
+option. At least Debian and RedHat Enteprise Linux also provide an
+option to install Google's Tcmalloc from their packages. Please note
+that you should install libtcmalloc_minimal package not libtcmalloc
+package which provides additional debugging facility. When installed
+libtcmalloc_minimal is detected and use automatically. If you don't
+like that, you can disable this by using --disable-tcmalloc configure
+option.
+
