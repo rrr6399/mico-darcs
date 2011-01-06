@@ -177,11 +177,14 @@
 /* Define if you have GNU C++ which supports atomic functions */
 #undef HAVE_GCC_ATOMICS
 
+/* Define if you have Solaris OS which supports atomic functions in libc (atomic.h)*/
+#undef HAVE_SOLARIS_ATOMICS
+
 /* Define if your C++ compiler and OS support forced unwind exception */
 #undef HAVE_FORCED_UNWIND_EXCEPTION
 
-/* Define if you have Solaris OS which supports atomic functions in libc (atomic.h)*/
-#undef HAVE_SOLARIS_ATOMICS
+/* Define if you have libtcmalloc_minimal available on your system */
+#undef HAVE_TCMALLOC
 
 /* The number of bytes in a double.  */
 #undef SIZEOF_DOUBLE
@@ -225,14 +228,14 @@
 /* Define if you have the asinl function.  */
 #undef HAVE_ASINL
 
-/* Define if you have the atomic_dec_ulong_nv function.  */
-#undef HAVE_ATOMIC_DEC_ULONG_NV
+/* Define if you have the atomic_dec_32_nv function.  */
+#undef HAVE_ATOMIC_DEC_32_NV
 
-/* Define if you have the atomic_inc_ulong function.  */
-#undef HAVE_ATOMIC_INC_ULONG
+/* Define if you have the atomic_inc_32 function.  */
+#undef HAVE_ATOMIC_INC_32
 
-/* Define if you have the atomic_inc_ulong_nv function.  */
-#undef HAVE_ATOMIC_INC_ULONG_NV
+/* Define if you have the atomic_inc_32_nv function.  */
+#undef HAVE_ATOMIC_INC_32_NV
 
 /* Define if you have the backtrace function.  */
 #undef HAVE_BACKTRACE
@@ -476,6 +479,9 @@
 
 /* Define if you have the ssl library (-lssl).  */
 #undef HAVE_LIBSSL
+
+/* Define if you have the tcmalloc_minimal library (-ltcmalloc_minimal).  */
+#undef HAVE_LIBTCMALLOC_MINIMAL
 
 /* Define if you have the termcap library (-ltermcap).  */
 #undef HAVE_LIBTERMCAP
