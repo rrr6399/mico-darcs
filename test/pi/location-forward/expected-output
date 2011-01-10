@@ -1,11 +1,54 @@
 Running.
-client: send_request
+client: interceptor[5]: send_request
+client: interceptor[4]: send_request
+client: interceptor[3]: send_request
+client: interceptor[2]: send_request
+client: interceptor[1]: send_request
 server: receive_request_service_contexts
 server: send_other
-client: receive_other
-client: send_request
+client: interceptor[1]: receive_other
+client: interceptor[2]: receive_other
+client: interceptor[3]: receive_other
+client: interceptor[4]: receive_other
+client: interceptor[5]: receive_other
+client: interceptor[5]: send_request
+client: interceptor[4]: send_request
+client: interceptor[3]: send_request
+client: interceptor[2]: send_request
+client: interceptor[1]: send_request
 server: receive_request_service_contexts
 server: receive_request
 server: Hello World
 server: send_reply
-client: receive_reply
+client: interceptor[1]: receive_reply
+client: interceptor[2]: receive_reply
+client: interceptor[3]: receive_reply
+client: interceptor[4]: receive_reply
+client: interceptor[5]: receive_reply
+client: interceptor[5]: send_request
+client: interceptor[4]: send_request
+client: interceptor[3]: send_request
+client: interceptor[2]: send_request
+client: interceptor[1]: send_request
+server: receive_request_service_contexts
+server: receive_request
+server: send_exception
+client: interceptor[1]: receive_exception
+client: interceptor[2]: receive_exception
+client: interceptor[3]: receive_other
+client: interceptor[4]: receive_other
+client: interceptor[5]: receive_other
+client: interceptor[5]: send_request
+client: interceptor[4]: send_request
+client: interceptor[3]: send_request
+client: interceptor[2]: send_request
+client: interceptor[1]: send_request
+server: receive_request_service_contexts
+server: receive_request
+server: Hello World II
+server: send_reply
+client: interceptor[1]: receive_reply
+client: interceptor[2]: receive_reply
+client: interceptor[3]: receive_reply
+client: interceptor[4]: receive_reply
+client: interceptor[5]: receive_reply

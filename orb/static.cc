@@ -2255,6 +2255,7 @@ CORBA::StaticRequest::invoke ()
 	    break;
 
 	case CORBA::InvokeSysEx:
+		try {
 	    // receive_exception (system exception)
 	    PInterceptor::PI::_receive_exception_ip
 		(_cri, PortableInterceptor::SYSTEM_EXCEPTION,
@@ -2294,10 +2295,22 @@ CORBA::StaticRequest::invoke ()
 					    TRUE, 0, id);
                     break;
 		}
-	    }
+		}
+		} catch(PortableInterceptor::ForwardRequest_catch& exc) {
+			_obj->_forward(exc->forward);
+			env()->clear();
+			CORBA::release(_cri);
+			id = orb->new_orbid();
+			_cri = PInterceptor::PI::_create_cri(_obj, _opname);
+			PInterceptor::PI::_send_request_ip
+			(_cri, CORBA::ORB::get_msgid(id), _args, this->ctx_list(),
+			 this->ctx(), this->context());
+			id = orb->invoke_async (_obj, this, Principal::_nil(),
+			     TRUE, 0, id);  
+			break;          
+        }
 	    done = TRUE;
 	    break;
-
 	default:
 	    assert (0);
 	}
@@ -2492,6 +2505,7 @@ CORBA::StaticRequest::get_response ()
 	    break;
 
 	case CORBA::InvokeSysEx:
+	    try{
 	    PInterceptor::PI::_receive_exception_ip
 		(_cri, PortableInterceptor::SYSTEM_EXCEPTION,
 		 this->exception(), this->ctx_list(),
@@ -2535,6 +2549,19 @@ CORBA::StaticRequest::get_response ()
                     break;
 		}
 	    }
+        } catch(PortableInterceptor::ForwardRequest_catch& exc) {
+			_obj->_forward(exc->forward);
+			env()->clear();
+			CORBA::release(_cri);
+			_id = orb->new_orbid();
+			_cri = PInterceptor::PI::_create_cri(_obj, _opname);
+			PInterceptor::PI::_send_request_ip
+			(_cri, CORBA::ORB::get_msgid(_id), _args, this->ctx_list(),
+			 this->ctx(), this->context());
+			_id = orb->invoke_async (_obj, this, Principal::_nil(),
+			     TRUE, 0, _id);  
+			break;          
+        }
 	    done = TRUE;
 	    break;
 

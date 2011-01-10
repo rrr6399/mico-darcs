@@ -1,5 +1,5 @@
 // -*- c++ -*-
 
 interface HelloWorld {
-  void hello ();
+  void hello (in boolean returnException);
 };
