@@ -2259,8 +2259,12 @@ PInterceptor::PI::_receive_exception_ip
 	cri->icept_oper(PInterceptor::RECEIVE_EXCEPTION);
 	cri->exception(exception->_clone());
 	cri->set_reply_service_context_list(reply_scl);
-	PInterceptor::PI::_exec_receive_exception(cri); // end point
-    }
+	try {
+		PInterceptor::PI::_exec_receive_exception(cri); // end point
+	} catch (PortableInterceptor::ForwardRequest_catch& ex) {
+		throw;
+	}
+	}
 }
 
 void
@@ -2280,8 +2284,12 @@ PInterceptor::PI::_receive_exception_ip
 	cri->contexts(contexts);
 	cri->operation_context(operation_context);
 	cri->set_reply_service_context_list(reply_scl);
-	PInterceptor::PI::_exec_receive_exception(cri); // end point
-    }
+	try {
+		PInterceptor::PI::_exec_receive_exception(cri); // end point
+	} catch (PortableInterceptor::ForwardRequest_catch& ex) {
+		throw;
+	}
+	}
 }
 
 void

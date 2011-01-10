@@ -13,13 +13,28 @@ using namespace PortableInterceptor;
 class HelloWorld_impl : virtual public POA_HelloWorld
 {
 public:
-    void hello();
+    void hello(CORBA::Boolean returnException);
 };
 
 void
-HelloWorld_impl::hello()
+HelloWorld_impl::hello(CORBA::Boolean returnException)
 {
-    cout << "server: Hello World" << endl;
+    if (returnException) 
+        throw CORBA::COMM_FAILURE();
+    else
+        cout << "server: Hello World" << endl;
+}
+
+class HelloWorld_impl2 : virtual public POA_HelloWorld
+{
+public:
+    void hello(CORBA::Boolean returnException);
+};
+
+void
+HelloWorld_impl2::hello(CORBA::Boolean returnException)
+{
+    cout << "server: Hello World II" << endl;
 }
 
 class HelloInterceptor
@@ -184,6 +199,13 @@ main (int argc, char *argv[])
     of << str.in() << endl;
     of.close ();
 
+    HelloWorld_impl2 *hello2 = new HelloWorld_impl2;
+    CORBA::Object_var hello2Obj = hello2->_this();
+    str = orb->object_to_string (hello2Obj);
+    ofstream of2 ("hello2.ref");
+    of2 << str.in() << endl;
+    of2.close ();
+    
     cout << "Running." << endl;
 
     mgr->activate ();

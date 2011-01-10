@@ -942,6 +942,18 @@ CORBA::Request::get_response (Boolean block)
 		PInterceptor::PI::_receive_exception_ip
 		    (_cri, PortableInterceptor::SYSTEM_EXCEPTION,
 		     _environm->exception(), dummy->context());
+		} catch(PortableInterceptor::ForwardRequest_catch& exc) {
+			_object->_forward(exc->forward);
+			env()->clear();
+			CORBA::release(_cri);
+			_orbid = orb->new_orbid();
+			_cri = PInterceptor::PI::_create_cri(_object, _opname);
+			PInterceptor::PI::_send_request_ip
+			(_cri, CORBA::ORB::get_msgid(_orbid), _args, this->contexts(),
+			 this->ctx(), _orbreq->context());
+			_orbid = orb->invoke_async (_object, _orbreq, Principal::_nil(),
+			     TRUE, 0, _orbid);  
+			break;          
 	    } catch (...) {
 		this->env()->exception(_cri->exception()->_clone());
 		_invoke_pending = FALSE;
