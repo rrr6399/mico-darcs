@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2008 by The Mico Team
+ *  Copyright (c) 1997-2011 by The Mico Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -718,6 +718,15 @@ IDLParam::config()
   cout << "yes" << endl;
 #else
   cout << "no" << endl;
+#endif
+
+  cout << "malloc/free library....: ";
+#ifdef HAVE_UMEM
+  cout << "umem" << endl;
+#elif defined(HAVE_TCMALLOC)
+  cout << "tcmalloc" << endl;
+#else
+  cout << "system provided" << endl;
 #endif
 
   exit (0);
