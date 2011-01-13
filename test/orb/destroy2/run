@@ -1,0 +1,11 @@
+#!/bin/sh
+
+rm -f core*
+
+./main -ORBSL3 -ORBSL3CmdExt -ORBSL3TLSAcceptor -ORBSL3TLSAcceptorOptions ca_cert.pem,s_cert.pem,s_key.pem -ORBSL3TLSAcceptorVerifyDepth 1 -ORBSL3TLSInitiator -ORBSL3TLSInitiatorOptions ca_cert.pem,s_cert.pem,s_key.pem -ORBSL3TLSInitiatorVerifyDepth 1 -ORBDebug All &
+mpid=$!
+sleep 1
+echo killing main process
+kill $mpid
+sleep 1
+ls -la core*
