@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2010 by The Mico Team
+ *  Copyright (c) 1997-2011 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -324,10 +324,13 @@ MICO::SocketTransportServer::__clean_up () { }
 
 MICO::SocketTransportServer::~SocketTransportServer ()
 {
-    if (adisp && acb) {
-	adisp->remove (this, CORBA::Dispatcher::Read);
-	adisp = 0;
-	acb->callback (this, CORBA::TransportServerCallback::Remove);
+    {
+        MICOMT::AutoLock l(acb_lock);
+        if (adisp && acb) {
+            adisp->remove (this, CORBA::Dispatcher::Read);
+            adisp = 0;
+            acb->callback (this, CORBA::TransportServerCallback::Remove);
+        }
     }
     OSNet::sock_shutdown(fd);
     OSNet::sock_close (fd);
@@ -344,6 +347,7 @@ void
 MICO::SocketTransportServer::aselect (CORBA::Dispatcher *disp,
 				      CORBA::TransportServerCallback *cb)
 {
+    MICOMT::AutoLock l(acb_lock);
     if (acb && adisp) {
 	adisp->remove (this, CORBA::Dispatcher::Read);
 	adisp = 0;
@@ -361,14 +365,22 @@ void
 MICO::SocketTransportServer::callback (CORBA::Dispatcher *disp,
 				       CORBA::Dispatcher::Event ev)
 {
+    CORBA::TransportServerCallback* tmp_acb = NULL;
     switch (ev) {
     case CORBA::Dispatcher::Read:
-	assert (acb);
-	acb->callback (this, CORBA::TransportServerCallback::Accept);
+        {
+            MICOMT::AutoLock l(acb_lock);
+            assert (acb);
+            tmp_acb = acb;
+        }
+	tmp_acb->callback (this, CORBA::TransportServerCallback::Accept);
 	break;
     case CORBA::Dispatcher::Remove:
-	acb = 0;
-	adisp = 0;
+        {
+            MICOMT::AutoLock l(acb_lock);
+            acb = 0;
+        }
+        adisp = 0;
 	break;
     case CORBA::Dispatcher::Moved:
         adisp = disp;
@@ -430,8 +442,16 @@ MICO::SocketTransportServer::_run() {
 	MICO::Logger::Stream (MICO::Logger::Transport)
 	    << "void MICO::SocketTransportServer::_run()" << endl;
     }
-    while ( acb ) {
-	acb->callback( this, CORBA::TransportServerCallback::Accept );
+    while ( true ) {
+        CORBA::TransportServerCallback* tmp_acb = NULL;
+        {
+            MICOMT::AutoLock l(acb_lock);
+            if (acb)
+                tmp_acb = acb;
+            else
+                break;
+        }
+	tmp_acb->callback( this, CORBA::TransportServerCallback::Accept );
     };
 
     // Thread()->deregisterOperation( this );

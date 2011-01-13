@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2010 by The Mico Team
+ *  Copyright (c) 1997-2011 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -1186,6 +1186,7 @@ MICOSSL::SSLTransportServer::SSLTransportServer (const SSLAddress *a)
     assert(_server != NULL);
     _local_addr = (SSLAddress *)a->clone();
     _acb = 0;
+    _closed = FALSE;
 }
 
 MICOSSL::SSLTransportServer::~SSLTransportServer ()
@@ -1193,7 +1194,12 @@ MICOSSL::SSLTransportServer::~SSLTransportServer ()
     CORBA::ORB_var orb = CORBA::ORB_instance ("mico-local-orb", FALSE);
     _server->aselect (orb->dispatcher(), 0);
     _acb = 0;
-
+    this->remove_aselect();
+    // busy wait to wait on our worker thread which is accepting
+    // incomming connections to finish this and get into idle state
+    while (this->thread()->state() == MICO::WorkerThread::Busy) {
+        this->thread()->yield();
+    }
     delete _server;
     delete _local_addr;
 }
@@ -1247,7 +1253,9 @@ MICOSSL::SSLTransportServer::bind (const CORBA::Address *a)
 void
 MICOSSL::SSLTransportServer::close ()
 {
+    MICOMT::AutoLock l(_closed_lock);
     _server->close ();
+    _closed = TRUE;
 }
 
 void
@@ -1265,6 +1273,14 @@ MICOSSL::SSLTransportServer::isblocking ()
 CORBA::Transport *
 MICOSSL::SSLTransportServer::accept ()
 {
+    {
+        // if we are already closed and going to delete _server
+        // then thread which is invoking us need to return back to its
+        // _run method immediately. So return 0 in this case
+        MICOMT::AutoLock l(_closed_lock);
+        if (_closed)
+            return 0;
+    }
     CORBA::Transport *t = _server->accept();
     if (!t)
         return 0;

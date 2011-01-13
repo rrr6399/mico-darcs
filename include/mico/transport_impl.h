@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2010 by The Mico Team
+ *  Copyright (c) 1997-2011 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -76,6 +76,7 @@ protected:
 #endif // HAVE_THREADS
     CORBA::Dispatcher *adisp;
     CORBA::TransportServerCallback *acb;
+    MICOMT::Mutex acb_lock;
     CORBA::Long fd;
     std::string err;
 
@@ -87,7 +88,10 @@ protected:
 	    adisp->remove (this, CORBA::Dispatcher::Read);
 	
 	adisp = 0;
-	acb = 0;
+        {
+            MICOMT::AutoLock l(acb_lock);
+            acb = 0;
+        }
     };
     virtual void __clean_up();
 
