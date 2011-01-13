@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2010 by The Mico Team
+ *  Copyright (c) 1997-2011 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -294,6 +294,8 @@ class SSLTransportServer : public MICO::SocketTransportServer,
     SSLAddress *_local_addr;
     std::string _err;
     CORBA::TransportServerCallback *_acb;
+    CORBA::Boolean _closed;
+    MICOMT::Mutex _closed_lock;
 
     using MICO::SocketTransportServer::callback;
     void callback (CORBA::TransportServer *, CORBA::TransportServerCallback::Event);
