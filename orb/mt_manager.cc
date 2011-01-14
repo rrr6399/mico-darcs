@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 2000-2008 by The Mico Team
+ *  Copyright (c) 2000-2011 by The Mico Team
  * 
  *  thread management
  *  Copyright (C) 1999 Andreas Schultz                                 
@@ -91,6 +91,7 @@ MICO::ThreadPool::~ThreadPool() {
     for (cnt = idle_threads.count(); cnt > 0;
 	 i = idle_threads.next(i), cnt--) {
 	idle_threads[i]->terminate();
+        idle_threads[i]->wait();
     }
     if (op != NULL)
 	delete op;
