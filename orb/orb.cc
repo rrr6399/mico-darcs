@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2010 by The Mico Team
+ *  Copyright (c) 1997-2011 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -1807,6 +1807,7 @@ CORBA::ORB::do_shutdown ()
 	    }
 	    _is_shutdown = 2;
 #ifdef HAVE_THREADS
+            MICO::MTManager::free();
 	}
 #endif // HAVE_THREADS
     }
