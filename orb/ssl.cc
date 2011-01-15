@@ -1197,7 +1197,7 @@ MICOSSL::SSLTransportServer::~SSLTransportServer ()
     this->remove_aselect();
     // busy wait to wait on our worker thread which is accepting
     // incomming connections to finish this and get into idle state
-    while (this->thread()->state() == MICO::WorkerThread::Busy) {
+    while (this->thread() != NULL && this->thread()->state() == MICO::WorkerThread::Busy) {
         this->thread()->yield();
     }
     delete _server;
