@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2010 by The Mico Team
+ *  Copyright (c) 1997-2011 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -5263,10 +5263,6 @@ MICO::IIOPServer::listen (CORBA::Address *addr, CORBA::Address *fwproxyaddr, con
 {
     CORBA::IORProfile *prof;
     CORBA::TransportServer *tserv = addr->make_transport_server ();
-#ifdef HAVE_THREADS
-    if (!MICO::MTManager::thread_pool())
-	tserv->create_thread();
-#endif
     if (!tserv->bind (addr)) {
       if (MICO::Logger::IsLogged (MICO::Logger::IIOP)) {
 	MICOMT::AutoDebugLock __lock;
@@ -5279,6 +5275,13 @@ MICO::IIOPServer::listen (CORBA::Address *addr, CORBA::Address *fwproxyaddr, con
     }
     tserv->block ( Dispatcher()->isblocking() );
     tserv->aselect ( Dispatcher(), this);
+
+#ifdef HAVE_THREADS
+    if (!MICO::MTManager::thread_pool()) {
+	tserv->create_thread();
+	tserv->start();
+    }
+#endif // HAVE_THREADS
 
     if (!fwproxyaddr) {
         prof = tserv->addr()->make_ior_profile ((CORBA::Octet *)"", 1,
@@ -5316,10 +5319,6 @@ MICO::IIOPServer::listen (CORBA::Address *addr, CORBA::Address *fwproxyaddr, con
     _orb->ior_template()->add_profile (prof);
 
     _tservers.push_back(tserv);
-#ifdef HAVE_THREADS
-    if (!MICO::MTManager::thread_pool())
-	tserv->start();
-#endif // HAVE_THREADS
     return TRUE;
 }
 
