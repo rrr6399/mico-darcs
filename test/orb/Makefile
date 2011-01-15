@@ -22,7 +22,7 @@
 
 include ../../MakeVars
 
-DIRS = destroy
+DIRS = destroy destroy2
 
 .PHONY: all $(DIRS)
 
