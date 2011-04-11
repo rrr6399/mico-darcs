@@ -1,7 +1,7 @@
 /* -*- mode: c++; c-basic-offset: 4; -*-
  *
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2010 by The Mico Team
+ *  Copyright (c) 1997-2011 by The Mico Team
  * 
  *  os-thread wrapper
  *  Copyright (C) 1999 Andreas Schultz                                 
@@ -453,6 +453,9 @@ operator!=(MICOMT::Thread::ThreadID first, MICOMT::Thread::ThreadID second);
 
 std::ostream&
 operator<<(std::ostream& out, MICOMT::Thread::ThreadID id);
+
+bool
+operator<(MICOMT::Thread::ThreadID first, MICOMT::Thread::ThreadID second);
 #endif // _WIN32 && NEED_THREADID_OPERATORS
 
 #else // HAVE_THREADS
