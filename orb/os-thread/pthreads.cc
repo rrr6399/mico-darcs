@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2010 by The Mico Team
+ *  Copyright (c) 1997-2011 by The Mico Team
  * 
  *  OSThread: An abstract Thread class for MICO
  *  Copyright (C) 1999 Andy Kersting & Andreas Schultz
@@ -640,13 +640,13 @@ MICOMT::Thread::priority(MICO_Long new_priority)
 bool
 operator==(MICOMT::Thread::ThreadID first, MICOMT::Thread::ThreadID second)
 {
-	return (first.x == second.x) && (first.p == second.p);
+	return (first.p == second.p);
 }
 
 bool
 operator!=(MICOMT::Thread::ThreadID first, MICOMT::Thread::ThreadID second)
 {
-	return (first.x != second.x) || (first.p != second.p);
+	return (first.p != second.p);
 }
 
 ostream&
@@ -654,6 +654,12 @@ operator<<(ostream& out, MICOMT::Thread::ThreadID id)
 {
 	out << (void*)id.p << "(" << id.x << ")";
 	return out;
+}
+
+bool
+operator<(MICOMT::Thread::ThreadID first, MICOMT::Thread::ThreadID second)
+{
+	return first.p < second.p;
 }
 #endif // _WIN32 && NEED_THREADID_OPERATORS
 
