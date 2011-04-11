@@ -63,6 +63,7 @@ public:
 
 class WATMProfile : public CORBA::IORProfile {
     CORBA::Octet *object_key;
+    CORBA::Octet *object_key_nc;
     CORBA::ULong keylen;
     CORBA::Octet *terminal_id;
     CORBA::ULong tidlen;
@@ -85,6 +86,7 @@ public:
     ProfileId id () const;
     ProfileId encode_id () const;
     void objectkey (CORBA::Octet *, CORBA::Long);
+    void objectkey_nc (CORBA::Octet *, CORBA::Long);
     const CORBA::Octet *objectkey (CORBA::Long &) const;
     void terminalid (CORBA::Octet *, CORBA::Long);
     const CORBA::Octet *terminalid (CORBA::Long &) const;
