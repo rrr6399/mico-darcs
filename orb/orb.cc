@@ -2394,9 +2394,9 @@ CORBA::ORB::get_invoke (MsgId id)
          i++) {
         Locked<InvokeMap>* map = (*i).second;
         AutoLock l2(*map);
-        InvokeMap::iterator i = map->find(id);
-        if (i != map->end()) {
-            rec = (*i).second;
+        InvokeMap::iterator it = map->find(id);
+        if (it != map->end()) {
+            rec = (*it).second;
             return rec;
         }
     }
@@ -2445,10 +2445,10 @@ CORBA::ORB::del_invoke (MsgId id)
          i++) {
         Locked<InvokeMap>* map = (*i).second;
         AutoLock l2(*map);
-        InvokeMap::iterator i = map->find(id);
-        if (i != map->end()) {
-            delete (*i).second;
-            map->erase(i);
+        InvokeMap::iterator it = map->find(id);
+        if (it != map->end()) {
+            delete (*it).second;
+            map->erase(it);
             return;
         }
     }
