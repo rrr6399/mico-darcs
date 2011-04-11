@@ -235,11 +235,25 @@ WATM::WATMProfile::objectkey (CORBA::Octet *key, CORBA::Long len)
     memcpy(object_key, key, keylen);
 }
 
+void
+WATM::WATMProfile::objectkey_nc (CORBA::Octet *key, CORBA::Long len)
+{
+    if (object_key != NULL)
+        delete[] object_key;
+    object_key_nc = key;
+    keylen = len;
+}
+
 const CORBA::Octet *
 WATM::WATMProfile::objectkey (CORBA::Long &len) const
 {
     len = keylen;
-    return object_key;
+    if (object_key != NULL) {
+      return object_key;
+    }
+    else {
+      return object_key_nc;
+    }
 }
 
 void
