@@ -44,13 +44,13 @@ using namespace std;
 //
 #ifdef HAVE_THREADS  
 
-#ifndef __linux__
+#ifdef USE_SHARED_MUTEX_ATTRIBUTE
 pthread_mutexattr_t
 MICOMT::Mutex::S_normal_mutex_attr_;
 
 pthread_mutexattr_t
 MICOMT::Mutex::S_recursive_mutex_attr_;
-#endif // __linux__
+#endif // USE_SHARED_MUTEX_ATTRIBUTE
 
 static pthread_mutex_t __debug_mutex = PTHREAD_MUTEX_INITIALIZER;
 //static pthread_mutex_t __debug_mutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
@@ -392,7 +392,7 @@ MICOMT::Mutex::Mutex(MICO_Boolean locked, Attribute attr)
     _rec = 0;
 #endif
     if (attr == Normal) {
-#ifndef __linux__
+#ifdef USE_SHARED_MUTEX_ATTRIBUTE
         result = pthread_mutex_init(&_mutex, &S_normal_mutex_attr_);
         if (result == EINVAL) {
             // perhaps mutex attribute is not initialized yet?
@@ -400,22 +400,22 @@ MICOMT::Mutex::Mutex(MICO_Boolean locked, Attribute attr)
             assert(!res2);
             result = pthread_mutex_init(&_mutex, &S_normal_mutex_attr_);
         }
-#else // __linux__
-        // it seems that linux does not like our clever hack of using
+#else // USE_SHARED_MUTEX_ATTRIBUTE
+        // it seems that linux/win32 and others do not like our clever hack of using
         // static mutex attr at all! This is a pity, since this is a
         // speedup trick. So on Linux we go slow way...
         pthread_mutexattr_t mattr;
         int res2 = pthread_mutexattr_init(&mattr);
         assert(!res2);
         result = pthread_mutex_init(&_mutex, &mattr);
-#endif // __linux__
+#endif // USE_SHARED_MUTEX_ATTRIBUTE
         assert(!result);
     }
     else if (attr == Recursive) {
 #ifdef SOLARIS_MUTEX
 	    _rec = 1;
 #else // SOLARIS_MUTEX
-#ifndef __linux__
+#ifdef USE_SHARED_MUTEX_ATTRIBUTE
             result = pthread_mutex_init(&_mutex, &S_recursive_mutex_attr_);
             if (result == EINVAL) {
                 // perhaps mutex attribute is not initialized yet?
@@ -426,8 +426,8 @@ MICOMT::Mutex::Mutex(MICO_Boolean locked, Attribute attr)
                 assert (!res2);
                 result = pthread_mutex_init(&_mutex, &S_recursive_mutex_attr_);
             }
-#else // __linux__
-        // it seems that linux does not like our clever hack of using
+#else // USE_SHARED_MUTEX_ATTRIBUTE
+        // it seems that linux/win32 and others do not like our clever hack of using
         // static mutex attr at all! This is a pity, since this is a
         // speedup trick. So on Linux we go slow way...
         pthread_mutexattr_t mattr;
@@ -436,7 +436,7 @@ MICOMT::Mutex::Mutex(MICO_Boolean locked, Attribute attr)
         res2 = pthread_mutexattr_settype(&mattr, PTHREAD_MUTEX_RECURSIVE);
         assert (!res2);
         result = pthread_mutex_init(&_mutex, &mattr);
-#endif // __linux__
+#endif // USE_SHARED_MUTEX_ATTRIBUTE
 	    assert (!result);
 #endif // SOLARIS_MUTEX
     }

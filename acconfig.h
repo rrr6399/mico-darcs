@@ -14,6 +14,9 @@
 /* whether anything wireless is built */
 #undef USE_WIRELESS
 
+/* whether shared mutex attribute is supported */
+#undef USE_SHARED_MUTEX_ATTRIBUTE
+
 /* whether we have byteorder big endian */
 #undef HAVE_BYTEORDER_BE
 

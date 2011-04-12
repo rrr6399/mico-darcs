@@ -731,6 +731,7 @@ if test X"$GXX" = Xyes; then
     if test X"$use_threads" = Xyes; then
       SHLIBS="$SHLIBS -lposix4"
     fi
+    AC_DEFINE(USE_SHARED_MUTEX_ATTRIBUTE)
     ;;
   *osf*)
     CONF_LDSOFLAGS="-Wl,-expect_unresolved,'*' $CONF_LDSOFLAGS"
@@ -769,6 +770,7 @@ if test X"$GXX" = Xyes; then
     if test X"$use_threads" = Xyes; then
       CXXFLAGS="$CXXFLAGS -D_THREAD_SAFE"
     fi
+    AC_DEFINE(USE_SHARED_MUTEX_ATTRIBUTE)
     ;;
   *mingw*|*cygwin*)
     # check if the compiler is cygwin or mingw
@@ -890,6 +892,7 @@ else
     fi
     CONF_AR="CC"
     CONF_ARFLAGS="-xar -o"
+    AC_DEFINE(USE_SHARED_MUTEX_ATTRIBUTE)
     ;;
   *aix*)
     AC_PATH_PROG(AIXLINKER, makeC++SharedLib, makeC++SharedLib, $PATH:/usr/lpp/xlC/bin)
