@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2010 by The Mico Team
+ *  Copyright (c) 1997-2011 by The Mico Team
  * 
  *  OSThread: An abstract Thread class for MICO
  *  Copyright (C) 1999 Andy Kersting & Andreas Schultz
@@ -216,10 +216,10 @@ protected:
 #endif // SOLARIS_MUTEX
 
 private:
-#ifndef __linux__
+#ifdef USE_SHARED_MUTEX_ATTRIBUTE
     static pthread_mutexattr_t S_normal_mutex_attr_;
     static pthread_mutexattr_t S_recursive_mutex_attr_;
-#endif // __linux__
+#endif // USE_SHARED_MUTEX_ATTRIBUTE
 };
 
 
