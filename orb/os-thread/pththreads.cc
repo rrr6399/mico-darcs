@@ -69,6 +69,20 @@ void MICOMT::_init ()
 }
 
 //
+// No matter what the actual thread implementation is, _cleanup ()
+// takes care of cleaning up before exiting your application
+//
+void MICOMT::_cleanup ()
+{
+  if (MICO::Logger::IsLogged(MICO::Logger::Thread)) {
+    __mtdebug_lock();
+    MICO::Logger::Stream (MICO::Logger::Thread)
+      << "MICOMT::_cleanup()" << endl;
+    __mtdebug_unlock();
+  }
+}
+
+//
 // Thread::ThreadWrapper is a static member function that
 // pthread_create(...) (or the like) can call as its "thread start routine".
 // Any object whose methods are to be invoked as a thread, must derive from

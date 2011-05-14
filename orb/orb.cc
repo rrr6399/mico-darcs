@@ -1808,6 +1808,7 @@ CORBA::ORB::do_shutdown ()
 	    _is_shutdown = 2;
 #ifdef HAVE_THREADS
             MICO::MTManager::free();
+            MICOMT::_cleanup();
 	}
 #endif // HAVE_THREADS
     }

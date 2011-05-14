@@ -32,6 +32,7 @@
 #define __OS_THREAD_PTHREADS_H__
 
 void _init ();
+void _cleanup ();
 
 //
 // Mutex
@@ -848,6 +849,9 @@ public:
 #endif // MTDEBUG
             return ThreadFailure;
         }
+#ifdef PTW32_STATIC_LIB
+        pthread_win32_thread_attach_np();
+#endif
 	if (_detached == Detached)
 	    pthread_detach (_id);
 	return NoError;

@@ -106,6 +106,34 @@ void MICOMT::_init ()
 	__mtdebug_unlock();
     }
 #endif // MTDEBUG
+#ifdef PTW32_STATIC_LIB
+    pthread_win32_process_attach_np();
+#endif
+}
+
+
+//
+// No matter what the actual thread implementation is, _cleanup ()
+// takes care of cleaning up before exiting your application
+//
+/*!
+ * \ingroup micomt
+ *
+ * This method will perform cleaning procedure.
+ */
+void MICOMT::_cleanup ()
+{
+#ifdef MTDEBUG
+    if (MICO::Logger::IsLogged(MICO::Logger::Thread)) {
+	__mtdebug_lock();
+	MICO::Logger::Stream (MICO::Logger::Thread)
+	    << "MICOMT::_cleanup()" << endl;
+	__mtdebug_unlock();
+    }
+#endif // MTDEBUG
+#ifdef PTW32_STATIC_LIB
+    pthread_win32_process_detach_np();
+#endif
 }
 
 
@@ -559,6 +587,9 @@ MICOMT::Thread::~Thread ()
 	__mtdebug_unlock();
     }
 #endif // MTDEBUG
+#ifdef PTW32_STATIC_LIB
+    pthread_win32_thread_detach_np();
+#endif
 }
 
 //
