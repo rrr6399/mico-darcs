@@ -1,6 +1,6 @@
 //
 //  MICO SL3 --- an Open Source SL3 implementation
-//  Copyright (C) 2002, 2003 ObjectSecurity Ltd.
+//  Copyright (C) 2002, 2003, 2011 ObjectSecurity Ltd.
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Library General Public
@@ -89,7 +89,7 @@ MICOSL3_SL3AQArgs::ArgBuilder_impl::add_args(const ArgumentSeq& args)
 {
     this->check();
     for (ULong i = 0; i < args.length(); i++) {
-	this->add_arg(args[i]);
+	this->add_arg(args[i].in());
     }
 }
 
