@@ -3283,23 +3283,24 @@ CORBA::ORB::get_component (Object_ptr obj)
 CORBA::Boolean
 CORBA::ORB::is_a (Object_ptr obj, const char *repo_id)
 {
-    MICOMT::AutoLock l(_isa_cache);
+    {
+        MICOMT::AutoLock l(_isa_cache);
 
-    // XXX this assumes RepoIds are globally unique
-    if (*obj->_repoid()) {
-      string key = string(obj->_repoid()) + "$" + repo_id;
-      list<string>::iterator i;
-      for (i = _isa_cache.begin(); i != _isa_cache.end(); ++i) {
-        if (*i == key)
-	  break;
-      }
-      if (i != _isa_cache.end()) {
-        _isa_cache.erase (i);
-        _isa_cache.push_front (key);
-        return TRUE;
-      }
+        // XXX this assumes RepoIds are globally unique
+        if (*obj->_repoid()) {
+            string key = string(obj->_repoid()) + "$" + repo_id;
+            list<string>::iterator i;
+            for (i = _isa_cache.begin(); i != _isa_cache.end(); ++i) {
+                if (*i == key)
+                    break;
+            }
+            if (i != _isa_cache.end()) {
+                _isa_cache.erase (i);
+                _isa_cache.push_front (key);
+                return TRUE;
+            }
+        }
     }
-
     // [12-17]
     Request_var req = obj->_request ("_is_a");
     req->add_in_arg ("logical_type_id") <<= repo_id;
@@ -3316,6 +3317,7 @@ CORBA::ORB::is_a (Object_ptr obj, const char *repo_id)
 	obj->_ior()->objid (repo_id);
       }
       else {
+        MICOMT::AutoLock l(_isa_cache);
 	string key = string(obj->_repoid()) + "$" + repo_id;
         _isa_cache.push_front (key);
         // XXX CACHE size = 50
