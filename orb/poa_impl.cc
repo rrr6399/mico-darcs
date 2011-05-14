@@ -1952,7 +1952,7 @@ MICOPOA::POA_impl::POA_impl (const char * _name,
       = TransportSecurity::ObjectCredentialsPolicy::_nil();
   for (CORBA::ULong i = 0; i < policies.length(); i++) {
       if (policies[i]->policy_type() == TransportSecurity::ObjectCredentialsPolicyType) {
-          ocp = TransportSecurity::ObjectCredentialsPolicy::_narrow(policies[i]);
+          ocp = TransportSecurity::ObjectCredentialsPolicy::_narrow(policies[i].in());
           assert(!CORBA::is_nil(ocp));
           break;
       }
