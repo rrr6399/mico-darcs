@@ -16,7 +16,7 @@
 \usepackage{a4}
 \usepackage{vmargin}
 \usepackage{supertabular}
-\usepackage{psfig}
+\usepackage{epsfig}
 
 \setpapersize{A4}
 \setmargrb{2.5cm}{2cm}{2.5cm}{2cm}
