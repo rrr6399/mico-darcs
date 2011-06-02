@@ -764,6 +764,7 @@ dnl
       AC_TRY_RUN([
 #include <gtk/gtk.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 int 
 main ()
