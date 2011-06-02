@@ -531,7 +531,19 @@ if test X"$platform_supports_threads" = Xno; then
       )
       AC_CHECK_HEADERS(semaphore.h)
       AC_DEFINE(HAVE_PTHREADS)
+      case "${GXX}:${target}" in
+      yes:*solaris*|yes:*sunos*)
+        CXXFLAGS="-pthreads ${CXXFLAGS}"
+        LDFLAGS="-pthreads ${LDFLAGS}"
+	;;
+      yes:*)
+	CXXFLAGS="-pthread ${CXXFLAGS}"
+	LDFLAGS="-pthread ${LDFLAGS}"
+	;;
+      *)
       SHLIBS="-lpthread"
+      ;;
+      esac
     else 
       AC_CHECK_LIB(c_r, pthread_create, use_pthreads=yes, use_pthreads=no)
       if test X"$use_pthreads" = Xyes; then
