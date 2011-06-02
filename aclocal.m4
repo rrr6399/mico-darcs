@@ -353,11 +353,12 @@ AC_TRY_COMPILE_GLOBAL(,[
 
   void bar (const int &, int &, const int *, int *, int *&);
 
-  void foo (S &s, const S &cs)
+  int foo (S &s, const S &cs)
   {
-     int i = s; i = cs; i = *s; i = *cs;
+     int i = s; int j = cs; int k = *s; int l = *cs;
      bar (s, s, s, s, s);
      bar (cs, s, cs, s, s);
+     return (i + j + k + l);
   }
 ],
 eval "ac_cv_have_const_overload=yes",
