@@ -1195,11 +1195,13 @@ MICOSSL::SSLTransportServer::~SSLTransportServer ()
     _server->aselect (orb->dispatcher(), 0);
     _acb = 0;
     this->remove_aselect();
+#ifdef HAVE_THREADS
     // busy wait to wait on our worker thread which is accepting
     // incomming connections to finish this and get into idle state
     while (this->thread() != NULL && this->thread()->state() == MICO::WorkerThread::Busy) {
         this->thread()->yield();
     }
+#endif // HAVE_THREADS
     delete _server;
     delete _local_addr;
 }
