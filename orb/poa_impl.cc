@@ -3369,9 +3369,11 @@ MICOPOA::POA_impl::invoke (CORBA::ORBMsgId id,
     unsigned int thread_poa_name_len = strlen(thread_poa_name);
     if (strncmp((const char*)thread_poa_name,
                 (const char*)objkey, thread_poa_name_len) == 0) {
-      bool cont = true;
-      if (objkey[thread_poa_name_len] == '/') {
+      bool cont = false;
+      if ((thread_objkey_len == (objkey_len - thread_poa_name_len - 1))
+          && objkey[thread_poa_name_len] == '/') {
         for (unsigned int i = 0; i < thread_objkey_len; i++) {
+          cont = true;
           if (thread_objkey[i] != objkey[i + thread_poa_name_len + 1]) {
             cont = false;
             break;
