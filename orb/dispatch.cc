@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2008 by The Mico Team
+ *  Copyright (c) 1997-2013 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -445,12 +445,27 @@ MICO::SelectDispatcher::run (CORBA::Boolean infinite)
 			  (select_addr_t)&wset,
 			  (select_addr_t)&xset,
 			  &tm);
+	OSNet::set_errno();
 #ifdef HAVE_THREADS
         if (r == -1 && errno == EBADF) {
             // worker thread already closed some fd
             // let's loop and build fd set again
             continue;
         }
+#ifdef _WIN32
+        if (r == -1 && errno == EINVAL
+            && rset.fd_count == 0 && wset.fd_count == 0 && xset.fd_count == 0) {
+            // kcg: this is ill Windows' select syscall, it signals error EINVAL
+            // when either timeout value is out of range or all rset/wset/xset are empty.
+            // The later is exactly the case while using thread per connection concurrency model
+            // on the server side. We work around this issue by implementing proper wait as select
+            // should do itself but does not on Windows! For simplicity we're ignoring
+            // tv.tv_nsec value especially as we do not set/use it ourself.
+            time_t msec = tm.tv_sec * 1000;
+            Sleep(msec);
+            continue;
+        }
+#endif // _WIN32
 #endif // HAVE_THREADS
 	assert (r >= 0 || errno == EINTR || errno == EAGAIN ||
                 errno == EWOULDBLOCK);
