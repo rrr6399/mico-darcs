@@ -1,6 +1,6 @@
 //
 //  MICO SL3 --- an Open Source SL3 implementation
-//  Copyright (C) 2002, 2003, 2004 ObjectSecurity Ltd.
+//  Copyright (C) 2002, 2003, 2004, 2013 ObjectSecurity Ltd.
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Library General Public
@@ -1148,6 +1148,7 @@ MICOSL3Utils::X509Cert::X509Cert(const string& cert)
 	mico_throw(BAD_PARAM());
     X509* x = PEM_read_X509(in, NULL, NULL, NULL);
     this->init_from_x509(x);
+    fclose(in);
     X509_free(x);
 }
 
