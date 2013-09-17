@@ -1,7 +1,7 @@
 /*
  *  MICO --- an Open Source CORBA implementation
  *  Copyright (C) 1998 Frank Pilhofer
- *  Copyright (c) 1999-2011 by The Mico Team
+ *  Copyright (c) 1999-2013 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -564,6 +564,17 @@ MICOPOA::ObjectId::id ()
 /*
  * Object References
  */
+
+#ifdef HAVE_THREADS
+namespace MICOPOA {
+void POA_object_reference_cleanup(void* value) {
+  POAObjectReference* ref = static_cast<POAObjectReference *>(value);
+  if (ref != NULL) {
+    delete ref;
+  }
+}
+}
+#endif // HAVE_THREADS
 
 MICOPOA::POAObjectReference::POAObjectReference (POA_impl * _poa,
 						 const PortableServer::ObjectId &_i,
@@ -2277,7 +2288,7 @@ MICOPOA::POA_impl::POA_impl (CORBA::ORB_ptr porb)
 #endif // USE_CSL2
 
 #ifdef HAVE_THREADS
-  MICOMT::Thread::create_key(por_key_, NULL);
+  MICOMT::Thread::create_key(por_key_, POA_object_reference_cleanup);
 #endif // HAVE_THREADS
 }
 
