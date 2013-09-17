@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2011 by The Mico Team
+ *  Copyright (c) 1997-2013 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -201,6 +201,20 @@ MICO::GIOPOutContext::_retn()
 /******************************* GIOPCodec *******************************/
 
 
+#ifdef HAVE_THREADS
+namespace MICO
+{
+void
+GIOPCodec_clean_the_request_key(void* value)
+{
+    GIOPRequest* r = static_cast<GIOPRequest*>(value);
+    if (r != NULL) {
+        CORBA::release(r);
+    }
+}
+}
+#endif // HAVE_THREADS
+
 MICO::GIOPCodec::GIOPCodec (CORBA::DataDecoder *_dc,
                             CORBA::DataEncoder *_ec,
                             CORBA::UShort giop_ver)
@@ -224,7 +238,7 @@ MICO::GIOPCodec::GIOPCodec (CORBA::DataDecoder *_dc,
 	     << "GIOPCodec::GIOPCodec(): " << this << endl;
      }
 #ifdef HAVE_THREADS
-     MICOMT::Thread::create_key(request_key_, NULL);
+     MICOMT::Thread::create_key(request_key_, &GIOPCodec_clean_the_request_key);
 #endif // HAVE_THREADS
 }
 
