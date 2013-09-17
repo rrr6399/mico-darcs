@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2011 by The Mico Team
+ *  Copyright (c) 1997-2013 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -636,6 +636,15 @@ static MICO::IIOPProxy *iiop_proxy_instance = 0;
 #ifdef HAVE_THREADS
 namespace CORBA {
 void
+ORB_cleanup_current_invocation_rec(void* value)
+{
+    stack<CORBA::ORBInvokeRec*>* invs = static_cast<stack<CORBA::ORBInvokeRec*>*>(value);
+    if (invs != NULL) {
+        delete invs;
+    }
+}
+
+void
 ORB_cleanup_invocation_map(void* value)
 {
     assert(!CORBA::is_nil(orb_instance));
@@ -653,7 +662,7 @@ CORBA::ORB::ORB (int &argc, char **argv, const char *rcfile)
 #ifndef HAVE_THREADS
     //_currentid = 0;
 #else // HAVE_THREADS
-    MICOMT::Thread::create_key(_current_rec_key, NULL);
+    MICOMT::Thread::create_key(_current_rec_key, ORB_cleanup_current_invocation_rec);
     threading_initialized_ = FALSE;
     MICOMT::Thread::create_key(_invokes_key, ORB_cleanup_invocation_map);
 #endif // HAVE_THREADS
