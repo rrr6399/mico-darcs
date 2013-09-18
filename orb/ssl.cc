@@ -601,7 +601,8 @@ MICOSSL::SSLTransport::setup_ctx ()
 	    TransportSecurity::OwnCredentialsList_var creds_list
 		= curator->default_creds_list();
 	    for (CORBA::ULong i = 0; i < creds_list->length(); i++) {
-		string id = (*creds_list)[i]->creds_id();
+                CORBA::String_var tmp_id = (*creds_list)[i]->creds_id();
+                string id = tmp_id.in();
 		if (id.find("TLS") != string::npos) {
 		    creds = (*creds_list)[i];
 		    break;
