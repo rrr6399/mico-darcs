@@ -1,6 +1,7 @@
 //
 //  MICO SL3 --- an Open Source SL3 implementation
-//  Copyright (C) 2002, 2003, 2004, 2005, 2008, 2010 ObjectSecurity Ltd.
+//  Copyright (C) 2002, 2003, 2004, 2005, 2008, 2010,
+//                2013 ObjectSecurity Ltd.
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Library General Public
@@ -455,6 +456,7 @@ MICOSL3_TransportSecurity::ClientCredentials_impl::context_id()
 SL3PM::Principal*
 MICOSL3_TransportSecurity::ClientCredentials_impl::client_principal()
 {
+    CORBA::add_ref(client_principal_);
     return client_principal_;
 }
 
@@ -476,6 +478,7 @@ MICOSL3_TransportSecurity::ClientCredentials_impl::client_restricted_resources()
 SL3PM::Principal*
 MICOSL3_TransportSecurity::ClientCredentials_impl::target_principal()
 {
+    CORBA::add_ref(target_principal_);
     return target_principal_;
 }
 

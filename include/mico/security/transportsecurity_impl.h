@@ -1,7 +1,8 @@
 // -*- c++ -*-
 //
 //  MICO SL3 --- an Open Source SL3 implementation
-//  Copyright (C) 2002, 2003, 2004, 2005, 2006, 2008 ObjectSecurity Ltd.
+//  Copyright (C) 2002, 2003, 2004, 2005, 2006, 2008,
+//                2013 ObjectSecurity Ltd.
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Library General Public
@@ -80,7 +81,7 @@ namespace MICOSL3_TransportSecurity
 	virtual TimeBase::UtcT
 	expiry_time();
     protected:
-	SL3PM::Principal* principal_;
+	SL3PM::Principal_var principal_;
 	SL3PM::StatementList statement_list_;
 	SL3PM::ResourceNameList rsname_list_;
 	SL3PM::PrinAttributeList environmental_attributes_;
@@ -133,7 +134,7 @@ namespace MICOSL3_TransportSecurity
 	virtual TimeBase::UtcT
 	expiry_time();
     protected:
-	SL3PM::Principal* principal_;
+	SL3PM::Principal_var principal_;
 	SL3PM::StatementList statement_list_;
 	SL3PM::ResourceNameList rsname_list_;
 	SL3PM::PrinAttributeList environmental_attributes_;
@@ -307,10 +308,10 @@ namespace MICOSL3_TransportSecurity
 	quotable();
     protected:
 	CORBA::String_var context_id_;
-	SL3PM::Principal* client_principal_;
+	SL3PM::Principal_var client_principal_;
 	SL3PM::StatementList client_supporting_statements_;
 	SL3PM::ResourceNameList client_restricted_resources_;
-	SL3PM::Principal* target_principal_;
+	SL3PM::Principal_var target_principal_;
 	SL3PM::StatementList target_supporting_statements_;
 	SL3PM::ResourceNameList target_restricted_resources_;
 	SL3PM::PrinAttributeList environmental_attributes_;
