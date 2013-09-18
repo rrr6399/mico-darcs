@@ -1137,10 +1137,22 @@ MICOSL3_TransportSecurity::CredentialsCurator_impl::remove_creds_from_own_creds_
 // SecurityCurrent_impl
 //
 
+namespace MICOSL3_TransportSecurity
+{
+void
+SecurityCurrent_stack_cleanup(void* value)
+{
+    SecurityCurrent_impl::CCStack* stack = static_cast<SecurityCurrent_impl::CCStack *>(value);
+    if (stack != NULL)
+        delete stack;
+}
+
+}
+
 MICOSL3_TransportSecurity::SecurityCurrent_impl::SecurityCurrent_impl()
 {
 #ifdef HAVE_THREADS
-    MICOMT::Thread::create_key(thread_key_, NULL);
+    MICOMT::Thread::create_key(thread_key_, SecurityCurrent_stack_cleanup);
 #endif // HAVE_THREADS
 }
 
