@@ -1,6 +1,7 @@
 //
 //  MICO SL3 --- an Open Source SL3 implementation
-//  Copyright (C) 2003, 2004, 2005, 2006, 2010 ObjectSecurity Ltd.
+//  Copyright (C) 2003, 2004, 2005, 2006, 2010,
+//                2013 ObjectSecurity Ltd.
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Library General Public
@@ -644,7 +645,6 @@ MICOSL3_SL3TLS::TLSInitiator::TLSInitiator
     pistat->interpretation_aid("X509:V1IdentityCertificate");
     pistat->the_layer(SL_Transport);
     pistat->the_type(ST_IdentityStatement);
-    CORBA::add_ref(principal_);
     pistat->the_principal(principal_);
     statement_list_[0] = pistat;
 }
@@ -716,7 +716,6 @@ MICOSL3_SL3TLS::TLSAcceptor::TLSAcceptor
     pistat->interpretation_aid("X509:V1IdentityCertificate");
     pistat->the_layer(SL_Transport);
     pistat->the_type(ST_IdentityStatement);
-    CORBA::add_ref(principal_);
     pistat->the_principal(principal_);
     statement_list_[0] = pistat;
     rsname_list_.length(0);
@@ -1084,7 +1083,6 @@ MICOSL3_SL3TLS::TLSInitiatingContext::TLSInitiatingContext
     c_pis->interpretation_aid("X509:V1IdentityCertificate");
     c_pis->the_layer(SL_Transport);
     c_pis->the_type(ST_IdentityStatement);
-    CORBA::add_ref(client_principal_);
     c_pis->the_principal(client_principal_);
     client_supporting_statements_[0] = c_pis;
     target_supporting_statements_.length(1);
@@ -1094,7 +1092,6 @@ MICOSL3_SL3TLS::TLSInitiatingContext::TLSInitiatingContext
     t_pis->interpretation_aid("X509:V1IdentityCertificate");
     t_pis->the_layer(SL_Transport);
     t_pis->the_type(ST_IdentityStatement);
-    CORBA::add_ref(target_principal_);
     t_pis->the_principal(target_principal_);
     target_supporting_statements_[0] = t_pis;
     // restricted resources
@@ -1262,7 +1259,6 @@ MICOSL3_SL3TLS::TLSAcceptingContext::TLSAcceptingContext
     }
     c_pis->the_layer(SL_Transport);
     c_pis->the_type(ST_IdentityStatement);
-    CORBA::add_ref(client_principal_);
     c_pis->the_principal(client_principal_);
     client_supporting_statements_[0] = c_pis;
     target_supporting_statements_.length(1);
@@ -1277,7 +1273,6 @@ MICOSL3_SL3TLS::TLSAcceptingContext::TLSAcceptingContext
     }
     t_pis->the_layer(SL_Transport);
     t_pis->the_type(ST_IdentityStatement);
-    CORBA::add_ref(target_principal_);
     t_pis->the_principal(target_principal_);
     target_supporting_statements_[0] = t_pis;
     // restricted resources
