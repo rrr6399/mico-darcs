@@ -474,8 +474,9 @@ namespace MICOSL3_TransportSecurity
 
         void
         pop_client_credentials();
-    private:
+
         typedef std::stack<TransportSecurity::ClientCredentials_var> CCStack;
+    private:
 #ifndef HAVE_THREADS
         CCStack client_credentials_stack_;
 #else // HAVE_THREADS
