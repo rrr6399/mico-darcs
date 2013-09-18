@@ -802,7 +802,8 @@ MICOSL3_SL3TCPIP::TCPIPInitiatingContext::TCPIPInitiatingContext
     id += xdec(S_ctx_index_);
     S_ctx_index_++;
     context_id_ = id.c_str();
-    string ss = parent->creds_id();
+    String_var tmp_ss = parent->creds_id();
+    string ss = tmp_ss.in();
     ss += context_id_.in();
     creds_id_ = ss.c_str();
     creds_type_ = CT_TargetCredentials;
@@ -915,7 +916,8 @@ MICOSL3_SL3TCPIP::TCPIPAcceptingContext::TCPIPAcceptingContext
     id += xdec(S_ctx_index_);
     S_ctx_index_++;
     context_id_ = id.c_str();
-    string ss = parent->creds_id();
+    String_var tmp_ss = parent->creds_id();
+    string ss = tmp_ss.in();
     ss += context_id_.in();
     creds_id_ = ss.c_str();
     creds_type_ = CT_ClientCredentials;
