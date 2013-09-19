@@ -1047,7 +1047,8 @@ MICOSSL::SSLTransport::close ()
     // kcg: we need to block to correctly complete SSL_shutdown
     // otherwise we will need to use select to watch its completion
     _transp->block(TRUE);
-    if (SSL_shutdown(_ssl) == 0) {
+    int retval = SSL_shutdown(_ssl);
+    if (retval == 0 || retval == 2) {
 	// bi-direction SSL shutdown is not yet completed
 	long ret = SSL_shutdown(_ssl);
 	// ret value should be either 1 in case of success
