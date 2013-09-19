@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2010 by The Mico Team
+ *  Copyright (c) 1997-2013 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -908,7 +908,7 @@ private:
 #ifdef HAVE_THREADS
     typedef std::map<MICOMT::Thread::ThreadID, MICOMT::Locked<MapIdConn>*> ThreadIdRecMap;
 public:
-    static MICOMT::Thread::ThreadKey S_idrec_map_key_;
+    MICOMT::Thread::ThreadKey idrec_map_key_;
 #endif // HAVE_THREADS
 private:
     MICOMT::Locked<VecTranspServ> _tservers;
