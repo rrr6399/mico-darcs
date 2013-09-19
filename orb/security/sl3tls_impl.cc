@@ -1030,7 +1030,9 @@ MICOSL3_SL3TLS::TLSInitiatingContext::TLSInitiatingContext
     MICOSSL::SSLTransport* ssl_transp = dynamic_cast<MICOSSL::SSLTransport*>
 	(transport);
     assert(ssl_transp != NULL);
-    MICOSL3Utils::X509Cert t_cert(SSL_get_peer_certificate(ssl_transp->get_ssl()));
+    X509* x = SSL_get_peer_certificate(ssl_transp->get_ssl());
+    MICOSL3Utils::X509Cert t_cert(x);
+    X509_free(x);
     string subject = t_cert.subject();
     wstring wsubject = str2wstr(subject);
     t_name.the_name[0] = wsubject.c_str();
@@ -1195,7 +1197,9 @@ MICOSL3_SL3TLS::TLSAcceptingContext::TLSAcceptingContext
 	c_name.the_type = (const char*)NT_X509DirectoryNamePath;
 	c_name.the_name.length(2);
 	// will throw BAD_PARAM in case of NULL certificate
-	MICOSL3Utils::X509Cert c_cert(SSL_get_peer_certificate(ssl_transp->get_ssl()));
+        X509* x = SSL_get_peer_certificate(ssl_transp->get_ssl());
+	MICOSL3Utils::X509Cert c_cert(x);
+        X509_free(x);
 	string subject = c_cert.subject();
 	wstring wsubject = str2wstr(subject);
 	c_name.the_name[0] = wsubject.c_str();
