@@ -1014,12 +1014,15 @@ MICOSL3Utils::Address::addr_to_string(const CORBA::Address* addr)
     }
     assert(i_addr != NULL);
     string t_addr = "";
-    vector<CORBA::Octet> ip_addr = i_addr->ipaddr();
-    assert(ip_addr.size() == 4);
-    t_addr = xdec(ip_addr[0]) + "." + xdec(ip_addr[1]) + "."
-	+ xdec(ip_addr[2]) + "." + xdec(ip_addr[3]);
-    t_addr = t_addr + ":" + xdec(i_addr->port());
-    return t_addr;
+    if (i_addr->valid()) {
+        vector<CORBA::Octet> ip_addr = i_addr->ipaddr();
+        assert(ip_addr.size() == 4);
+        t_addr = xdec(ip_addr[0]) + "." + xdec(ip_addr[1]) + "."
+            + xdec(ip_addr[2]) + "." + xdec(ip_addr[3]);
+        t_addr = t_addr + ":" + xdec(i_addr->port());
+        return t_addr;
+    }
+    return "invalid";
 }
 
 
@@ -1039,12 +1042,15 @@ MICOSL3Utils::Address::addr_to_wstring(const CORBA::Address* addr)
     }
     assert(i_addr != NULL);
     wstring t_addr = L"";
-    vector<CORBA::Octet> ip_addr = i_addr->ipaddr();
-    assert(ip_addr.size() == 4);
-    t_addr = wxdec(ip_addr[0]) + L"." + wxdec(ip_addr[1]) + L"."
-	+ wxdec(ip_addr[2]) + L"." + wxdec(ip_addr[3]);
-    t_addr = t_addr + L":" + wxdec(i_addr->port());
-    return t_addr;
+    if (i_addr->valid()) {
+        vector<CORBA::Octet> ip_addr = i_addr->ipaddr();
+        assert(ip_addr.size() == 4);
+        t_addr = wxdec(ip_addr[0]) + L"." + wxdec(ip_addr[1]) + L"."
+            + wxdec(ip_addr[2]) + L"." + wxdec(ip_addr[3]);
+        t_addr = t_addr + L":" + wxdec(i_addr->port());
+        return t_addr;
+    }
+    return L"invalid";
 }
 
 
