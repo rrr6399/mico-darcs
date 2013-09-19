@@ -80,9 +80,6 @@ MICO::GIOPConn::S_reader_key_initialized_ = false;
 // `GIOPConn::initialize_reader_key' method
 MICOMT::Thread::ThreadKey
 MICO::GIOPConn::S_reader_key_;
-
-MICOMT::Thread::ThreadKey
-MICO::IIOPServer::S_idrec_map_key_;
 #endif // HAVE_THREADS
 
 /****************************** misc dtors *******************************/
@@ -5180,7 +5177,7 @@ MICO::IIOPServer::IIOPServer (CORBA::ORB_ptr orb, CORBA::UShort iiop_ver,
 #endif // HAVE_THREADS
 {
 #ifdef HAVE_THREADS
-    MICOMT::Thread::create_key(S_idrec_map_key_, IIOPServer_cleanup_idrecmap);
+    MICOMT::Thread::create_key(idrec_map_key_, IIOPServer_cleanup_idrecmap);
 #endif // HAVE_THREADS
     // require at most one IIOPServer running
     assert(iiopserver_instance_ == NULL);
@@ -5261,6 +5258,9 @@ MICO::IIOPServer::~IIOPServer ()
 	}
 	_tservers.erase(_tservers.begin(), _tservers.end());
     }
+#ifdef HAVE_THREADS
+    MICOMT::Thread::delete_key(idrec_map_key_);
+#endif // HAVE_THREADS
     assert(iiopserver_instance_ != NULL);
     iiopserver_instance_ = NULL;
 }
@@ -5448,10 +5448,10 @@ MICO::IIOPServer::add_invoke (IIOPServerInvokeRec *rec)
     //assert (_orbids.count (rec->orbid()) == 0);
 #ifdef HAVE_THREADS
     MICOMT::Locked<MapIdConn>* map = static_cast<MICOMT::Locked<MapIdConn>*>
-        (MICOMT::Thread::get_specific(S_idrec_map_key_));
+        (MICOMT::Thread::get_specific(idrec_map_key_));
     if (map == NULL) {
         map = new MICOMT::Locked<MapIdConn>();
-        MICOMT::Thread::set_specific(S_idrec_map_key_, map);
+        MICOMT::Thread::set_specific(idrec_map_key_, map);
         MICOMT::AutoLock lock(_orbids_mutex);
         _orbids[MICOMT::Thread::self()] = map;
     }
@@ -5493,7 +5493,7 @@ MICO::IIOPServer::del_invoke_orbid (IIOPServerInvokeRec *rec)
 #else // HAVE_THREADS
     bool found = false;
     MICOMT::Locked<MapIdConn>* map = static_cast<MICOMT::Locked<MapIdConn>*>
-        (MICOMT::Thread::get_specific(S_idrec_map_key_));
+        (MICOMT::Thread::get_specific(idrec_map_key_));
     if (map != NULL) {
         MICOMT::AutoLock l(*map);
         MapIdConn::iterator i = map->find(rec->orbmsgid());
