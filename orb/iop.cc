@@ -5143,19 +5143,9 @@ MICO::IIOPServerInvokeRec::init_locate (
 /******************************* IIOPServer *****************************/
 
 #ifdef HAVE_THREADS
-// cleanup function for per-thread idrecmap data
+// cleanup function for per-thread data
 namespace MICO
 {
-void
-IIOPServer_cleanup_idrecmap(void* value)
-{
-    MICOMT::Locked<MICO::IIOPServer::MapIdConn>* map = static_cast<MICOMT::Locked<MICO::IIOPServer::MapIdConn>*>
-        (MICOMT::Thread::get_specific(MICO::IIOPServer::S_idrec_map_key_));
-    if (map != NULL) {
-        MICOMT::AutoLock l(*map);
-        map->erase(map->begin(), map->end());
-    }
-}
 
 void
 IIOPServer_cleanup_target_obj(void* value)
@@ -5177,7 +5167,10 @@ MICO::IIOPServer::IIOPServer (CORBA::ORB_ptr orb, CORBA::UShort iiop_ver,
 #endif // HAVE_THREADS
 {
 #ifdef HAVE_THREADS
-    MICOMT::Thread::create_key(idrec_map_key_, IIOPServer_cleanup_idrecmap);
+    // kcg: the cleanup of associated data is done in ::kill_conn method
+    // and is thread independent so we do not provide any cleanup
+    // function here
+    MICOMT::Thread::create_key(idrec_map_key_, NULL);
 #endif // HAVE_THREADS
     // require at most one IIOPServer running
     assert(iiopserver_instance_ == NULL);
@@ -5661,22 +5654,34 @@ MICO::IIOPServer::kill_conn (GIOPConn *conn, CORBA::Boolean redo)
         for (ThreadIdRecMap::iterator i = _orbids.begin();
              i != _orbids.end();
              i++) {
-            MICOMT::AutoLock l2(*(*i).second);
-            for (MapIdConn::iterator j = (*i).second->begin();
-                 j != (*i).second->end();
-                 j++) {
-                rec = (*j).second;
-                if (rec->active() && (rec->conn() == conn)) {
-                    rec->deactivate();
-                    if (MICO::Logger::IsLogged (MICO::Logger::GIOP)) {
-                        MICOMT::AutoDebugLock __lock;
-                        MICO::Logger::Stream (MICO::Logger::GIOP)
-                            << "**aborting id="<< rec->orbmsgid()
-                            << endl;
+            if (MICO::MTManager::thread_per_connection()
+                && ((*i).second->empty())) {
+                // purge empty map
+                delete (*i).second;
+                _orbids.erase(i);
+                again = TRUE;
+                break;
+            }
+            else {
+                MICOMT::AutoLock l2(*(*i).second);
+                for (MapIdConn::iterator j = (*i).second->begin();
+                     j != (*i).second->end();
+                     j++) {
+                    rec = (*j).second;
+                    if (rec->active() && (rec->conn() == conn)) {
+                        rec->deactivate();
+                        if (MICO::Logger::IsLogged (MICO::Logger::GIOP)) {
+                            MICOMT::AutoDebugLock __lock;
+                            MICO::Logger::Stream (MICO::Logger::GIOP)
+                                << "**aborting id="<< rec->orbmsgid()
+                                << endl;
+                        }
+                        abort_invoke_orbid (rec);
+                        (*i).second->erase(j);
+                        delete rec;
+                        again = TRUE;
+                        break;
                     }
-                    abort_invoke_orbid (rec);
-                    again = TRUE;
-                    break;
                 }
             }
         }
