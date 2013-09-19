@@ -1,6 +1,6 @@
 //
 //  MICO SL3 --- an Open Source SL3 implementation
-//  Copyright (C) 2002, 2003, 2004, 2010, 2011 ObjectSecurity Ltd.
+//  Copyright (C) 2002, 2003, 2004, 2010, 2011, 2013 ObjectSecurity Ltd.
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Library General Public
@@ -1414,15 +1414,35 @@ MICOSL3_SecurityLevel3::TargetCredsHolder::release_credentials(const char* id)
 // ClientCredsHolder
 //
 
+namespace MICOSL3_SecurityLevel3
+{
+void
+ClientCredsHolder_current_credentials_cleanup(void* value)
+{
+    SecurityLevel3::ClientCredentials_ptr creds
+	= static_cast<SecurityLevel3::ClientCredentials*>(value);
+    if (!CORBA::is_nil(creds)) {
+        CORBA::release(creds);
+    }
+}
+}
+
 MICOSL3_SecurityLevel3::ClientCredsHolder::ClientCredsHolder()
 {
 #ifdef HAVE_THREADS
-    MICOMT::Thread::create_key(thread_key_, NULL);
+    MICOMT::Thread::create_key(thread_key_, ClientCredsHolder_current_credentials_cleanup);
 #else // HAVE_THREADS
     current_creds_ = ClientCredentials::_nil();
 #endif // HAVE_THREADS
 }
 
+
+MICOSL3_SecurityLevel3::ClientCredsHolder::~ClientCredsHolder()
+{
+#ifdef HAVE_THREADS
+    MICOMT::Thread::delete_key(thread_key_);
+#endif // HAVE_THREADS
+}
 
 SecurityLevel3::ClientCredentials_ptr
 MICOSL3_SecurityLevel3::ClientCredsHolder::csi_creds(const string& key)

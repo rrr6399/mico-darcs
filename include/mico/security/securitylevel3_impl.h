@@ -1,7 +1,7 @@
 // -*- c++ -*-
 //
 //  MICO SL3 --- an Open Source SL3 implementation
-//  Copyright (C) 2002, 2003, 2004, 2010 ObjectSecurity Ltd.
+//  Copyright (C) 2002, 2003, 2004, 2010, 2013 ObjectSecurity Ltd.
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Library General Public
@@ -641,6 +641,9 @@ namespace MICOSL3_SecurityLevel3
     {
     public:
 	ClientCredsHolder();
+
+        virtual
+        ~ClientCredsHolder();
 
 	SecurityLevel3::ClientCredentials_ptr
 	csi_creds(const std::string& key);
