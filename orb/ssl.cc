@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2011 by The Mico Team
+ *  Copyright (c) 1997-2013 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -1121,16 +1121,6 @@ MICOSSL::SSLTransport::write (const void *_b, CORBA::Long len)
     MICOMT::AutoLock lock(_ssl_mutex);
 #endif // HAVE_THREADS
     int i = SSL_write (_ssl, (char *)_b, len);
-    if (i < 0) {
-	cerr << "SSL error handling" << endl;
-	CORBA::Long error = SSL_get_error(_ssl, i);
-	cerr << "SSL error: " << error << endl;
-	if (error == SSL_ERROR_WANT_WRITE) {
-	    cerr << "SSL_ERROR_WANT_WRITE" << endl;
-	}
-	ERR_print_errors_fp(stderr);
-	assert(0);
-    }
     if (i < 0)
 	_err = _transp->errormsg();
     return i;
