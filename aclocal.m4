@@ -686,11 +686,11 @@ dnl
 AC_DEFUN(AC_CHECK_FORCED_UNWIND,
 [AC_MSG_CHECKING(for forced unwind exception support)
 AC_CACHE_VAL(ac_cv_have_forced_unwind_exception,
-[AC_TRY_COMPILE([#include <cxxabi-forced.h>],[
+[AC_TRY_COMPILE([#include <cxxabi.h>],[
   try {
    ;
   }
-  catch (__cxxabiv1::__forced_unwind&) {
+  catch (abi::__forced_unwind&) {
     throw;
   }
   catch (...) {
