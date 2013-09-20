@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2011 by The Mico Team
+ *  Copyright (c) 1997-2013 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -232,10 +232,20 @@ class SSLTransport : public MICO::SocketTransport,
     std::string _err;
     CORBA::TransportCallback *_rcb, *_wcb;
 #ifndef USE_CSL2
+#ifndef USE_SL3
     static CORBA::Boolean setup_ctx ();
+#else // USE_SL3
+    // SL3 uses per-transport SSL context
+    CORBA::Boolean setup_ctx ();
+#endif // USE_SL3
 #endif /* NOT USE_CSL2  */
 
+#ifndef USE_SL3
     static SSL_CTX *_ssl_ctx;
+#else // USE_SL3
+    // SL3 uses per-transport SSL context
+    SSL_CTX *_ssl_ctx;
+#endif // USE_SL3
     static int _ssl_verify_depth;
     static int ssl_verify_callback (int ok, X509_STORE_CTX *);
 
