@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2011 by The Mico Team
+ *  Copyright (c) 1997-2013 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -317,6 +317,10 @@ MICO::SocketTransportServer::SocketTransportServer ()
 
     adisp = 0;
     acb = 0;
+
+    fd = -1;
+    listening = false;
+    is_blocking = false;
 }
 
 void
@@ -332,8 +336,10 @@ MICO::SocketTransportServer::~SocketTransportServer ()
             acb->callback (this, CORBA::TransportServerCallback::Remove);
         }
     }
-    OSNet::sock_shutdown(fd);
-    OSNet::sock_close (fd);
+    if (fd != -1) {
+        OSNet::sock_shutdown(fd);
+        OSNet::sock_close (fd);
+    }
 #ifdef HAVE_THREADS
     if (this->worker_thread_ != NULL) {
         this->worker_thread_->deregister_operation(this);
