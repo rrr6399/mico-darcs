@@ -432,7 +432,9 @@ static MICOSSL::SSLAddressParser ssl_address_parser;
 
 namespace MICOSSL {
   int SSLTransport::_ssl_verify_depth = 0;
+#ifndef USE_SL3
   SSL_CTX *SSLTransport::_ssl_ctx = 0;
+#endif // USE_SL3
 }
 
 MICOSSL::SSLTransport::SSLTransport (const SSLAddress *a, CORBA::Transport *t)
@@ -480,7 +482,11 @@ MICOSSL::SSLTransport::~SSLTransport ()
     }
 //    BIO_ctrl (_ssl->rbio, BIO_CTRL_SET_CLOSE, 1, (char *)0);
     SSL_free (_ssl);
-    
+    _ssl = 0;
+#ifdef USE_SL3
+    // SL3 uses per-transport SSL context
+    SSL_CTX_free (_ssl_ctx);
+#endif // USE_SL3
     // BIO is freed in SSL_free()
     delete _transp;
     delete _local_addr;
