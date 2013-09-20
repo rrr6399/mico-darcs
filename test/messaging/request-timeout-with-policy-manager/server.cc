@@ -9,6 +9,7 @@
 #include <fstream.h>
 #endif
 
+#include <unistd.h>
 
 using namespace std;
 
