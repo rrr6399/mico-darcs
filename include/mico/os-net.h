@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2009 by The Mico Team
+ *  Copyright (c) 1997-20013 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -52,6 +52,10 @@
 
 #ifndef EINPROGRESS
 #define EINPROGRESS WSAEINPROGRESS
+#endif
+
+#ifndef EINVAL
+#define EINVAL WSAEINVAL
 #endif
 
 class OSNet {
@@ -113,6 +117,10 @@ public:
 
         case WSAESHUTDOWN:
             errno = ECONNRESET;
+            break;
+
+	case WSAEINVAL:
+            errno = EINVAL;
             break;
 
 	default:
