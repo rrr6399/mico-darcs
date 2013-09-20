@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2011 by The Mico Team
+ *  Copyright (c) 1997-2013 by The Mico Team
  * 
  *  OSThread: An abstract Thread class for MICO
  *  Copyright (C) 1999 Andy Kersting & Andreas Schultz
@@ -34,7 +34,7 @@
 #include <mico/os-misc.h>
 
 #ifdef HAVE_FORCED_UNWIND_EXCEPTION
-#include <cxxabi-forced.h>
+#include <cxxabi.h>
 #endif // HAVE_FORCED_UNWIND_EXCEPTION
 
 using namespace std;
@@ -223,7 +223,7 @@ MICOMT::Thread::_thr_startup(void *arg)
         //throw;
     }
 #ifdef HAVE_FORCED_UNWIND_EXCEPTION
-    catch (__cxxabiv1::__forced_unwind&) {
+    catch (abi::__forced_unwind&) {
         // this is a needed hack for platforms which are using special
         // exception for POSIX thread cancellation implementation
         // E.g. GNU C++/GNU libc
