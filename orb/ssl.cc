@@ -443,6 +443,10 @@ MICOSSL::SSLTransport::SSLTransport (const SSLAddress *a, CORBA::Transport *t)
     _transp = t ? t : a->content()->make_transport();
     _local_addr = (SSLAddress *)a->clone();
     _peer_addr = (SSLAddress *)a->clone();
+#ifdef USE_SL3
+    // SL3 is using per-transport SSL context
+    _ssl_ctx = NULL;
+#endif // USE_SL3
 
 #ifdef USE_CSL2
     _ssl = 0;
