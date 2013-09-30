@@ -5159,6 +5159,18 @@ IIOPServer_cleanup_target_obj(void* value)
     }
 }
 
+void
+IIOPServer_cleanup_idrec_map(void* value)
+{
+    IIOPServer::ThreadIdRecMapMember* obj = static_cast<IIOPServer::ThreadIdRecMapMember*>
+        (value);
+    if (obj != NULL) {
+        // this just marks map for deletion and actual deletion will
+        // be done by different thread in ::kill_conn method
+        obj->scheduled_for_removal_ = TRUE;
+    }
+}
+
 }
 #endif // HAVE_THREADS
 
@@ -5169,10 +5181,7 @@ MICO::IIOPServer::IIOPServer (CORBA::ORB_ptr orb, CORBA::UShort iiop_ver,
 #endif // HAVE_THREADS
 {
 #ifdef HAVE_THREADS
-    // kcg: the cleanup of associated data is done in ::kill_conn method
-    // and is thread independent so we do not provide any cleanup
-    // function here
-    MICOMT::Thread::create_key(idrec_map_key_, NULL);
+    MICOMT::Thread::create_key(idrec_map_key_, IIOPServer_cleanup_idrec_map);
 #endif // HAVE_THREADS
     // require at most one IIOPServer running
     assert(iiopserver_instance_ == NULL);
@@ -5233,8 +5242,8 @@ MICO::IIOPServer::~IIOPServer ()
 	for (ThreadIdRecMap::iterator i1 = _orbids.begin();
 	     i1 != _orbids.end(); ++i1) {
             MICOMT::AutoLock l2(*((*i1).second));
-            for (MapIdConn::iterator j = (*i1).second->begin();
-                 j != (*i1).second->end();
+            for (MapIdConn::iterator j = (*i1).second->map_.begin();
+                 j != (*i1).second->map_.end();
                  j++) {
                 IIOPServerInvokeRec *rec = (*j).second;
                 _orb->cancel ( rec->orbid() );
@@ -5392,8 +5401,8 @@ MICO::IIOPServer::pull_invoke_reqid (MsgId msgid, GIOPConn *conn)
     MICOMT::AutoLock l(_orbids_mutex);
     for (ThreadIdRecMap::iterator i = _orbids.begin(); i != _orbids.end(); ++i) {
         MICOMT::AutoLock l2(*(*i).second);
-        for (MapIdConn::iterator j = (*i).second->begin();
-             j != (*i).second->end();
+        for (MapIdConn::iterator j = (*i).second->map_.begin();
+             j != (*i).second->map_.end();
              j++) {
             rec = (*j).second;
             if (rec->reqid() == msgid && rec->conn() == conn && rec->active() )
@@ -5442,16 +5451,16 @@ MICO::IIOPServer::add_invoke (IIOPServerInvokeRec *rec)
     }
     //assert (_orbids.count (rec->orbid()) == 0);
 #ifdef HAVE_THREADS
-    MICOMT::Locked<MapIdConn>* map = static_cast<MICOMT::Locked<MapIdConn>*>
+    MICOMT::Locked<ThreadIdRecMapMember>* map = static_cast<MICOMT::Locked<ThreadIdRecMapMember>*>
         (MICOMT::Thread::get_specific(idrec_map_key_));
     if (map == NULL) {
-        map = new MICOMT::Locked<MapIdConn>();
+        map = new MICOMT::Locked<ThreadIdRecMapMember>();
         MICOMT::Thread::set_specific(idrec_map_key_, map);
         MICOMT::AutoLock lock(_orbids_mutex);
         _orbids[MICOMT::Thread::self()] = map;
     }
     MICOMT::AutoLock l(*map);
-    (*map)[rec->orbmsgid()] = rec;
+    map->map_[rec->orbmsgid()] = rec;
 #else // HAVE_THREADS
     _orbids[ rec->orbmsgid() ] = rec;
 #endif // HAVE_THREADS
@@ -5487,15 +5496,15 @@ MICO::IIOPServer::del_invoke_orbid (IIOPServerInvokeRec *rec)
     }
 #else // HAVE_THREADS
     bool found = false;
-    MICOMT::Locked<MapIdConn>* map = static_cast<MICOMT::Locked<MapIdConn>*>
+    MICOMT::Locked<ThreadIdRecMapMember>* map = static_cast<MICOMT::Locked<ThreadIdRecMapMember>*>
         (MICOMT::Thread::get_specific(idrec_map_key_));
     if (map != NULL) {
         MICOMT::AutoLock l(*map);
-        MapIdConn::iterator i = map->find(rec->orbmsgid());
-        if (i != map->end()) {
+        MapIdConn::iterator i = map->map_.find(rec->orbmsgid());
+        if (i != map->map_.end()) {
             found = true;
             delete (*i).second;
-            map->erase(i);
+            map->map_.erase(i);
         }
     }
     if (!found) {
@@ -5504,10 +5513,10 @@ MICO::IIOPServer::del_invoke_orbid (IIOPServerInvokeRec *rec)
              i != _orbids.end();
              i++) {
             MICOMT::AutoLock l2(*(*i).second);
-            MapIdConn::iterator j = (*i).second->find(rec->orbmsgid());
-            if (j != map->end()) {
+            MapIdConn::iterator j = (*i).second->map_.find(rec->orbmsgid());
+            if (j != map->map_.end()) {
                 delete (*j).second;
-                map->erase(j);
+                map->map_.erase(j);
             }
         }
     }
@@ -5545,12 +5554,12 @@ MICO::IIOPServer::del_invoke_reqid (MsgId msgid, GIOPConn *conn)
     MICOMT::AutoLock l(_orbids_mutex);
     for (ThreadIdRecMap::iterator i = _orbids.begin(); i != _orbids.end(); i++) {
         MICOMT::AutoLock l2(*(*i).second);
-        for (MapIdConn::iterator j = (*i).second->begin(); j != (*i).second->end(); j++) {
+        for (MapIdConn::iterator j = (*i).second->map_.begin(); j != (*i).second->map_.end(); j++) {
             rec = (*j).second;
             if (rec->reqid() == msgid && rec->conn() == conn) {
                 assert( !rec->active() );
                 delete rec;
-                (*i).second->erase (j);
+                (*i).second->map_.erase (j);
                 break;
             }
         }
@@ -5657,17 +5666,18 @@ MICO::IIOPServer::kill_conn (GIOPConn *conn, CORBA::Boolean redo)
              i != _orbids.end();
              i++) {
             if (MICO::MTManager::thread_per_connection()
-                && ((*i).second->empty())) {
-                // purge empty map
-                delete (*i).second;
-                _orbids.erase(i);
-                again = TRUE;
-                break;
+                && ((*i).second->map_.empty())
+                && ((*i).second->scheduled_for_removal_)) {
+                    // purge empty map
+                    delete (*i).second;
+                    _orbids.erase(i);
+                    again = TRUE;
+                    break;
             }
             else {
                 MICOMT::AutoLock l2(*(*i).second);
-                for (MapIdConn::iterator j = (*i).second->begin();
-                     j != (*i).second->end();
+                for (MapIdConn::iterator j = (*i).second->map_.begin();
+                     j != (*i).second->map_.end();
                      j++) {
                     rec = (*j).second;
                     if (rec->active() && (rec->conn() == conn)) {
@@ -5679,7 +5689,7 @@ MICO::IIOPServer::kill_conn (GIOPConn *conn, CORBA::Boolean redo)
                                 << endl;
                         }
                         abort_invoke_orbid (rec);
-                        (*i).second->erase(j);
+                        (*i).second->map_.erase(j);
                         delete rec;
                         again = TRUE;
                         break;
@@ -6338,18 +6348,18 @@ MICO::IIOPServer::shutdown (CORBA::Boolean wait_for_completion)
         for (ThreadIdRecMap::iterator i = _orbids.begin();
              i != _orbids.end();
              i++) {
-            MapIdConn* map = (*i).second;
+            ThreadIdRecMapMember* map = (*i).second;
             {
                 MICOMT::AutoLock l2(*(*i).second);
-                for (MapIdConn::iterator j = (*i).second->begin();
-                     j != (*i).second->end();
+                for (MapIdConn::iterator j = (*i).second->map_.begin();
+                     j != (*i).second->map_.end();
                      j++) {
                     IIOPServerInvokeRec* rec = (*j).second;
                     _orb->cancel (rec->orbid());
                     delete rec;
                 }
             }
-            map->erase(map->begin(), map->end());
+            map->map_.erase(map->map_.begin(), map->map_.end());
             delete map;
         }
         _orbids.erase (_orbids.begin(), _orbids.end());
