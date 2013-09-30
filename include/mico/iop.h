@@ -906,8 +906,19 @@ private:
     typedef std::list<GIOPConn *> ListConn;
     typedef std::vector<CORBA::TransportServer*> VecTranspServ;
 #ifdef HAVE_THREADS
-    typedef std::map<MICOMT::Thread::ThreadID, MICOMT::Locked<MapIdConn>*> ThreadIdRecMap;
 public:
+    class ThreadIdRecMapMember {
+    public:
+
+        ThreadIdRecMapMember()
+            : scheduled_for_removal_(FALSE)
+        {}
+
+        MapIdConn map_;
+        bool scheduled_for_removal_;
+    };
+
+    typedef std::map<MICOMT::Thread::ThreadID, MICOMT::Locked<ThreadIdRecMapMember>*> ThreadIdRecMap;
     MICOMT::Thread::ThreadKey idrec_map_key_;
 #endif // HAVE_THREADS
 private:
