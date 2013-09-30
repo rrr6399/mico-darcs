@@ -2164,8 +2164,10 @@ MICO::GIOPSimpleProf::objectkey (CORBA::Octet *o, CORBA::Long l)
 void
 MICO::GIOPSimpleProf::objectkey_nc (CORBA::Octet *o, CORBA::Long l)
 {
-    if (_objkey)
+    if (_objkey) {
         delete[] _objkey;
+        _objkey = 0;
+    }
     _objkey_nc = o;
     _length = l;
 }
