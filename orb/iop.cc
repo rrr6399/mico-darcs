@@ -235,7 +235,7 @@ MICO::GIOPCodec::GIOPCodec (CORBA::DataDecoder *_dc,
 	     << "GIOPCodec::GIOPCodec(): " << this << endl;
      }
 #ifdef HAVE_THREADS
-     MICOMT::Thread::create_key(request_key_, &GIOPCodec_clean_the_request_key);
+     MICOMT::Thread::create_key(request_key_, GIOPCodec_clean_the_request_key);
 #endif // HAVE_THREADS
 }
 
