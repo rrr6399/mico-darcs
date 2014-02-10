@@ -1,6 +1,6 @@
 #
 #  MICO --- an Open Source CORBA implementation
-#  Copyright (c) 1997-2011 by The Mico Team
+#  Copyright (c) 1997-2014 by The Mico Team
 #
 #  This library is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Library General Public
@@ -1494,7 +1494,10 @@ AC_CHECK_FUNCS(strdup strerror gethostname infnan isnan isinf finite)
 AC_CHECK_FUNCS(infnanl isnanl isinfl asinl ldexpl frexpl fabsl floorl ceill)
 AC_CHECK_FUNCS(powl fmodl dlopen shl_load ftime)
 AC_CHECK_FUNCS(backtrace backtrace_symbols)
-AC_LANG_CPLUSPLUS
+# Due to CLang complaining about size related tests below, let's move
+# AC_LANG_CPLUSPLUS down below where we need it for performing actual
+# C++ tests.
+#AC_LANG_CPLUSPLUS
 
 #
 # size of datatypes
@@ -1688,6 +1691,8 @@ AC_MSG_RESULT($ftime_pt)
 #
 # C++ features
 #
+
+AC_LANG_CPLUSPLUS
 
 # bool
 
