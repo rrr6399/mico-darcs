@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2010 by The Mico Team
+ *  Copyright (c) 1997-2013 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -260,7 +260,7 @@ class Request : public ServerlessObject, public ORBCallback {
     ExceptionList_ptr _elist;
     ContextList_ptr _clist;
     Environment_ptr _environm;
-    CORBA::ORBMsgId _orbid;
+    CORBA::ORBMsgId_var _orbid;
     Boolean _invoke_pending;
     ORBRequest *_orbreq;
     RequestCallback *_cb;

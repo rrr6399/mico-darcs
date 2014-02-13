@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2010 by The Mico Team
+ *  Copyright (c) 1997-2013 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -628,7 +628,7 @@ CORBA::Request::Request (Object_ptr o, const char *op)
     // XXX use IR to fill elist/clist
     orb->create_context_list (_clist);
     orb->create_exception_list (_elist);
-    _orbid = 0;
+    _orbid = ORBInvokeRec::_nil();
     _flags = 0;
     _orbreq = new MICO::LocalRequest (this);
     _cb = 0;
@@ -807,13 +807,13 @@ CORBA::Request::send_oneway ()
 	throw;
     }
 
-    CORBA::ORBMsgId __id = orb->invoke_async
+    CORBA::ORBMsgId_var __id = orb->invoke_async
 	(_object, _orbreq, Principal::_nil(), FALSE);
 
 //      Corba::ULong mid = orb->invoke_async
 //  	(_object, _orbreq, Principal::_nil(), FALSE);
 //      if (mid > 0) { // object not exists
-    if (__id != NULL) {
+    if (!CORBA::is_nil(__id)) {
 	cerr << "dii.cc hack pi...." << endl;
 	CORBA::OBJECT_NOT_EXIST ex;
 	try {
@@ -983,8 +983,8 @@ CORBA::Request::get_response (Boolean block)
 		    env()->clear();
 		    CORBA::release (_cri);
 		    //_msgid = orb->new_msgid();
-		    if (_orbid != NULL)
-			delete _orbid;
+		    //if (_orbid != NULL)
+                    //delete _orbid;
 		    _orbid = orb->new_orbid();
 		    _cri = PInterceptor::PI::_create_cri
 			(_object, _opname, _elist, _res);
@@ -1032,8 +1032,8 @@ CORBA::Request::get_response (Boolean block)
 	    }
 	    CORBA::release (_cri);
 	    //_msgid = orb->new_msgid();
-	    if (_orbid != NULL)
-		delete _orbid;
+	    //if (_orbid != NULL)
+            //delete _orbid;
 	    _orbid = orb->new_orbid();
 	    _cri = PInterceptor::PI::_create_cri
 		(_object, _opname, _elist, _res);

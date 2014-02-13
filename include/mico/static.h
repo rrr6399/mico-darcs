@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2003 by The Mico Team
+ *  Copyright (c) 1997-2013 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -147,7 +147,7 @@ class StaticRequest : public CORBA::ORBRequest {
     CORBA::ContextList_ptr _ctx_list;
     CORBA::Object_var _obj;
     CORBA::ServerlessObject_ptr _iceptreq;
-    CORBA::ORBMsgId _id;
+    CORBA::ORBMsgId_var _id;
     // PI client interceptor request info
     PInterceptor::ClientRequestInfo_impl* _cri;
 
@@ -241,7 +241,7 @@ class StaticServerRequest : public CORBA::ServerRequestBase {
     ORBRequest *_req;
     StaticAnyList _args;
     StaticAny *_res;
-    CORBA::ORBMsgId _id;
+    CORBA::ORBMsgId_var _id;
     CORBA::ServerlessObject_ptr _iceptreq;
     CORBA::Boolean _aborted;
 public:

@@ -3423,8 +3423,9 @@ MICO::IIOPProxy::add_invoke (IIOPProxyInvokeRec *rec)
     }
 
     assert( rec->active() );
-    _ids[CORBA::ORB::get_msgid(rec->id())] = rec;
-    _orb->set_invoke_hint(rec->id(), rec);
+    CORBA::ORBMsgId_var tid = rec->id();
+    _ids[CORBA::ORB::get_msgid(tid)] = rec;
+    _orb->set_invoke_hint(tid, rec);
 }
 
 void
@@ -4785,7 +4786,7 @@ MICO::IIOPProxy::handle_invoke_reply (GIOPConn *conn, GIOPInContext &in)
     }
 
     // turn the MsgId into somthing usefull
-    CORBA::ORBMsgId id = _orb->get_orbid(req_id);
+    CORBA::ORBMsgId_var id = _orb->get_orbid(req_id);
     IIOPProxyInvokeRec *rec = pull_invoke (id);
     if (MICO::Logger::IsLogged (MICO::Logger::GIOP)) {
 	MICOMT::AutoDebugLock __lock;
@@ -4873,7 +4874,7 @@ MICO::IIOPProxy::handle_locate_reply (GIOPConn *conn, GIOPInContext &in)
 	<< endl;
     }
 
-    CORBA::ORBMsgId id = _orb->get_orbid(req_id);
+    CORBA::ORBMsgId_var id = _orb->get_orbid(req_id);
     IIOPProxyInvokeRec *rec = pull_invoke (id);
 #ifdef HAVE_THREADS
     conn->active_deref();
@@ -5081,7 +5082,7 @@ MICO::IIOPServerInvokeRec::IIOPServerInvokeRec ()
     _req = 0;
     _obj = 0;
     _pr = 0;
-    _orbid = 0;
+    _orbid = CORBA::ORBInvokeRec::_nil();
 }
 
 
@@ -5105,8 +5106,8 @@ MICO::IIOPServerInvokeRec::free ()
     _req = 0;
     _obj = 0;
     _pr = 0;
-    _orbid = 0;
-    _active = TRUE;
+    _orbid = CORBA::ORBInvokeRec::_nil();
+    _active = FALSE;
 }
 
 void
@@ -5117,7 +5118,7 @@ MICO::IIOPServerInvokeRec::init_invoke (
     CORBA::Principal_ptr pr)
 {
     _conn = conn;
-    _orbid = orbid;
+    _orbid = CORBA::ORBInvokeRec::_duplicate(orbid);
     _orbmsgid = CORBA::ORB::get_msgid(orbid);
     _reqid = reqid;
     _req = req;
@@ -5132,7 +5133,7 @@ MICO::IIOPServerInvokeRec::init_locate (
     CORBA::ORBMsgId orbid, CORBA::Object_ptr obj)
 {
     _conn = conn;
-    _orbid = orbid;
+    _orbid = CORBA::ORBInvokeRec::_duplicate(orbid);
     _orbmsgid = CORBA::ORB::get_msgid(orbid);
     _reqid = reqid;
     _req = CORBA::ORBRequest::_nil();
@@ -5234,7 +5235,8 @@ MICO::IIOPServer::~IIOPServer ()
 	for (MapIdConn::iterator i1 = _orbids.begin();
 	     i1 != _orbids.end(); ++i1) {
 	    IIOPServerInvokeRec *rec = (*i1).second;
-	    _orb->cancel ( rec->orbid() );
+            CORBA::ORBInvokeRec_var tid = rec->orbid();
+	    _orb->cancel ( tid );
 	    delete rec;
 	}
 #else // HAVE_THREADS
@@ -5246,7 +5248,8 @@ MICO::IIOPServer::~IIOPServer ()
                  j != (*i1).second->map_.end();
                  j++) {
                 IIOPServerInvokeRec *rec = (*j).second;
-                _orb->cancel ( rec->orbid() );
+                CORBA::ORBInvokeRec_var tid = rec->orbid();
+                _orb->cancel ( tid );
                 delete rec;
             }
 	}
@@ -5464,7 +5467,8 @@ MICO::IIOPServer::add_invoke (IIOPServerInvokeRec *rec)
 #else // HAVE_THREADS
     _orbids[ rec->orbmsgid() ] = rec;
 #endif // HAVE_THREADS
-    _orb->set_request_hint( rec->orbid(), rec );
+    CORBA::ORBInvokeRec_var tid = rec->orbid();
+    _orb->set_request_hint( tid, rec );
 }
 
 void
@@ -5913,8 +5917,7 @@ MICO::IIOPServer::handle_invoke_request (GIOPConn *conn, GIOPInContext &in)
      * may invoke callback before returning from invoke_async ...
      */
     MsgId msgid = _orb->new_msgid();
-    CORBA::ORBMsgId orbid = 0;
-    orbid = _orb->new_orbid(msgid);
+    CORBA::ORBMsgId_var orbid = _orb->new_orbid(msgid);
     conn->ref ();
     IIOPServerInvokeRec *rec = create_invoke();
     rec->init_invoke (conn, req_id, orbid, req, obj, pr);
@@ -5925,9 +5928,8 @@ MICO::IIOPServer::handle_invoke_request (GIOPConn *conn, GIOPInContext &in)
     //  exec_invoke_request ?
     conn->active_deref();
 #endif // HAVE_THREADS
-    CORBA::ORBMsgId orbid2 = exec_invoke_request (in, obj, req, pr, resp, conn, orbid);
+    CORBA::ORBMsgId_var orbid2 = exec_invoke_request (in, obj, req, pr, resp, conn, orbid);
     assert (orbid == orbid2 || (orbid2 == 0 && !resp));
-
     // maybe the connection was closed inbetween: make do_read() break
     //return FALSE;
     // kcg: we need to return TRUE here, because of thread-per-connection
@@ -5983,7 +5985,7 @@ MICO::IIOPServer::handle_locate_request (GIOPConn *conn, GIOPInContext &in)
      * must install the invocation record before we call the ORB, because
      * may invoke callback before returning from invoke_async ...
      */
-    CORBA::ORBMsgId orbid = _orb->new_orbid();
+    CORBA::ORBMsgId_var orbid = _orb->new_orbid();
     conn->ref ();
     IIOPServerInvokeRec *rec = create_invoke();
     rec->init_locate (conn, req_id, orbid, obj);
@@ -6065,14 +6067,21 @@ MICO::IIOPServer::handle_invoke_reply (CORBA::ORBMsgId id)
 
     GIOP::AddressingDisposition ad;
 
+    if (CORBA::is_nil(id) || !id->active()) {
+        return;
+    }
+
     IIOPServerInvokeRec *rec = pull_invoke_orbid ( id );
     if (rec == NULL)
 	return;
-    if (rec->orbid() != NULL) {
-	if (!rec->orbid()->response_expected()) {
-	    del_invoke_orbid (rec);
-	    return;
-	}
+
+    CORBA::ORBInvokeRec_var tid = rec->orbid();
+    if (!CORBA::is_nil(tid)) {
+	if (!(tid->response_expected()
+              && tid->active())) {
+            del_invoke_orbid (rec);
+            return;
+        }
     }
     CORBA::InvokeStatus stat = _orb->get_invoke_reply (id, obj, req, ad);
     if (!rec) {
@@ -6149,6 +6158,9 @@ MICO::IIOPServer::handle_locate_reply (CORBA::ORBMsgId id)
         return;
     }
 
+    // orb->get_locate_reply calls orb->del_invoke, so we have to set
+    // rec->orbid() to NULL
+    rec->orbid(NULL);
     GIOP::LocateStatusType giop_stat = GIOP::OBJECT_HERE;
     switch (stat) {
     case CORBA::LocateHere:
@@ -6200,6 +6212,10 @@ MICO::IIOPServer::handle_bind_reply (CORBA::ORBMsgId id)
 	CORBA::release (obj);
         return;
     }
+
+    // orb->get_bind_reply calls orb->del_invoke, so we have to set
+    // rec->orbid() to NULL
+    rec->orbid(NULL);
 
     GIOP::LocateStatusType giop_stat = GIOP::OBJECT_HERE;
     switch (stat) {
@@ -6339,7 +6355,8 @@ MICO::IIOPServer::shutdown (CORBA::Boolean wait_for_completion)
         for (MapIdConn::iterator i1 = _orbids.begin();
              i1 != _orbids.end(); ++i1) {
             IIOPServerInvokeRec *rec = (*i1).second;
-            _orb->cancel ( rec->orbid() );
+            CORBA::ORBInvokeRec_var tid = rec->orbid();
+            _orb->cancel ( tid );
             delete rec;
         }
         _orbids.erase (_orbids.begin(), _orbids.end());
@@ -6355,7 +6372,8 @@ MICO::IIOPServer::shutdown (CORBA::Boolean wait_for_completion)
                      j != (*i).second->map_.end();
                      j++) {
                     IIOPServerInvokeRec* rec = (*j).second;
-                    _orb->cancel (rec->orbid());
+                    CORBA::ORBInvokeRec_var tid = rec->orbid();
+                    _orb->cancel (tid);
                     delete rec;
                 }
             }

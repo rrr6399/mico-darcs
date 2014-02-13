@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2001 by The Mico Team
+ *  Copyright (c) 1997-2013 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -52,6 +52,7 @@ class ORBRequest;
 class ORBInvokeRec;
 
 typedef ORBInvokeRec* ORBMsgId;
+typedef ObjVar<ORBInvokeRec> ORBMsgId_var;
 
 struct ORBCallback {
     enum Event { Invoke, Locate, Bind, Result };

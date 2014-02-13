@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2010 by The Mico Team
+ *  Copyright (c) 1997-2013 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -45,7 +45,7 @@ public:
 };
 
 
-class ORBInvokeRec {
+class ORBInvokeRec : public ServerlessObject {
 public:
     typedef ULong MsgId;
 private:
@@ -61,6 +61,11 @@ private:
     InvokeStatus _invoke_stat;
     LocateStatus _locate_stat;
     ObjectAdapter *_adapter;
+    // Do not do any memory management on _req! On client side this is
+    // just a `this' pointer pointing to object allocated on stack!
+    // i.e. see <interface>_stub::<method name>, there is a
+    // StaticRequest __req object which is passed this way
+    // So server side needs to deal with this on its own
     ORBRequest *_req;
     ORBCallback *_cb;
     ORB_ptr _orb;
@@ -165,8 +170,22 @@ public:
 
     void timedout(Boolean);
 #endif // USE_MESSAGING
+
+    static ORBInvokeRec* _nil ()
+    {
+	return 0;
+    }
+    static ORBInvokeRec* _duplicate (ORBInvokeRec *o)
+    {
+	if (o)
+	    o->_ref();
+	return o;
+    }
 };
 
+typedef ORBInvokeRec *ORBInvokeRec_ptr;
+typedef ObjVar<ORBInvokeRec> ORBInvokeRec_var;
+typedef ObjOut<ORBInvokeRec> ORBInvokeRec_out;
 
 
 class ORB : public ServerlessObject {
@@ -234,7 +253,7 @@ private:
     void initialize_threading();
 #endif // HAVE_THREADS
     typedef std::vector<ObjectAdapter *> OAVec;
-    typedef std::map<MsgId, ORBInvokeRec *, std::less<MsgId> > InvokeMap;
+    typedef std::map<MsgId, ORBInvokeRec_var, std::less<MsgId> > InvokeMap;
     typedef std::map<std::string, Object_var, std::less<std::string> >
     InitialRefMap;
     typedef std::map<std::string, ValueFactoryBase_var, std::less<std::string> >
@@ -304,7 +323,7 @@ private:
     void del_invoke (MsgId);
 
     // internal ORBMsgId handling
-    ORBInvokeRec *get_invoke (ORBMsgId id) { return id; };
+    ORBInvokeRec *get_invoke (ORBMsgId id) { return ORBInvokeRec::_duplicate(id); };
 
     void do_shutdown ();
 
@@ -486,29 +505,29 @@ public:
 #endif // USE_CSL2
 
     ORBMsgId new_orbid (MsgId msgid = 0);
-    static MsgId get_msgid (ORBMsgId rec) { return rec ? rec->id() : 0; };
+    static MsgId get_msgid (ORBMsgId rec) { return !CORBA::is_nil(rec) ? rec->id() : 0; };
     ORBMsgId get_orbid (MsgId id) { return get_invoke(id); };
 
     //FIXME: hopefully nobody is going to shot me for this :-)
     void set_request_hint(ORBMsgId id, void *hint) {
-	ORBInvokeRec *rec = get_invoke (id);
-	assert( rec );
-	rec->set_request_hint( hint );
+	//ORBInvokeRec_var rec = get_invoke (id);
+	assert( !CORBA::is_nil(id) );
+	id->set_request_hint( hint );
     };
     void *get_request_hint(ORBMsgId id) {
-	ORBInvokeRec *rec = get_invoke (id);
-	assert( rec );
-	return rec->get_request_hint();
+	//ORBInvokeRec_var rec = get_invoke (id);
+	assert( !CORBA::is_nil(id) );
+	return id->get_request_hint();
     };
     void set_invoke_hint(ORBMsgId id, void *hint) {
-	ORBInvokeRec *rec = get_invoke (id);
-	assert( rec );
-	rec->set_invoke_hint( hint );
+	//ORBInvokeRec_var rec = get_invoke (id);
+	assert( !CORBA::is_nil(id) );
+	id->set_invoke_hint( hint );
     };
     void *get_invoke_hint(ORBMsgId id) {
-	ORBInvokeRec *rec = get_invoke (id);
-	assert( rec );
-	return rec->get_invoke_hint();
+	//ORBInvokeRec_var rec = get_invoke (id);
+	assert( !CORBA::is_nil(id) );
+	return id->get_invoke_hint();
     };
 
     ORBMsgId invoke_async (Object_ptr, ORBRequest *, Principal_ptr,

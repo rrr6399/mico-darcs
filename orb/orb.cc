@@ -291,7 +291,10 @@ CORBA::ORBInvokeRec::~ORBInvokeRec ()
     CORBA::release (_obj);
     CORBA::release (_target);
     CORBA::release (_principal);
-    CORBA::release (_req);
+    // _req is intentionally omitted here as it may be object allocated on stack!
+    // For more information see comment next to _req variable
+    // declaration in orb_mico.h
+    // CORBA::release (_req);
     CORBA::release (_sri);
 #ifdef HAVE_THREADS
     CORBA::ORBAsyncCallback* tmp_cb = dynamic_cast<CORBA::ORBAsyncCallback*>(_cb);
@@ -307,9 +310,11 @@ CORBA::ORBInvokeRec::free ()
     CORBA::release (_obj);
     CORBA::release (_target);
     CORBA::release (_principal);
-    CORBA::release (_req);
+    // _req is intentionally omitted here as it may be object allocated on stack!
+    // For more information see comment next to _req variable
+    // declaration in orb_mico.h
+    // CORBA::release (_req);
     CORBA::release (_sri);
-
     if (_cb)
 	delete _cb;
     _have_result = FALSE;
@@ -638,7 +643,7 @@ namespace CORBA {
 void
 ORB_cleanup_current_invocation_rec(void* value)
 {
-    stack<CORBA::ORBInvokeRec*>* invs = static_cast<stack<CORBA::ORBInvokeRec*>*>(value);
+    stack<CORBA::ORBInvokeRec_var>* invs = static_cast<stack<CORBA::ORBInvokeRec_var>*>(value);
     if (invs != NULL) {
         delete invs;
     }
@@ -699,9 +704,10 @@ CORBA::ORB::~ORB ()
     delete _disp;
     delete _tmpl;
 #ifndef HAVE_THREADS
-    map<MsgId, ORBInvokeRec *, less<MsgId> >::iterator i;
-    for (i = _invokes.begin(); i != _invokes.end(); ++i)
-	delete (*i).second;
+    // map<MsgId, ORBInvokeRec *, less<MsgId> >::iterator i;
+    // for (i = _invokes.begin(); i != _invokes.end(); ++i)
+    //     delete (*i).second;
+    _invokes.erase(_invokes.begin(), _invokes.end());
 #endif // HAVE_THREADS
     if (iiop_proxy_instance != NULL) {
 	delete iiop_proxy_instance;
@@ -2346,7 +2352,7 @@ CORBA::ORB::add_invoke (ORBInvokeRec *rec)
     // kcg: if this assert ever fails, then we need to implement
     // new msgid colision checking into ORB::new_msgid method
     assert(_invokes.count(rec->id()) == 0);
-    _invokes[rec->id()] = rec;
+    _invokes[rec->id()] = ORBInvokeRec::_duplicate(rec);
 #else // HAVE_THREADS
     MICOMT::Locked<InvokeMap>* map = static_cast<MICOMT::Locked<InvokeMap>*>
         (MICOMT::Thread::get_specific(_invokes_key));
@@ -2361,7 +2367,7 @@ CORBA::ORB::add_invoke (ORBInvokeRec *rec)
         // kcg: if this assert ever fails, then we need to implement
         // new msgid colision checking into ORB::new_msgid method
         assert(map->count(rec->id()) == 0);
-        (*map)[rec->id()] = rec;
+        (*map)[rec->id()] = ORBInvokeRec::_duplicate(rec);
     }
 #endif // HAVE_THREADS
 }
@@ -2380,22 +2386,22 @@ CORBA::ORB::get_invoke (MsgId id)
 	    << "ORB::get_invoke (MsgId="<< id << ")" << endl;
     }
 #ifndef HAVE_THREADS
-    map<MsgId, ORBInvokeRec *, less<MsgId> >::iterator i;
+    map<MsgId, ORBInvokeRec_var, less<MsgId> >::iterator i;
     i = _invokes.find (id);
     if (i == _invokes.end()) {
 	return NULL;
     }
-    CORBA::ORBInvokeRec *rec = (*i).second;
+    CORBA::ORBInvokeRec_var rec = CORBA::ORBInvokeRec::_duplicate((*i).second);
 #else // HAVE_THREADS
     MICOMT::Locked<InvokeMap>* map = static_cast<MICOMT::Locked<InvokeMap>*>
         (MICOMT::Thread::get_specific(_invokes_key));
-    CORBA::ORBInvokeRec* rec = NULL;
+    CORBA::ORBInvokeRec_var rec = CORBA::ORBInvokeRec::_nil();
     if (map != NULL) {
         AutoLock l(*map);
         InvokeMap::iterator i = map->find(id);
         if (i != map->end()) {
-            rec = (*i).second;
-            return rec;
+            rec = CORBA::ORBInvokeRec::_duplicate((*i).second);
+            return rec._retn();
         }
     }
     AutoLock l(_invokes);
@@ -2406,12 +2412,12 @@ CORBA::ORB::get_invoke (MsgId id)
         AutoLock l2(*map);
         InvokeMap::iterator it = map->find(id);
         if (it != map->end()) {
-            rec = (*it).second;
-            return rec;
+            rec = CORBA::ORBInvokeRec::_duplicate((*it).second);
+            return rec._retn();
         }
     }
 #endif // HAVE_THREADS
-    return rec;
+    return rec._retn();
 }
 
 void
@@ -2431,10 +2437,10 @@ CORBA::ORB::del_invoke (MsgId id)
 	    << "ORB::del_invoke (MsgId="<< id << ")" << endl;
     }
 #ifndef HAVE_THREADS
-    map<MsgId, ORBInvokeRec *, less<MsgId> >::iterator i;
+    map<MsgId, ORBInvokeRec_var, less<MsgId> >::iterator i;
     i = _invokes.find (id);
     if (i != _invokes.end()) {
-	delete (*i).second;
+	//delete (*i).second;
 	_invokes.erase (i);
     }
 #else // HAVE_THREADS
@@ -2444,7 +2450,8 @@ CORBA::ORB::del_invoke (MsgId id)
         AutoLock l(*map);
         InvokeMap::iterator i = map->find(id);
         if (i != map->end()) {
-            delete (*i).second;
+            //delete (*i).second;
+            //cerr << "ORB::del_invoke _refcnt(): " << (*i).second->_refcnt() << endl;
             map->erase(i);
             return;
         }
@@ -2457,7 +2464,8 @@ CORBA::ORB::del_invoke (MsgId id)
         AutoLock l2(*map);
         InvokeMap::iterator it = map->find(id);
         if (it != map->end()) {
-            delete (*it).second;
+            //delete (*it).second;
+            //cerr << "ORB::del_invoke2 _refcnt(): " << (*it).second->_refcnt() << endl;
             map->erase(it);
             return;
         }
@@ -2692,15 +2700,15 @@ CORBA::ORB::invoke_async (Object_ptr obj,
 			  ORBMsgId id)
 {
     MsgId msgid;
-    ORBInvokeRec *rec;
+    ORBInvokeRec_var rec = ORBInvokeRec::_nil();
 
-    if (!id) {
+    if (CORBA::is_nil(id)) {
 	msgid = new_msgid();
     } else {
 	msgid = get_msgid(id);
     }
 
-    rec = id;
+    rec = ORBInvokeRec::_duplicate(id);
 #ifndef HAVE_THREADS
     // XXX has to be changed for MT
     //_currentid = msgid;
@@ -2711,16 +2719,17 @@ CORBA::ORB::invoke_async (Object_ptr obj,
         this->initialize_threading();
     }
 
-    stack<CORBA::ORBInvokeRec*>* invs = static_cast<stack<CORBA::ORBInvokeRec*>*>
+    stack<CORBA::ORBInvokeRec_var>* invs = static_cast<stack<CORBA::ORBInvokeRec_var>*>
 	(MICOMT::Thread::get_specific(_current_rec_key));
     if (invs == NULL) {
-	invs = new stack<CORBA::ORBInvokeRec*>;
-	invs->push(rec);
+	invs = new stack<CORBA::ORBInvokeRec_var>;
+	invs->push(ORBInvokeRec::_duplicate(rec));
 	MICOMT::Thread::set_specific(_current_rec_key, invs);
     }
     else {
-	invs->push(rec);
+	invs->push(ORBInvokeRec::_duplicate(rec));
     }
+
 #endif // HAVE_THREADS
 
     // we need to know OA before calling
@@ -2731,7 +2740,7 @@ CORBA::ORB::invoke_async (Object_ptr obj,
 	if (!cb && response_exp) 
 	    cb = new ORBAsyncCallback;
 #endif
-    if (!rec)
+    if (CORBA::is_nil(rec))
 	rec = create_invoke(msgid);
 //  	try {
 //  	    rec->init_invoke (this, msgid, obj, req, pr, response_exp, cb, oa);
@@ -2763,7 +2772,7 @@ CORBA::ORB::invoke_async (Object_ptr obj,
             CORBA::OBJECT_NOT_EXIST ex;
 	    req->set_out_args (&ex);
 	    answer_invoke (rec, InvokeSysEx, Object::_nil(), req, 0);
-	    return rec;
+	    return rec._retn();
 	}
 	rec->oa (oa);
         oa->invoke (rec, obj, req, pr, response_exp);
@@ -2775,7 +2784,7 @@ CORBA::ORB::invoke_async (Object_ptr obj,
 	        _currentid.pop();
             }
 #else // HAVE_THREADS
-            stack<CORBA::ORBInvokeRec*>* invs = static_cast<stack<CORBA::ORBInvokeRec*>*>
+            stack<CORBA::ORBInvokeRec_var>* invs = static_cast<stack<CORBA::ORBInvokeRec_var>*>
 	        (MICOMT::Thread::get_specific(_current_rec_key));
             if (invs != NULL && !invs->empty()) {
 	        invs->pop();
@@ -2789,11 +2798,11 @@ CORBA::ORB::invoke_async (Object_ptr obj,
 	    _cache_used = FALSE;
 	  }
 #endif
-	  delete rec;
+	  //delete rec;
 #endif // USE_SL3
 	}
     }
-    return response_exp ? rec : 0;
+    return response_exp ? rec._retn() : 0;
 }
 
 CORBA::ORBMsgId
@@ -2805,8 +2814,8 @@ CORBA::ORB::locate_async (Object_ptr obj, ORBCallback *cb, ORBMsgId id)
     }
 #endif // HAVE_THREADS
     ObjectAdapter *oa = get_oa (obj);
-    ORBInvokeRec *rec = get_invoke( id );
-    if (!rec)
+    ORBInvokeRec_var rec = get_invoke ( id );
+    if (CORBA::is_nil(rec))
 	rec = new_orbid();
 #ifdef HAVE_THREADS
     if (!cb) 
@@ -2820,7 +2829,7 @@ CORBA::ORB::locate_async (Object_ptr obj, ORBCallback *cb, ORBMsgId id)
     } else {
         oa->locate (rec, obj);
     }
-    return rec;
+    return rec._retn();
 }
 
 CORBA::ORBMsgId
@@ -2834,8 +2843,8 @@ CORBA::ORB::bind_async (const char *repoid,
         this->initialize_threading();
     }
 #endif // HAVE_THREADS
-    ORBInvokeRec *rec = get_invoke( id );
-    if (!rec)
+    ORBInvokeRec_var rec = get_invoke( id );
+    if (CORBA::is_nil(rec))
 	rec = new_orbid();
 #ifdef HAVE_THREADS
     if (!cb) 
@@ -2850,18 +2859,19 @@ CORBA::ORB::bind_async (const char *repoid,
 	for (ULong i = 0; i < _adapters.size(); ++i) {
 	    rec->oa (_adapters[i]);
 	    if (_adapters[i]->bind (rec, repoid, rec->tag(), addr))
-		return rec;
+		return rec._retn();
 	}
     }
     answer_bind (rec, LocateUnknown, Object::_nil());
-    return rec;
+    return rec._retn();
 }
 
 CORBA::InvokeStatus
 CORBA::ORB::invoke (Object_ptr &obj, ORBRequest *req,
 		    Principal_ptr pr, Boolean reply_exp)
 {
-    ORBMsgId id = invoke_async (obj, req, pr, reply_exp);
+    cerr << "ORB::invoke" << endl;
+    ORBMsgId_var id = invoke_async (obj, req, pr, reply_exp);
     if (!reply_exp)
 	return InvokeOk;
     assert (id != 0);
@@ -2875,7 +2885,7 @@ CORBA::ORB::invoke (Object_ptr &obj, ORBRequest *req,
 CORBA::LocateStatus
 CORBA::ORB::locate (Object_ptr &obj)
 {
-    ORBMsgId id = locate_async (obj);
+    ORBMsgId_var id = locate_async (obj);
     CORBA::Boolean r = wait (id);
     assert (r);
     GIOP::AddressingDisposition adummy;
@@ -2886,7 +2896,7 @@ CORBA::LocateStatus
 CORBA::ORB::bind (const char *repoid, const ObjectTag &oid,
 		  Address *addr, Object_ptr &obj)
 {
-    ORBMsgId id = bind_async (repoid, oid, addr);
+    ORBMsgId_var id = bind_async (repoid, oid, addr);
     if (id == 0)
 	return LocateUnknown;
     CORBA::Boolean r = wait (id);
@@ -2936,36 +2946,36 @@ CORBA::ORB::bind (const char *repoid, const char *addr)
 void
 CORBA::ORB::cancel (ORBMsgId id)
 {
-    ORBInvokeRec *rec = this->get_invoke (id);
-    if (rec) {
+    ORBInvokeRec_var rec = this->get_invoke (id);
+    if (!CORBA::is_nil(rec)) {
 	rec->deactivate();
         if (rec->oa()) {
 	    rec->oa()->cancel ( rec );
 	}
-#ifndef HAVE_THREADS
+        //#ifndef HAVE_THREADS
 	del_invoke ( rec->id() );
-#endif
+        //#endif
     }
 }
 
 void
 CORBA::ORB::cancel (MsgId id)
 {
-    ORBInvokeRec *rec = get_invoke (id);
-    if (rec) {
+    ORBInvokeRec_var rec = get_invoke (id);
+    if (!CORBA::is_nil(rec)) {
 	rec->deactivate();
         if (rec->oa())
             rec->oa()->cancel ( rec );
-#ifndef HAVE_THREADS
 	del_invoke ( rec->id() );
 
+#ifndef HAVE_THREADS
         // XXX has to be changed for MT
         //_currentid = 0;
 	if (!_currentid.empty()) {
 	    _currentid.pop();
 	}
 #else // HAVE_THREADS
-	stack<CORBA::ORBInvokeRec*>* invs = static_cast<stack<CORBA::ORBInvokeRec*>*>
+	stack<CORBA::ORBInvokeRec_var>* invs = static_cast<stack<CORBA::ORBInvokeRec_var>*>
 	    (MICOMT::Thread::get_specific(_current_rec_key));
 	if (invs != NULL && !invs->empty()) {
 	    invs->pop();
@@ -3007,7 +3017,7 @@ CORBA::ORB::wait (ORBMsgId id, Long tmout)
 	MICO::Logger::Stream (MICO::Logger::ORB) 
 	    << "ORB::wait for " << id << endl;
     }
-    ORBInvokeRec *rec = get_invoke (id);
+    ORBInvokeRec_var rec = get_invoke (id);
 #ifdef USE_MESSAGING
     if (id->relative_roundtrip_timeout() > 0)
         tmout = id->relative_roundtrip_timeout();
@@ -3018,14 +3028,14 @@ CORBA::ORB::wait (ORBMsgId id, Long tmout)
     MICO::IIOPProxyInvokeRec* proxy_invoke_rec = NULL;
     MICO::GIOPConn *invoke_rec_conn = NULL;
 
-    if (rec != NULL) {
+    if (!CORBA::is_nil(rec)) {
         proxy_invoke_rec = (MICO::IIOPProxyInvokeRec*)rec->get_invoke_hint();
         if (proxy_invoke_rec != NULL) {
             invoke_rec_conn = proxy_invoke_rec->conn();
         }
     }
 
-    if (rec
+    if (!CORBA::is_nil(rec)
         && (MICO::MTManager::blocking_threaded_client()
             || (MICO::MTManager::threaded_client()
                 && !((invoke_rec_conn != NULL) && invoke_rec_conn->is_this_reader_thread()) ))) {
@@ -3038,7 +3048,7 @@ CORBA::ORB::wait (ORBMsgId id, Long tmout)
         }
         return TRUE;
     }
-    else if (rec
+    else if (!CORBA::is_nil(rec)
              && (MICO::MTManager::reactive_client()
                  || (MICO::MTManager::threaded_client()
                      && ((invoke_rec_conn != NULL) && invoke_rec_conn->is_this_reader_thread()) ))) {
@@ -3049,7 +3059,7 @@ CORBA::ORB::wait (ORBMsgId id, Long tmout)
         // way
 #endif // HAVE_THREADS
     if (tmout == 0) {
-      if (!rec || rec->completed()) {
+      if (CORBA::is_nil(rec) || rec->completed()) {
 	return TRUE;
       }
     }
@@ -3068,13 +3078,13 @@ CORBA::ORB::wait (ORBMsgId id, Long tmout)
     Timeout t (disp_for_waiting, tmout);
 
     while (42) {
-      if (!rec || rec->completed())
+      if (CORBA::is_nil(rec) || rec->completed())
 	return TRUE;
 #ifdef USE_MESSAGING
       if (t.done()) {
         if (tmout > 0) {
           // timeout was enabled
-          assert(rec != NULL);
+            assert(!CORBA::is_nil(rec));
           rec->timedout(TRUE);
           return TRUE;
         }
@@ -3108,8 +3118,8 @@ CORBA::InvokeStatus
 CORBA::ORB::get_invoke_reply (ORBMsgId id, Object_out obj, ORBRequest *&r,
 			      GIOP::AddressingDisposition &ad)
 {
-    ORBInvokeRec *rec = get_invoke (id);
-    assert (rec);
+    ORBInvokeRec_var rec = get_invoke (id);
+    assert (!CORBA::is_nil(rec));
 
     InvokeStatus state;
     Object_ptr o;
@@ -3125,7 +3135,7 @@ CORBA::ORB::get_invoke_reply (ORBMsgId id, Object_out obj, ORBRequest *&r,
 	_currentid.pop();
     }
 #else // HAVE_THREADS
-    stack<CORBA::ORBInvokeRec*>* invs = static_cast<stack<CORBA::ORBInvokeRec*>*>
+    stack<CORBA::ORBInvokeRec_var>* invs = static_cast<stack<CORBA::ORBInvokeRec_var>*>
 	(MICOMT::Thread::get_specific(_current_rec_key));
     if (invs != NULL && !invs->empty()) {
 	invs->pop();
@@ -3138,8 +3148,8 @@ CORBA::LocateStatus
 CORBA::ORB::get_locate_reply (ORBMsgId id, Object_out obj,
 			      GIOP::AddressingDisposition &ad)
 {
-    ORBInvokeRec *rec = get_invoke (id);
-    assert (rec);
+    ORBInvokeRec_var rec = get_invoke (id);
+    assert (!CORBA::is_nil(rec));
 
     LocateStatus state;
     Object_ptr o;
@@ -3153,8 +3163,8 @@ CORBA::ORB::get_locate_reply (ORBMsgId id, Object_out obj,
 CORBA::LocateStatus
 CORBA::ORB::get_bind_reply (ORBMsgId id, Object_out obj)
 {
-    ORBInvokeRec *rec = get_invoke (id);
-    assert (rec);
+    ORBInvokeRec_var rec = get_invoke (id);
+    assert (!CORBA::is_nil(rec));
 
     LocateStatus state;
     Object_ptr o;
@@ -3180,8 +3190,8 @@ CORBA::ORB::answer_invoke (ORBMsgId id, InvokeStatus stat, Object_ptr obj,
 			   ORBRequest *req,
 			   GIOP::AddressingDisposition ad)
 {
-    ORBInvokeRec *rec = get_invoke (id);
-    if (rec) {
+    ORBInvokeRec_var rec = get_invoke (id);
+    if (!CORBA::is_nil(rec)) {
 	rec->set_answer_invoke (stat, obj, req, ad);
 	if (rec->callback())
 	    rec->callback()->notify (this, rec, ORBCallback::Invoke);
@@ -3191,8 +3201,8 @@ CORBA::ORB::answer_invoke (ORBMsgId id, InvokeStatus stat, Object_ptr obj,
 void
 CORBA::ORB::answer_bind (ORBMsgId id, LocateStatus stat, Object_ptr obj)
 {
-    ORBInvokeRec *rec = get_invoke (id);
-    if (rec) {
+    ORBInvokeRec_var rec = get_invoke (id);
+    if (!CORBA::is_nil(rec)) {
 	rec->set_answer_bind (stat, obj);
 	if (rec->callback())
 	    rec->callback()->notify (this, rec, ORBCallback::Bind);
@@ -3203,8 +3213,8 @@ void
 CORBA::ORB::answer_locate (ORBMsgId id, LocateStatus stat, Object_ptr obj,
 			   GIOP::AddressingDisposition ad)
 {
-    ORBInvokeRec *rec = get_invoke (id);
-    if (rec) {
+    ORBInvokeRec_var rec = get_invoke (id);
+    if (!CORBA::is_nil(rec)) {
 	rec->set_answer_locate (stat, obj, ad);
 	if (rec->callback())
 	    rec->callback()->notify (this, rec, ORBCallback::Locate);
@@ -3214,8 +3224,8 @@ CORBA::ORB::answer_locate (ORBMsgId id, LocateStatus stat, Object_ptr obj,
 CORBA::ORBRequest *
 CORBA::ORB::request (ORBMsgId id)
 {
-    ORBInvokeRec *rec = get_invoke (id);
-    if (!rec)
+    ORBInvokeRec_var rec = get_invoke (id);
+    if (CORBA::is_nil(rec))
 	return 0;
     return rec->request ();
 }
@@ -3223,8 +3233,8 @@ CORBA::ORB::request (ORBMsgId id)
 CORBA::RequestType
 CORBA::ORB::request_type (ORBMsgId id)
 {
-    ORBInvokeRec *rec = get_invoke (id);
-    if (!rec)
+    ORBInvokeRec_var rec = get_invoke (id);
+    if (CORBA::is_nil(rec))
 	return RequestUnknown;
     return rec->request_type ();
 }
@@ -3232,8 +3242,8 @@ CORBA::ORB::request_type (ORBMsgId id)
 void
 CORBA::ORB::redo_request (ORBMsgId id)
 {
-    ORBInvokeRec *rec = get_invoke (id);
-    if (rec && rec->active() ) {
+    ORBInvokeRec_var rec = get_invoke (id);
+    if (!CORBA::is_nil(rec) && rec->active() ) {
 	rec->redo();
     } else {
       if (MICO::Logger::IsLogged (MICO::Logger::Info)) {
@@ -3359,10 +3369,11 @@ CORBA::ORBInvokeRec *
 CORBA::ORB::get_current_invoke_rec ()
 {
 #ifdef HAVE_THREADS
-    stack<ORBInvokeRec*>* invs = static_cast<stack<CORBA::ORBInvokeRec*>*>
+    stack<ORBInvokeRec_var>* invs = static_cast<stack<CORBA::ORBInvokeRec_var>*>
 	(MICOMT::Thread::get_specific(_current_rec_key));
     assert(invs != NULL && !invs->empty());
-    return invs->top();
+    return ORBInvokeRec::_duplicate(invs->top());
+    //return ORBInvokeRec::_nil();
 #else // HAVE_THREADS
     // XXX has to be changed for MT
     if (_currentid.empty()) {
@@ -3448,8 +3459,8 @@ CORBA::Principal_ptr
 CORBA::PrincipalCurrent_impl::get_principal ()
 {
     ORB_var orb = CORBA::ORB_instance ("mico-local-orb");
-    ORBInvokeRec *rec = orb->get_current_invoke_rec();
-    if (!rec)
+    ORBInvokeRec_var rec = orb->get_current_invoke_rec();
+    if (CORBA::is_nil(rec))
         return CORBA::Principal::_nil();
     return CORBA::Principal::_duplicate (rec->principal());
 }
