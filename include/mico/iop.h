@@ -668,7 +668,7 @@ public:
     typedef CORBA::ULong MsgId;
     typedef CORBA::Codeset::CodesetId CodesetId;
 private:
-    CORBA::ORBMsgId _id;
+    CORBA::ORBMsgId_var _id;
     MsgId _msgid;
     GIOPConn *_conn;
     CORBA::ORBRequest *_req;
@@ -677,21 +677,27 @@ private:
 
 public:
     IIOPProxyInvokeRec ()
-    {}
+    {
+        _id = CORBA::ORBInvokeRec::_nil();
+        _msgid = 0;
+        _conn = NULL;
+        _req = CORBA::ORBRequest::_nil();
+        _active = FALSE;
+    }
 
     ~IIOPProxyInvokeRec ()
     {
-	if (this->id() != NULL) {
-	    this->id()->set_invoke_hint(NULL);
+	if (!CORBA::is_nil(_id)) {
+	    _id->set_invoke_hint(NULL);
 	}
     }
 
     void free ()
-    {}
+    { assert(0); }
 
     void init (CORBA::ORBMsgId idval, GIOPConn *connval, CORBA::ORBRequest *req = 0)
     {
-	_id = idval;
+	_id = CORBA::ORBInvokeRec::_duplicate(idval);
 	_msgid = CORBA::ORB::get_msgid(idval);
 	_conn = connval;
 	_req = req;
@@ -711,7 +717,7 @@ public:
     { return _req; }
 
     CORBA::ORBMsgId id () const
-    { return _id; }
+    { return CORBA::ORBInvokeRec::_duplicate(_id); }
 
     MsgId msgid () const
     { return _msgid; }
@@ -853,7 +859,7 @@ private:
     CORBA::ORBRequest *_req;
     CORBA::Object_ptr _obj;
     CORBA::Principal_ptr _pr;
-    CORBA::ORBMsgId _orbid;
+    CORBA::ORBMsgId_var _orbid;
     MsgId _orbmsgid;
     MsgId _reqid;
     GIOPConn *_conn;
@@ -879,13 +885,13 @@ public:
     { return _req; }
 
     CORBA::ORBMsgId orbid()
-    { return _orbid; }
+    { return CORBA::ORBInvokeRec::_duplicate(_orbid); }
 
     MsgId orbmsgid()
     { return _orbmsgid; }
 
     void orbid (CORBA::ORBMsgId id)
-    { _orbid = id; }
+    { _orbid = CORBA::ORBInvokeRec::_duplicate(id); }
 
     MsgId reqid()
     { return _reqid; }

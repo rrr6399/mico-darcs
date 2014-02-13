@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2010 by The Mico Team
+ *  Copyright (c) 1997-2013 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -1739,7 +1739,7 @@ CORBA::StaticRequest::StaticRequest (CORBA::Object_ptr obj, const char *opname)
 	// locality constrained object
 	mico_throw (NO_IMPLEMENT());
 
-    _id = 0;
+    _id = ORBInvokeRec::_nil();
     _opname = opname;
     _res = 0;
     _ctx = 0;
@@ -1757,7 +1757,7 @@ CORBA::StaticRequest::StaticRequest (CORBA::Object_ptr obj, const char *opname)
 
 CORBA::StaticRequest::~StaticRequest ()
 {
-    if (_id)
+    if (!CORBA::is_nil(_id))
         _obj->_orbnc()->cancel (_id);
     CORBA::release (_ctx);
     CORBA::release (_env);
@@ -2130,10 +2130,10 @@ CORBA::StaticRequest::invoke ()
     CORBA::Object_var obj;
     CORBA::ORBRequest *dummy;
     CORBA::Boolean done = FALSE;
-    CORBA::ORBMsgId id;
+    CORBA::ORBMsgId_var id = CORBA::ORBInvokeRec::_nil();
 
     // no pending invocations please ...
-    assert (!_id);
+    assert (CORBA::is_nil(_id));
 //      assert (!_msgid);
 //      msgid = orb->new_msgid();
     id = orb->new_orbid();
@@ -2342,10 +2342,10 @@ CORBA::StaticRequest::oneway ()
 
 //      CORBA::ULong msgid = _obj->_orbnc()->invoke_async
 //  	(_obj, this, CORBA::Principal::_nil(), FALSE);
-    CORBA::ORBMsgId id = _obj->_orbnc()->invoke_async
+    CORBA::ORBMsgId_var id = _obj->_orbnc()->invoke_async
 	(_obj, this, CORBA::Principal::_nil(), FALSE);
 //      if (msgid > 0) { // object not exists exc.
-    if (id != NULL) {
+    if (!CORBA::is_nil(id)) {
 	cerr << "static.cc hack pi...." << endl;
 	CORBA::OBJECT_NOT_EXIST ex;
 	PInterceptor::PI::_receive_exception_ip
@@ -2373,13 +2373,13 @@ CORBA::StaticRequest::send_deferred ()
     if (_iceptreq && !Interceptor::ClientInterceptor::
 	_exec_initialize_request ((Interceptor::LWRequest_ptr)_iceptreq,
 				  env())) {
-        _id = 0;
+        _id = ORBInvokeRec::_nil();
 	return;
     }
 #endif // USE_OLD_INTERCEPTORS
     
 //      CORBA::ULong msgid = orb->new_msgid();
-    CORBA::ORBMsgId id = orb->new_orbid();
+    CORBA::ORBMsgId_var id = orb->new_orbid();
     PInterceptor::PI::_send_request_ip
 	(_cri, CORBA::ORB::get_msgid(id), _args, this->ctx_list(), this->ctx(),
 	 this->context());
@@ -2394,7 +2394,7 @@ CORBA::StaticRequest::send_deferred ()
 	_exec_after_marshal ((Interceptor::LWRequest_ptr)_iceptreq,
 			     env())) {
 	orb->cancel (_id);
-	_id = 0;
+	_id = ORBInvokeRec::_nil();
     }
 #endif // USE_OLD_INTERCEPTORS
 }
@@ -2408,7 +2408,7 @@ CORBA::StaticRequest::get_response ()
     CORBA::Boolean done = FALSE;
     GIOP::AddressingDisposition ad;
 
-    assert (_id);
+    assert (!CORBA::is_nil(_id));
 //      assert (_msgid);
 
     PInterceptor::PI::_send_poll_ip(_cri, CORBA::ORB::get_msgid(_id));
@@ -2423,7 +2423,7 @@ CORBA::StaticRequest::get_response ()
 	    _exec_before_unmarshal ((Interceptor::LWRequest_ptr)_iceptreq,
 				    env())) {
 	    orb->cancel (_id);
-            _id = 0;
+            _id = ORBInvokeRec::_nil();
 	    return;
 	}
 #endif // USE_OLD_INTERCEPTORS
@@ -2443,8 +2443,6 @@ CORBA::StaticRequest::get_response ()
 		 this->ctx_list(), this->ctx(), dummy->context());
 	    CORBA::release(_cri);
 //  	    _msgid = orb->new_msgid();
-	    if (_id != NULL)
-		delete _id;
 	    _id = orb->new_orbid();
 	    _cri = PInterceptor::PI::_create_cri(_obj, _opname);
 	    PInterceptor::PI::_send_request_ip
@@ -2463,8 +2461,6 @@ CORBA::StaticRequest::get_response ()
 		 this->ctx(), dummy->context());
 	    CORBA::release(_cri);
 //  	    _msgid = orb->new_msgid();
-	    if (_id != NULL)
-		delete _id;
 	    _id = orb->new_orbid();
 	    _cri = PInterceptor::PI::_create_cri(_obj, _opname);
 	    PInterceptor::PI::_send_request_ip
@@ -2534,8 +2530,6 @@ CORBA::StaticRequest::get_response ()
                     env()->clear();
 		    CORBA::release(_cri);
 //  		    _msgid = orb->new_msgid();
-		    if (_id != NULL)
-			delete _id;
 		    _id = orb->new_orbid();
 		    _cri = PInterceptor::PI::_create_cri(_obj, _opname);
 		    PInterceptor::PI::_send_request_ip
@@ -2578,7 +2572,7 @@ CORBA::StaticRequest::get_response ()
     }
 #endif // USE_OLD_INTERCEPTORS
     // kcg: Is this ok instead of delete _id; _id = 0; ??
-    _id = 0;
+    _id = ORBInvokeRec::_nil();
 }
 
 
@@ -2592,7 +2586,7 @@ CORBA::StaticServerRequest::StaticServerRequest (ORBRequest *req,
     : _oa (oa), _obj (Object::_duplicate (obj)),
       _ctx (Context::_nil()), _env (pr),
       _req (ORBRequest::_duplicate (req)),
-      _res (0), _id (id), _aborted (FALSE)
+      _res (0), _id (ORBInvokeRec::_duplicate(id)), _aborted (FALSE)
 {
 #ifdef USE_OLD_INTERCEPTORS
     _iceptreq = Interceptor::ServerInterceptor::_create_request
@@ -2613,10 +2607,9 @@ CORBA::StaticServerRequest::~StaticServerRequest ()
             }
         }
 	// change aruments after servant is done        
-	CORBA::ORBInvokeRec* rec = _id;
-	if (rec) {
+	if (!CORBA::is_nil(_id)) {
 	    PInterceptor::PI::_set_sri_exception
-		(rec->requestinfo(), _env.exception());
+		(_id->requestinfo(), _env.exception());
 	}
 //          _oa->answer_invoke (_msgid, _obj, _req, stat);
         _oa->answer_invoke (_id, _obj, _req, stat);
@@ -2700,10 +2693,9 @@ CORBA::StaticServerRequest::read_args ()
 #endif // USE_OLD_INTERCEPTORS
     
     CORBA::ORB_ptr orb = _obj->_orbnc();
-    CORBA::ORBInvokeRec* rec = _id;
-    if (!rec)
+    if (CORBA::is_nil(_id))
     	return TRUE;
-    PInterceptor::ServerRequestInfo_impl* sri = rec->requestinfo();
+    PInterceptor::ServerRequestInfo_impl* sri = _id->requestinfo();
     // point of receive_request call
     try {
 	PInterceptor::PI::_receive_request_ip(sri, _args, _ctx, _oa, _obj);
@@ -2714,7 +2706,7 @@ CORBA::StaticServerRequest::read_args ()
 	return FALSE;
     } catch (PortableInterceptor::ForwardRequest_catch& exc) {
 	_obj = Object::_duplicate(exc->forward);
-	orb->answer_invoke(rec, CORBA::InvokeForward, exc->forward,
+	orb->answer_invoke(_id, CORBA::InvokeForward, exc->forward,
 			   _req, 0);
     } catch (CORBA::UserException& ex) {
 	set_exception(ex._clone());
@@ -2754,9 +2746,8 @@ CORBA::StaticServerRequest::write_results ()
 	_req->set_out_args (_env.exception());
     }
     else {
-	CORBA::ORBInvokeRec* rec = _id;
-	if (rec) {
-	    PInterceptor::ServerRequestInfo_impl* sri = rec->requestinfo();
+	if (!CORBA::is_nil(_id)) {
+	    PInterceptor::ServerRequestInfo_impl* sri = _id->requestinfo();
 	    CORBA::Any r;
 	    CORBA::TypeCode_ptr tc;
 	    if (_res && (tc = _res->typecode())) {

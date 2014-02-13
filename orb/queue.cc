@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2010 by The Mico Team
+ *  Copyright (c) 1997-2013 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -49,7 +49,7 @@ MICO::ReqQueueRec::ReqQueueRec (CORBA::ORBMsgId id, CORBA::ORBRequest *req,
 				CORBA::Principal_ptr pr,
 				CORBA::Boolean resp)
 {
-    _id = id;
+    _id = CORBA::ORBInvokeRec::_duplicate(id);
     _request = CORBA::ORBRequest::_duplicate (req);
     _obj = CORBA::Object::_duplicate (obj);
     _pr = CORBA::Principal::_duplicate (pr);
@@ -60,7 +60,7 @@ MICO::ReqQueueRec::ReqQueueRec (CORBA::ORBMsgId id, CORBA::ORBRequest *req,
 MICO::ReqQueueRec::ReqQueueRec (CORBA::ORBMsgId id, const char *repoid,
 				const CORBA::ORB::ObjectTag &tag)
 {
-    _id = id;
+    _id = CORBA::ORBInvokeRec::_duplicate(id);
     _repoid = repoid;
     _request = CORBA::ORBRequest::_nil();
     _obj = CORBA::Object::_nil();
@@ -71,7 +71,7 @@ MICO::ReqQueueRec::ReqQueueRec (CORBA::ORBMsgId id, const char *repoid,
 
 MICO::ReqQueueRec::ReqQueueRec (CORBA::ORBMsgId id, CORBA::Object_ptr obj)
 {
-    _id = id;
+    _id = CORBA::ORBInvokeRec::_duplicate(id);
     _request = CORBA::ORBRequest::_nil();
     _obj = CORBA::Object::_duplicate (obj);
     _pr = CORBA::Principal::_nil();
@@ -147,7 +147,7 @@ MICO::ReqQueueRec::target ()
 
 MICO::RequestQueue::RequestQueue (CORBA::ObjectAdapter *oa,
 				  CORBA::ORB_ptr orb)
-    : _current_id (0), _oa (oa), _orb (orb)
+    : _current_id (CORBA::ORBInvokeRec::_nil()), _oa (oa), _orb (orb)
 {
 }
 
@@ -168,7 +168,7 @@ void
 MICO::RequestQueue::exec_now ()
 {
     // reissue pending invokes ...
-    set<CORBA::ORBMsgId, less<CORBA::ORBMsgId> > seen;
+    set<CORBA::ORBMsgId_var, less<CORBA::ORBMsgId_var> > seen;
     while (_invokes.size() > 0) {
 	ReqQueueRec *inv = _invokes.front();
         _current_id = inv->id();
@@ -183,7 +183,7 @@ MICO::RequestQueue::exec_now ()
 	inv->exec (_oa, _orb);
 	delete inv;
     }
-    _current_id = 0;
+    _current_id = CORBA::ORBInvokeRec::_nil();
 }
 
 void

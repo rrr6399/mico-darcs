@@ -2,7 +2,7 @@
 /*
  *  MICO --- an Open Source CORBA implementation
  *  Copyright (C) 1998 Frank Pilhofer
- *  Copyright (c) 1999-2010 by The Mico Team
+ *  Copyright (c) 1999-2013 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -392,7 +392,7 @@ public:
     }
 
   private:
-    CORBA::ORBMsgId orbid;
+    CORBA::ORBMsgId_var orbid;
     POAObjectReference * por;
     CORBA::ORBRequest * req;
     CORBA::Principal_ptr pr;

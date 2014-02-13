@@ -1476,12 +1476,12 @@ MICOPOA::POA_impl::InvocationRecord::InvocationRecord (CORBA::ORBMsgId _id,
 						       POAObjectReference * _por,
 						       CORBA::ORBRequest * _req,
 						       CORBA::Principal_ptr _pr)
-  : orbid (_id)
 {
   por = new POAObjectReference (*_por);
   req = CORBA::ORBRequest::_duplicate (_req);
   pr  = CORBA::Principal::_duplicate (_pr);
   svr = CORBA::ServerRequest::_nil ();
+  orbid = CORBA::ORBInvokeRec::_duplicate(_id);
 }
 
 MICOPOA::POA_impl::InvocationRecord::~InvocationRecord ()
@@ -1501,7 +1501,7 @@ MICOPOA::POA_impl::InvocationRecord::exec (POA_impl * poa)
 CORBA::ORBMsgId
 MICOPOA::POA_impl::InvocationRecord::id ()
 {
-  return orbid;
+  return CORBA::ORBInvokeRec::_duplicate(orbid);
 }
 
 CORBA::ORBRequest *
@@ -3553,7 +3553,8 @@ MICOPOA::POA_impl::local_invoke (InvocationRecord_ptr ir)
       // XXX obj->_repoid() is empty ...
       theior->objid (obj->_ior()->objid());
       CORBA::Object_var local_ref = new CORBA::Object (theior);
-      orb->answer_invoke (ir->id(), CORBA::InvokeForward,
+      CORBA::ORBInvokeRec_var id = ir->id();
+      orb->answer_invoke (id, CORBA::InvokeForward,
 			  local_ref, ir->get_or(), 0);
     }
     return;
@@ -3957,7 +3958,8 @@ MICOPOA::POA_impl::perform_invoke (InvocationRecord_ptr ir)
 	  }
 #ifdef HAVE_EXCEPTIONS
 	} catch (PortableServer::ForwardRequest_catch & fwr) {
-	  orb->answer_invoke (ir->id(), CORBA::InvokeForward,
+          CORBA::ORBInvokeRec_var id = ir->id();
+	  orb->answer_invoke (id, CORBA::InvokeForward,
 			      fwr->forward_reference,
 			      ir->get_or(), 0);
 	  return;
@@ -4038,7 +4040,8 @@ MICOPOA::POA_impl::perform_invoke (InvocationRecord_ptr ir)
 	  }
 #ifdef HAVE_EXCEPTIONS
       } catch (PortableServer::ForwardRequest_catch & fwr) {
-	orb->answer_invoke (ir->id(), CORBA::InvokeForward,
+        CORBA::ORBInvokeRec_var id = ir->id();
+	orb->answer_invoke (id, CORBA::InvokeForward,
 			    fwr->forward_reference,
 			    ir->get_or(), 0);
 	return;

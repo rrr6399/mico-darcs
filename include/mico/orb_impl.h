@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2010 by The Mico Team
+ *  Copyright (c) 1997-2013 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -85,7 +85,7 @@ private:
     CORBA::ORBRequest *_request;
     CORBA::Object_ptr _obj;
     CORBA::Principal_ptr _pr;
-    CORBA::ORBMsgId _id;
+    CORBA::ORBMsgId_var _id;
     CORBA::Boolean _response_exp;
     CORBA::ORB::ObjectTag _tag;
 public:
@@ -100,8 +100,8 @@ public:
     void fail (CORBA::ObjectAdapter *, CORBA::ORB_ptr);
 
     CORBA::Object_ptr target ();
-    CORBA::ORBMsgId id () const
-    { return _id; }
+    CORBA::ORBMsgId id ()
+    { return CORBA::ORBInvokeRec::_duplicate(_id); }
 };
 
 class RequestQueue : public CORBA::DispatcherCallback {
@@ -109,7 +109,7 @@ public:
     typedef CORBA::ULong MsgId;
 private:
     typedef std::list<ReqQueueRec *> InvokeList;
-    CORBA::ORBMsgId _current_id;
+    CORBA::ORBMsgId_var _current_id;
     InvokeList _invokes;
     CORBA::ObjectAdapter *_oa;
     CORBA::ORB_ptr _orb;
@@ -125,7 +125,7 @@ public:
     void clear ();
 
     CORBA::Boolean iscurrent (CORBA::ORBMsgId id) const
-    { return _current_id && id == _current_id; }
+    { return !CORBA::is_nil(_current_id) && id == _current_id; }
 
     CORBA::ULong size () const
     {
