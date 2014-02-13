@@ -2090,12 +2090,14 @@ CORBA::StaticRequest::add_inout_arg (StaticAny *a)
 void
 CORBA::StaticRequest::set_context (CORBA::Context_ptr ctx)
 {
+    CORBA::release(_ctx);
     _ctx = CORBA::Context::_duplicate (ctx);
 }
 
 void
 CORBA::StaticRequest::set_context_list (CORBA::ContextList_ptr ctx_list)
 {
+    CORBA::release(_ctx_list);
     _ctx_list = CORBA::ContextList::_duplicate (ctx_list);
 }
 
@@ -2144,7 +2146,7 @@ CORBA::StaticRequest::invoke ()
     // because right value of operation_context is computed with help
     // of contexts!
     PInterceptor::PI::_send_request_ip
-	(_cri, CORBA::ORB::get_msgid(id), _args, this->ctx_list(), this->ctx(),
+	(_cri, CORBA::ORB::get_msgid(id), _args, _ctx_list, _ctx,
 	 this->context());
 #ifdef USE_OLD_INTERCEPTORS
     if (_iceptreq && !Interceptor::ClientInterceptor::
@@ -2199,10 +2201,11 @@ CORBA::StaticRequest::invoke ()
 	    CORBA::release(_cri);
 //  	    msgid = orb->new_msgid();
 	    id = orb->new_orbid();
+            //cerr << __FILE__ << ":" << __LINE__ << ": id->_refcnt(): " << (CORBA::is_nil(id) ? -1 : id->_refcnt()) << endl;
 	    _cri = PInterceptor::PI::_create_cri(_obj, _opname);
 	    PInterceptor::PI::_send_request_ip
-		(_cri, CORBA::ORB::get_msgid(id), _args, this->ctx_list(),
-		 this->ctx(), this->context());
+		(_cri, CORBA::ORB::get_msgid(id), _args, _ctx_list,
+		 _ctx, this->context());
 //  	    msgid = orb->invoke_async (_obj, this, Principal::_nil(),
 //  				       TRUE, 0, msgid);
 	    id = orb->invoke_async (_obj, this, Principal::_nil(),
@@ -2219,8 +2222,8 @@ CORBA::StaticRequest::invoke ()
 	    id = orb->new_orbid();
 	    _cri = PInterceptor::PI::_create_cri(_obj, _opname);
 	    PInterceptor::PI::_send_request_ip
-		(_cri, CORBA::ORB::get_msgid(id), _args, this->ctx_list(),
-		 this->ctx(), this->context());
+		(_cri, CORBA::ORB::get_msgid(id), _args, _ctx_list,
+		 _ctx, this->context());
 //  	    msgid = orb->invoke_async (_obj, this, Principal::_nil(),
 //  				       TRUE, 0, msgid);
 //  	    break;
@@ -2288,7 +2291,7 @@ CORBA::StaticRequest::invoke ()
 		    _cri = PInterceptor::PI::_create_cri(_obj, _opname);
 		    PInterceptor::PI::_send_request_ip
 			(_cri, CORBA::ORB::get_msgid(id), _args,
-			 this->ctx_list(), this->ctx(), this->context());
+			 _ctx_list, _ctx, this->context());
 //                      msgid = orb->invoke_async
 //  			(_obj, this, Principal::_nil(), TRUE, 0, msgid);
                     id = orb->invoke_async (_obj, this, Principal::_nil(),
@@ -2303,8 +2306,8 @@ CORBA::StaticRequest::invoke ()
 			id = orb->new_orbid();
 			_cri = PInterceptor::PI::_create_cri(_obj, _opname);
 			PInterceptor::PI::_send_request_ip
-			(_cri, CORBA::ORB::get_msgid(id), _args, this->ctx_list(),
-			 this->ctx(), this->context());
+			(_cri, CORBA::ORB::get_msgid(id), _args, _ctx_list,
+			 _ctx, this->context());
 			id = orb->invoke_async (_obj, this, Principal::_nil(),
 			     TRUE, 0, id);  
 			break;          
@@ -2338,7 +2341,7 @@ CORBA::StaticRequest::oneway ()
 //      _obj->_orbnc()->invoke_async (_obj, this, CORBA::Principal::_nil(), FALSE);
 
     PInterceptor::PI::_send_request_ip
-	(_cri, 0, _args, this->ctx_list(), this->ctx(), this->context(), FALSE);
+	(_cri, 0, _args, _ctx_list, _ctx, this->context(), FALSE);
 
 //      CORBA::ULong msgid = _obj->_orbnc()->invoke_async
 //  	(_obj, this, CORBA::Principal::_nil(), FALSE);
@@ -2350,7 +2353,7 @@ CORBA::StaticRequest::oneway ()
 	CORBA::OBJECT_NOT_EXIST ex;
 	PInterceptor::PI::_receive_exception_ip
 	    (_cri, PortableInterceptor::SYSTEM_EXCEPTION, ex,
-	     this->ctx_list(), this->ctx(), this->context());
+	     _ctx_list, _ctx, this->context());
     }
     else {
 	PInterceptor::PI::_receive_other_ip(_cri);
@@ -2381,7 +2384,7 @@ CORBA::StaticRequest::send_deferred ()
 //      CORBA::ULong msgid = orb->new_msgid();
     CORBA::ORBMsgId_var id = orb->new_orbid();
     PInterceptor::PI::_send_request_ip
-	(_cri, CORBA::ORB::get_msgid(id), _args, this->ctx_list(), this->ctx(),
+	(_cri, CORBA::ORB::get_msgid(id), _args, _ctx_list, _ctx,
 	 this->context());
 //      _msgid = orb->invoke_async (_obj, this, CORBA::Principal::_nil(),
 //  				TRUE, 0, msgid);
@@ -2440,14 +2443,14 @@ CORBA::StaticRequest::get_response ()
 	    _obj->_forward (obj);
 	    PInterceptor::PI::_receive_other_ip
 		(_cri, PortableInterceptor::LOCATION_FORWARD, _obj,
-		 this->ctx_list(), this->ctx(), dummy->context());
+		 _ctx_list, _ctx, dummy->context());
 	    CORBA::release(_cri);
 //  	    _msgid = orb->new_msgid();
 	    _id = orb->new_orbid();
 	    _cri = PInterceptor::PI::_create_cri(_obj, _opname);
 	    PInterceptor::PI::_send_request_ip
-		(_cri, CORBA::ORB::get_msgid(_id), _args, this->ctx_list(),
-		 this->ctx(), this->context());
+		(_cri, CORBA::ORB::get_msgid(_id), _args, _ctx_list,
+		 _ctx, this->context());
 //  	    _msgid = orb->invoke_async (obj, this, Principal::_nil(),
 //  					TRUE, 0, _msgid);
 	    _id = orb->invoke_async (obj, this, Principal::_nil(),
@@ -2457,15 +2460,15 @@ CORBA::StaticRequest::get_response ()
 	case CORBA::InvokeAddrDisp:
 	    _obj->_ior_fwd()->addressing_disposition (ad);
 	    PInterceptor::PI::_receive_other_ip
-		(_cri, PortableInterceptor::TRANSPORT_RETRY, this->ctx_list(),
-		 this->ctx(), dummy->context());
+		(_cri, PortableInterceptor::TRANSPORT_RETRY, _ctx_list,
+		 _ctx, dummy->context());
 	    CORBA::release(_cri);
 //  	    _msgid = orb->new_msgid();
 	    _id = orb->new_orbid();
 	    _cri = PInterceptor::PI::_create_cri(_obj, _opname);
 	    PInterceptor::PI::_send_request_ip
-		(_cri, CORBA::ORB::get_msgid(_id), _args, this->ctx_list(),
-		 this->ctx(), this->context());
+		(_cri, CORBA::ORB::get_msgid(_id), _args, _ctx_list,
+		 _ctx, this->context());
 //  	    _msgid = orb->invoke_async (_obj, this, Principal::_nil(),
 //  					TRUE, 0, _msgid);
 //  	    break;
@@ -2481,12 +2484,12 @@ CORBA::StaticRequest::get_response ()
 		&& tc->kind() != CORBA::tk_null) {
 		r.from_static_any (*_res);
 		PInterceptor::PI::_receive_reply_ip
-		    (_cri, r, _args, this->ctx_list(), this->ctx(),
+		    (_cri, r, _args, _ctx_list, _ctx,
 		     dummy->context(), TRUE);
 	    }
 	    else {
 		PInterceptor::PI::_receive_reply_ip
-		    (_cri, r, _args, this->ctx_list(), this->ctx(),
+		    (_cri, r, _args, _ctx_list, _ctx,
 		     dummy->context(), FALSE);
 	    }
 	    done = TRUE;
@@ -2495,8 +2498,8 @@ CORBA::StaticRequest::get_response ()
 	case CORBA::InvokeUsrEx:
 	    PInterceptor::PI::_receive_exception_ip
 		(_cri, PortableInterceptor::USER_EXCEPTION,
-		 this->exception(), this->ctx_list(),
-		 this->ctx(), dummy->context());
+		 this->exception(), _ctx_list,
+		 _ctx, dummy->context());
 	    done = TRUE;
 	    break;
 
@@ -2504,8 +2507,8 @@ CORBA::StaticRequest::get_response ()
 	    try{
 	    PInterceptor::PI::_receive_exception_ip
 		(_cri, PortableInterceptor::SYSTEM_EXCEPTION,
-		 this->exception(), this->ctx_list(),
-		 this->ctx(), dummy->context());
+		 this->exception(), _ctx_list,
+		 _ctx, dummy->context());
 	    if (_obj->_is_forwarded()) {
 		/*
 		 * [15-44] says:
@@ -2533,8 +2536,8 @@ CORBA::StaticRequest::get_response ()
 		    _id = orb->new_orbid();
 		    _cri = PInterceptor::PI::_create_cri(_obj, _opname);
 		    PInterceptor::PI::_send_request_ip
-			(_cri, CORBA::ORB::get_msgid(_id), _args, this->ctx_list(),
-			 this->ctx(), this->context());
+			(_cri, CORBA::ORB::get_msgid(_id), _args, _ctx_list,
+			 _ctx, this->context());
 //  		    _msgid = orb->invoke_async (_obj, this, Principal::_nil(),
 //  						TRUE, 0, _msgid);
 //  		    break;
@@ -2550,8 +2553,8 @@ CORBA::StaticRequest::get_response ()
 			_id = orb->new_orbid();
 			_cri = PInterceptor::PI::_create_cri(_obj, _opname);
 			PInterceptor::PI::_send_request_ip
-			(_cri, CORBA::ORB::get_msgid(_id), _args, this->ctx_list(),
-			 this->ctx(), this->context());
+			(_cri, CORBA::ORB::get_msgid(_id), _args, _ctx_list,
+			 _ctx, this->context());
 			_id = orb->invoke_async (_obj, this, Principal::_nil(),
 			     TRUE, 0, _id);  
 			break;          
