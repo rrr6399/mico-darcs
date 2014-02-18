@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2013 by The Mico Team
+ *  Copyright (c) 1997-2014 by The Mico Team
  * 
  *  OSThread: An abstract Thread class for MICO
  *  Copyright (C) 1999 Andy Kersting & Andreas Schultz
@@ -231,6 +231,11 @@ MICOMT::Thread::_thr_startup(void *arg)
         // with a message "FATAL: exception not rethrown" while
         // terminating thread. (e.g. using Thread::terminate which is using
         // pthread_cancel function)
+
+#ifdef _THR_CREATE_AND_BLOCK
+        _ready.unlock();
+#endif // _THR_CREATE_AND_BLOCK
+
         throw;
     }
 #endif // HAVE_FORCED_UNWIND_EXCEPTION
