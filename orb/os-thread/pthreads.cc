@@ -236,6 +236,8 @@ MICOMT::Thread::_thr_startup(void *arg)
         _ready.unlock();
 #endif // _THR_CREATE_AND_BLOCK
 
+        _finished = true;
+
         throw;
     }
 #endif // HAVE_FORCED_UNWIND_EXCEPTION
@@ -248,6 +250,8 @@ MICOMT::Thread::_thr_startup(void *arg)
 #ifdef _THR_CREATE_AND_BLOCK
     _ready.unlock();
 #endif // _THR_CREATE_AND_BLOCK
+
+    _finished = true;
 }
 
 
@@ -558,6 +562,9 @@ MICOMT::Thread::Thread(MICOMT::Thread::DetachFlag detached)
 #endif // DEBUG_NAMES
 {
     _detached = detached;
+    _id = 0;
+    _finished = false;
+    _joined = false;
 #ifdef MTDEBUG
     __NAME (name ("<Un-Named Thread>"));
     if (MICO::Logger::IsLogged(MICO::Logger::Thread)) {

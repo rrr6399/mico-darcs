@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2011 by The Mico Team
+ *  Copyright (c) 1997-2014 by The Mico Team
  * 
  *  OSThread: An abstract Thread class for MICO
  *  Copyright (C) 1999 Andy Kersting & Andreas Schultz
@@ -920,6 +920,10 @@ public:
 	    __mtdebug_unlock();
 	}
 #endif // MTDEBUG
+        if (_joined)
+            return;
+        if (_finished)
+            return;
         int result = pthread_cancel(this->id());
 	assert(!result);
     };
@@ -942,15 +946,40 @@ public:
 	    __mtdebug_unlock();
 	}
 #endif // MTDEBUG
-	pthread_join(this->id(), exitval);
+        if (_finished) {
+            // there is nothing to wait for if the target thread is
+            // already finished
+            return;
+        }
+        if (!_joined) {
+            // We absolutely need to avoid calling of pthread_join
+            // several times. Hence the mutex and dual-checking of
+            // _joined variable. Linux/glibc is especially sensitive
+            // on that and POSIX says clearly that this leads to
+            // "undefined behavior".
+            _join_lock.lock();
+            if (_joined) {
+                _join_lock.unlock();
+                return;
+            }
+            pthread_join(this->id(), exitval);
+            _joined = true;
+            _join_lock.unlock();
+        }
     };    
     //@}
 
+    bool
+    finished()
+    { return _finished; }
 protected:
     void* _arg;			//!< Parameters passed in on start
     ThreadID _id;		//!< The system thread id
     ThreadNo _no;		//!< MICO thread number
     DetachFlag _detached;	//!< Thread attached or detached?
+    bool _finished;             //!< Is thread finished?
+    bool _joined;
+    Mutex _join_lock;           //!< protects simultaneous calls to pthread_join
 #ifdef _THR_CREATE_AND_BLOCK
     Mutex _ready;		//!< Blocks thread on create (if specified)
     ErrorType _start_error;     //!< Used to carry starting error from ctor to start method
