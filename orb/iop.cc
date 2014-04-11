@@ -5869,7 +5869,7 @@ MICO::IIOPServer::handle_invoke_request (GIOPConn *conn, GIOPInContext &in)
 {
     CORBA::ULong req_id;
     CORBA::Boolean resp;
-    CORBA::ORBRequest *req;
+    CORBA::ORBRequest_var req;
     CORBA::Principal_ptr pr = conn->transport()->get_principal();
 #ifndef HAVE_THREADS
     CORBA::Object_ptr obj = CORBA::Object::_duplicate(target_obj_);
@@ -5885,7 +5885,7 @@ MICO::IIOPServer::handle_invoke_request (GIOPConn *conn, GIOPInContext &in)
     CORBA::Object_ptr obj = CORBA::Object::_duplicate(throbj);
 #endif // HAVE_THREADS
     // XXX take care, get_invoke_request() does a in._retn()
-    if (!conn->codec()->get_invoke_request (in, req_id, resp, obj, req, pr)) {
+    if (!conn->codec()->get_invoke_request (in, req_id, resp, obj, req.inout(), pr)) {
 	CORBA::release (obj);
 	CORBA::release (pr);
 
