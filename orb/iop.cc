@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2013 by The Mico Team
+ *  Copyright (c) 1997-2014 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -80,6 +80,12 @@ MICO::GIOPConn::S_reader_key_initialized_ = false;
 // `GIOPConn::initialize_reader_key' method
 MICOMT::Thread::ThreadKey
 MICO::GIOPConn::S_reader_key_;
+
+bool
+MICO::GIOPCodec::S_request_key_initialized_ = false;
+// S_request_key_ is initialized in GIOPCodec CTOR
+MICOMT::Thread::ThreadKey
+MICO::GIOPCodec::S_request_key_;
 #endif // HAVE_THREADS
 
 /****************************** misc dtors *******************************/
@@ -235,7 +241,10 @@ MICO::GIOPCodec::GIOPCodec (CORBA::DataDecoder *_dc,
 	     << "GIOPCodec::GIOPCodec(): " << this << endl;
      }
 #ifdef HAVE_THREADS
-     MICOMT::Thread::create_key(request_key_, GIOPCodec_clean_the_request_key);
+     if (!S_request_key_initialized_) {
+         MICOMT::Thread::create_key(S_request_key_, GIOPCodec_clean_the_request_key);
+         S_request_key_initialized_ = true;
+     }
 #endif // HAVE_THREADS
 }
 
@@ -250,9 +259,6 @@ MICO::GIOPCodec::~GIOPCodec ()
 	MICO::Logger::Stream (MICO::Logger::GIOP)
 	    << "GIOPCodec::~GIOPCodec: " << this << endl;
     }
-#ifdef HAVE_THREADS
-    MICOMT::Thread::delete_key(request_key_);
-#endif // HAVE_THREADS
 }
 
 CORBA::Boolean
@@ -1331,7 +1337,7 @@ MICO::GIOPCodec::get_invoke_request (GIOPInContext &in,
         // connection and hence also does have the same codec and
         // codeset properties. So GIOPRequest caching is possible
         GIOPRequest* r = static_cast<GIOPRequest*>
-            (MICOMT::Thread::get_specific(request_key_));
+            (MICOMT::Thread::get_specific(S_request_key_));
         if (r != NULL) {
             r->reset(opname, in._retn());
             r->context(&ctx);
@@ -1340,7 +1346,7 @@ MICO::GIOPCodec::get_invoke_request (GIOPInContext &in,
         else {
             r = new GIOPRequest (opname, in._retn(), this);
             r->context (&ctx);
-            MICOMT::Thread::set_specific(request_key_, r);
+            MICOMT::Thread::set_specific(S_request_key_, r);
             req = GIOPRequest::_duplicate(r);
         }
     }

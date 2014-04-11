@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2013 by The Mico Team
+ *  Copyright (c) 1997-2014 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -92,7 +92,8 @@ class GIOPCodec : public CORBA::ServerlessObject {
     CORBA::Boolean _codesets_sent;
 
 #ifdef HAVE_THREADS
-    MICOMT::Thread::ThreadKey request_key_;
+    static bool S_request_key_initialized_;
+    static MICOMT::Thread::ThreadKey S_request_key_;
 #endif // HAVE_THREADS
     CORBA::ULong put_header (GIOPOutContext &out, GIOP::MsgType);
     void put_size (GIOPOutContext &out, CORBA::ULong key);
