@@ -1822,8 +1822,7 @@ CORBA::ORB::do_shutdown ()
 	    }
 	    _is_shutdown = 2;
 #ifdef HAVE_THREADS
-            MICO::MTManager::free();
-            MICOMT::_cleanup();
+            MICO::MTManager::shutdown();
 	}
 #endif // HAVE_THREADS
     }
@@ -1941,6 +1940,11 @@ CORBA::ORB::destroy ()
          << "ORB::shutdown : orb_instance->_refcnt() =  "
 	 << orb_instance->_refcnt() << endl;
     }
+#ifdef HAVE_THREADS
+    MICO::MTManager::free();
+    MICOMT::_cleanup();
+#endif
+
     // destroy all registered PIs
     PortableInterceptor::destroy_all_interceptors();
 
