@@ -946,11 +946,8 @@ public:
 	    __mtdebug_unlock();
 	}
 #endif // MTDEBUG
-        if (_finished) {
-            // there is nothing to wait for if the target thread is
-            // already finished
-            return;
-        }
+        // we need to call at least one pthread_join per pthread_exit
+        //     on Solaris to get rid of dead/zombie LWP
         if (!_joined) {
             // We absolutely need to avoid calling of pthread_join
             // several times. Hence the mutex and dual-checking of
