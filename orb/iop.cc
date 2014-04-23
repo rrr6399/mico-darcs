@@ -4638,6 +4638,22 @@ void
 MICO::IIOPProxy::shutdown (CORBA::Boolean wait_for_completion)
 {
     // XXX make sure all invocations have completed
+    vector<GIOPConn*> copy_conns;
+    {
+        MICOMT::AutoLock l(_conns);
+        for (MapVerAddrConn::iterator i = _conns.begin(); i != _conns.end(); ++i) {
+            for (MapAddrConn::iterator j = (*i).second.begin(); j != (*i).second.end(); ++j) {
+                copy_conns.push_back((*j).second);
+            }
+        }
+    }
+    for (vector<GIOPConn*>::iterator it = copy_conns.begin(); it != copy_conns.end(); it++) {
+#ifdef HAVE_THREADS
+        this->kill_conn((*it), FALSE);
+#else // HAVE_THREADS
+        this->deref_conn((*it), FALSE);
+#endif // HAVE_THREADS
+    }
     _orb->answer_shutdown (this);
 }
 
