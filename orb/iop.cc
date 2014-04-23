@@ -6489,9 +6489,9 @@ MICO::IIOPServer::callback (GIOPConn *conn, GIOPConnCallback::Event ev)
 	    << conn->transport()->peer()->stringify() 
 	    << " closed or broken" << endl;
 	}
+#ifdef USE_OLD_INTERCEPTORS
 	const CORBA::Address *addr = conn->transport()->peer();
 	assert (addr);
-#ifdef USE_OLD_INTERCEPTORS
 	Interceptor::ConnInterceptor::
 	    _exec_client_disconnect (addr->stringify().c_str());
 #endif // USE_OLD_INTERCEPTORS
@@ -6544,9 +6544,9 @@ MICO::IIOPServer::callback (CORBA::TransportServer *tserv,
 #endif // HAVE_THREADS
                 break;
             }
+#ifdef USE_OLD_INTERCEPTORS
 	    const CORBA::Address *addr = t->peer();
 	    assert (addr);
-#ifdef USE_OLD_INTERCEPTORS
 	    CORBA::Boolean r = Interceptor::ConnInterceptor::
 		_exec_client_connect (addr->stringify().c_str());
 	    if (!r) {
