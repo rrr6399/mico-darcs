@@ -236,8 +236,13 @@ MICOMT::Thread::_thr_startup(void *arg)
         _ready.unlock();
 #endif // _THR_CREATE_AND_BLOCK
 
-        _finished = true;
+        {
+            MICOMT::AutoLock l(_finished_lock);
+            _finished = true;
+        }
 
+        // this is Linux/Glibc and we're unwinding caused by pthread_cancel
+        // we cannot call pthread_exit here
         throw;
     }
 #endif // HAVE_FORCED_UNWIND_EXCEPTION
@@ -251,7 +256,47 @@ MICOMT::Thread::_thr_startup(void *arg)
     _ready.unlock();
 #endif // _THR_CREATE_AND_BLOCK
 
-    _finished = true;
+    {
+        MICOMT::AutoLock l(_finished_lock);
+        _finished = true;
+    }
+    pthread_exit(NULL);
+}
+
+
+void
+MICOMT::Thread::terminate()
+{
+#ifdef MTDEBUG
+    if (MICO::Logger::IsLogged (MICO::Logger::Thread)) {
+        __mtdebug_lock();
+        MICO::Logger::Stream (MICO::Logger::Thread)
+            __NAME(<< name ()) << ": Thread::terminate (void *exitval)" << endl;
+        __mtdebug_unlock();
+    }
+#endif // MTDEBUG
+    if (_joined)
+        return;
+    if (_finished)
+        return;
+    if (!_terminated) {
+        AutoLock lterm(_terminated_lock);
+        // double-checking necessary
+        if (_terminated) {
+            return;
+        }
+        {
+            // need to avoid calling pthread_cancel on finished
+            // thread since we would get ESRC as a result and will
+            // assert below
+            AutoLock l(_finished_lock);
+            if (_finished)
+                return;
+            int result = pthread_cancel(this->id());
+            assert(!result);
+        }
+        _terminated = true;
+    }
 }
 
 
@@ -565,6 +610,7 @@ MICOMT::Thread::Thread(MICOMT::Thread::DetachFlag detached)
     _id = 0;
     _finished = false;
     _joined = false;
+    _terminated = false;
 #ifdef MTDEBUG
     __NAME (name ("<Un-Named Thread>"));
     if (MICO::Logger::IsLogged(MICO::Logger::Thread)) {
