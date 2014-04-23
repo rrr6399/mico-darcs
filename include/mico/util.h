@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2010 by The Mico Team
+ *  Copyright (c) 1997-2014 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -211,6 +211,12 @@ extern char * mico_url_encode (const CORBA::Octet *, CORBA::ULong);
 extern CORBA::Octet * mico_url_decode (const char *, CORBA::ULong &);
 
 extern CORBA::ULong mico_string_hash (const char *s, CORBA::ULong max);
+
+#if defined(HAVE_ANSI_CPLUSPLUS_HEADERS) && defined(HAVE_BACKTRACE) && defined(HAVE_BACKTRACE_SYMBOLS)
+extern void mico_print_stack_trace();
+extern void mico_print_stack_trace(std::ostream&);
+extern void mico_print_stack_trace(const char*);
+#endif // HAVE_ANSI_CPLUSPLUS_HEADERS && HAVE_BACKTRACE && HAVE_BACKTRACE_SYMBOLS
 
 #ifndef HAVE_STRERROR_PROTO
 extern "C" char *strerror (int);
