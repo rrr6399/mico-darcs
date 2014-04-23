@@ -910,23 +910,7 @@ public:
      * thread's context, effectively preventing cleanup.
      */
     void
-    terminate()
-    {
-#ifdef MTDEBUG
-	if (MICO::Logger::IsLogged (MICO::Logger::Thread)) {
-	    __mtdebug_lock();
-	    MICO::Logger::Stream (MICO::Logger::Thread)
-		__NAME(<< name ()) << ": Thread::terminate (void *exitval)" << endl;
-	    __mtdebug_unlock();
-	}
-#endif // MTDEBUG
-        if (_joined)
-            return;
-        if (_finished)
-            return;
-        int result = pthread_cancel(this->id());
-	assert(!result);
-    };
+    terminate();
 
     /*!
      * This method blocks the current thread until the thread being called
@@ -975,8 +959,15 @@ protected:
     ThreadNo _no;		//!< MICO thread number
     DetachFlag _detached;	//!< Thread attached or detached?
     bool _finished;             //!< Is thread finished?
+    Mutex _finished_lock;
+
     bool _joined;
-    Mutex _join_lock;           //!< protects simultaneous calls to pthread_join
+    Mutex _join_lock;           //!< protects simultaneous calls to
+                                //!pthread_join
+    bool _terminated;           //!< set to true after successfull
+                                //!pthread_cancel call
+    Mutex _terminated_lock;
+
 #ifdef _THR_CREATE_AND_BLOCK
     Mutex _ready;		//!< Blocks thread on create (if specified)
     ErrorType _start_error;     //!< Used to carry starting error from ctor to start method
