@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 2000-2011 by The Mico Team
+ *  Copyright (c) 2000-2014 by The Mico Team
  * 
  *  thread management
  *  Copyright (C) 1999 Andreas Schultz                                 
@@ -57,11 +57,13 @@ MICO::ThreadPool::ThreadPool( unsigned int _max,
 						       tp_cond_(&tp_lock),
 						       tpm(NULL),
 						       idle_threads(_max),
+                                                       all_threads(_max),
 						       op(NULL),
 						       input_mc(NULL),
 						       max_idle( _max_idle ),
 						       min_idle( _min_idle ),
-						       cnt_all( 0 )
+						       cnt_all( 0 ),
+                                                       shutdown_(false)
                                                        
 {
     this->max = _max; // moved here because MSVC7 thinks is the max macro and gives an error
@@ -78,21 +80,8 @@ MICO::ThreadPool::ThreadPool( unsigned int _max,
  * is not freed. Another memory leak.
  */
 MICO::ThreadPool::~ThreadPool() {
-    
-    AutoLock lock(tp_lock);
-    unsigned int i, cnt;
-    // we need to call dtor with _all_ thread idle
-    while (cnt_all != idle_threads.count()) {
-	// not all threads are idle => wait
-	tp_cond_.wait();
-    }
 
-    i = idle_threads.first();
-    for (cnt = idle_threads.count(); cnt > 0;
-	 i = idle_threads.next(i), cnt--) {
-	idle_threads[i]->terminate();
-        idle_threads[i]->wait();
-    }
+    assert(shutdown_);
     if (op != NULL)
 	delete op;
     if (input_mc != NULL)
@@ -150,6 +139,10 @@ MICO::ThreadPool::get_idle_thread()
 	
 	kt = new MICO::WorkerThread( this );
         assert(kt);
+        {
+            AutoLock l(tp_lock);
+            all_threads.insert(kt);
+        }
 	if (op)
 	    kt->register_operation( op->copy() );
 	cnt_all++;
@@ -177,6 +170,7 @@ MICO::ThreadPool::new_idle_thread()
     {
 	AutoLock l(tp_lock);
 	
+        all_threads.insert(kt);
 	kt->no( idle_threads.insert( kt ) );
 	kt->state( MICO::WorkerThread::Idle );
 	cnt_all++;
@@ -248,9 +242,32 @@ MICO::ThreadPool::remove_thread( MICO::WorkerThread *kt )
 void
 MICO::ThreadPool::put_msg( MICO::OP_id_type nextOP_id, MICO::msg_type *msg )
 {
+    if (shutdown_) {
+        // shutdown is in progress so we ignore any additional work
+        return;
+    }
     if (input_mc)
 	input_mc->put_msg(nextOP_id, msg);
 }
+
+
+void
+MICO::ThreadPool::shutdown()
+{
+    shutdown_ = true;
+    unsigned int i, cnt;
+    i = all_threads.first();
+    for (cnt = all_threads.count(); cnt > 0;
+	 i = all_threads.next(i), cnt--) {
+        all_threads[i]->terminate();
+    }
+    i = all_threads.first();
+    for (cnt = all_threads.count(); cnt > 0;
+	 i = all_threads.next(i), cnt--) {
+        all_threads[i]->wait();
+    }
+}
+
 
 /****************************** WorkerThread *******************************/
 
@@ -369,6 +386,18 @@ MICO::ThreadPoolManager::~ThreadPoolManager()
     }
 }
 
+
+void
+MICO::ThreadPoolManager::shutdown()
+{
+    for (std::map<OP_id_type, ThreadPool*>::iterator it = tp.begin();
+         it != tp.end();
+         it++) {
+        (*it).second->shutdown();
+    }
+}
+
+
 /*!
  * \ingroup micomt
  * \param conn_limit	Maximum number of connections
@@ -459,6 +488,8 @@ MICO::MTManager::thread_setup(unsigned int conn_limit, unsigned int req_limit)
 ServerConcurrencyModel MICO::MTManager::_S_server_concurrency_model = THREAD_POOL;
 ClientConcurrencyModel MICO::MTManager::_S_client_concurrency_model = THREADED;
 MICO::ThreadPoolManager* MICO::MTManager::_S_thread_pool_manager = NULL;
+bool MICO::MTManager::_S_mt_manager_shutdown_ = false;
+
 
 void
 MICO::MTManager::server_concurrency_model(ServerConcurrencyModel __model)
@@ -522,8 +553,16 @@ MICO::MTManager::reactive_client()
 void
 MICO::MTManager::free()
 {
-    if (_S_thread_pool_manager != NULL) {
-	delete _S_thread_pool_manager;
-	_S_thread_pool_manager = NULL;
-    }
+    assert(_S_mt_manager_shutdown_);
+    assert(_S_thread_pool_manager != NULL);
+    delete _S_thread_pool_manager;
+    _S_thread_pool_manager = NULL;
+}
+
+void
+MICO::MTManager::shutdown()
+{
+    _S_mt_manager_shutdown_ = true;
+    assert(_S_thread_pool_manager != NULL);
+    _S_thread_pool_manager->shutdown();
 }

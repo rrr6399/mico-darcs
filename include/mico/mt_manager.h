@@ -1,7 +1,7 @@
 /* -*- mode: c++; c-basic-offset: 4; -*-
  *
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2008 by The Mico Team
+ *  Copyright (c) 1997-2014 by The Mico Team
  * 
  *  thread management
  *  Copyright (C) 1999 Andreas Schultz                                 
@@ -275,6 +275,9 @@ namespace MICO
 	virtual void put_msg( OP_id_type nextOP_id, msg_type * msg);
 	//@}
 
+        virtual void
+        shutdown();
+
     protected:
 	typedef FastArray< WorkerThread > ThreadArray;
 	
@@ -282,12 +285,15 @@ namespace MICO
 	MICOMT::CondVar         tp_cond_;
 	ThreadPoolManager      *tpm;		//!< The thread pool manager
 	ThreadArray		idle_threads;	//!< Array of idle threads
+        ThreadArray             all_threads;    //!< Array of all threads
+
 	Operation	       *op;		//!< Operation prototype for the pool
 	MsgChannel	       *input_mc;	//!< The input message channel
 	unsigned int		max;		//!< Max threads
 	unsigned int		max_idle;	//!< Max idle threads
 	unsigned int		min_idle;	//!< Min idle threads
 	unsigned int		cnt_all;	//!< Count of all threads
+        bool                    shutdown_;      //!< Marks shutdown state
     };
 
     /*!
@@ -435,6 +441,9 @@ namespace MICO
 	virtual void put_msg( OP_id_type nextOP_id, msg_type *msg ) {
 	    get_thread_pool(nextOP_id).put_msg( nextOP_id, msg );
 	};
+
+        virtual void
+        shutdown();
     };
 
 
@@ -443,6 +452,7 @@ namespace MICO
 	static MICOMT::ServerConcurrencyModel _S_server_concurrency_model;
         static MICOMT::ClientConcurrencyModel _S_client_concurrency_model;
 	static MICO::ThreadPoolManager* _S_thread_pool_manager;
+        static bool _S_mt_manager_shutdown_;
     public:
 	static void
 	server_concurrency_model(MICOMT::ServerConcurrencyModel __model);
@@ -480,6 +490,9 @@ namespace MICO
 
 	static void
 	free();
+
+        static void
+        shutdown();
     };
 }
 
