@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2010 by The Mico Team
+ *  Copyright (c) 1997-2014 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -54,6 +54,10 @@
 #ifdef USE_MEMTRACE
 #include <mico/memtrace.h>
 #endif
+
+#if defined(HAVE_BACKTRACE) && defined(HAVE_BACKTRACE_SYMBOLS)
+#include <execinfo.h>
+#endif // HAVE_BACKTRACE && HAVE_BACKTRACE_SYMBOLS
 
 #endif // FAST_PCH
 
@@ -1317,3 +1321,60 @@ mico_float2ieee (CORBA::Octet ieee[4], CORBA::Float f)
 	ie.f = (unsigned long)ldexp (frac, FLT_FRC_BITS);
     }
 }
+
+/*********************** stack trace ****************************************/
+
+#if defined(HAVE_BACKTRACE) && defined(HAVE_BACKTRACE_SYMBOLS)
+void
+mico_print_stack_trace()
+{
+    cerr << getpid() << "|" << MICOMT::Thread::self() << ": Stack trace:" << endl;
+    const int max_length = 500;
+    void* array[max_length];
+    size_t size = backtrace(array, max_length);
+    char** strings = backtrace_symbols(array, size);
+    for (size_t i = 0; i < size; i++) {
+        cerr << getpid() << "|" << MICOMT::Thread::self() << "        " << strings[i] << endl;
+    }
+    free (strings);
+}
+
+void
+mico_print_stack_trace(ostream& out)
+{
+    out << getpid() << "|" << MICOMT::Thread::self() << ": Stack trace:" << endl;
+    const int max_length = 500;
+    void* array[max_length];
+    size_t size = backtrace(array, max_length);
+    char** strings = backtrace_symbols(array, size);
+    for (size_t i = 0; i < size; i++) {
+        out << getpid() << "|" << MICOMT::Thread::self() << "        " << strings[i] << endl;
+    }
+    free (strings);
+}
+
+void
+mico_print_stack_trace(const char* s)
+{
+    const int max_length = 500;
+    void* array[max_length];
+    size_t size = backtrace(array, max_length);
+    char** strings = backtrace_symbols(array, size);
+    int found = 0;
+    for (size_t i = 0; i < size; i++) {
+        char* f = strstr(strings[i], s);
+        if (f) {
+            found = 1;
+            break;
+        }
+    }
+    if (found == 1) {
+        cerr << getpid() << "|" << MICOMT::Thread::self() << ": Stack trace:" << endl;
+        for (size_t i = 0; i < size; i++) {
+            cerr << getpid() << "|" << MICOMT::Thread::self() << "        " << strings[i] << endl;
+        }
+    }
+    free (strings);
+}
+
+#endif // HAVE_BACKTRACE && HAVE_BACKTRACE_SYMBOLS
