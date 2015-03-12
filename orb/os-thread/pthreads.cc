@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2014 by The Mico Team
+ *  Copyright (c) 1997-2015 by The Mico Team
  * 
  *  OSThread: An abstract Thread class for MICO
  *  Copyright (C) 1999 Andy Kersting & Andreas Schultz
@@ -490,6 +490,8 @@ MICOMT::Mutex::Mutex(MICO_Boolean locked, Attribute attr)
         int res2 = pthread_mutexattr_init(&mattr);
         assert(!res2);
         result = pthread_mutex_init(&_mutex, &mattr);
+        assert(!result);
+        result = pthread_mutexattr_destroy(&mattr);
 #endif // USE_SHARED_MUTEX_ATTRIBUTE
         assert(!result);
     }
@@ -518,6 +520,8 @@ MICOMT::Mutex::Mutex(MICO_Boolean locked, Attribute attr)
         res2 = pthread_mutexattr_settype(&mattr, PTHREAD_MUTEX_RECURSIVE);
         assert (!res2);
         result = pthread_mutex_init(&_mutex, &mattr);
+        assert(!result);
+        result = pthread_mutexattr_destroy(&mattr);
 #endif // USE_SHARED_MUTEX_ATTRIBUTE
 	    assert (!result);
 #endif // SOLARIS_MUTEX

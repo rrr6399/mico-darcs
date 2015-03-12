@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2013 by The Mico Team
+ *  Copyright (c) 1997-2015 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -859,7 +859,7 @@ CORBA::Request::send_deferred (RequestCallback *cb)
     
     _invoke_pending = TRUE;
 
-    orb->invoke_async(_object, _orbreq, Principal::_nil(),
+    CORBA::ORBMsgId_var id = orb->invoke_async(_object, _orbreq, Principal::_nil(),
 		      TRUE, _cb ? this : 0, _orbid);
 }
 

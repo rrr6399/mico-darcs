@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2013 by The Mico Team
+ *  Copyright (c) 1997-2015 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -195,7 +195,10 @@ CORBA::ORBInvokeRec::init_invoke (ORB_ptr orb,
     _orb = orb;
     _obj = Object::_nil();
     _target = Object::_duplicate (o);
-    _req = CORBA::ORBRequest::_duplicate (r);
+    // do not apply usual memory management (ie. do not duplicate) to
+    // the CORBA::ORBRequest object, see note in orb_mico.h describing
+    // the problem near to the ORBInvokeRec::_req member definition.
+    _req = r;
     _principal = Principal::_duplicate (pr);
     _response_expected = response;
     _addr = 0;
