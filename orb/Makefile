@@ -249,7 +249,7 @@ ifeq ($(HAVE_PRELINK), yes)
 	$(CXX) $(PRELINK_FLAG) $(SHARED_OBJS) $(LDFLAGS) $(CONFLIBS)
 endif
 	$(RM) $@
-	$(LDSO) -o libmico$(VERSION) $(SHARED_OBJS) $(PLATFORM_LIBS)
+	$(LDSO) -o libmico$(VERSION) $(SHARED_OBJS) $(CONFLIBS)
 	$(IDIRCMD) ../libs
 	cd ../libs; $(RM) $@; $(LN) ../orb/$@ .
 endif
