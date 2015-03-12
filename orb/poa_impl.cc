@@ -1,7 +1,7 @@
 /*
  *  MICO --- an Open Source CORBA implementation
  *  Copyright (C) 1998 Frank Pilhofer
- *  Copyright (c) 1999-2013 by The Mico Team
+ *  Copyright (c) 1999-2015 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -1535,7 +1535,7 @@ MICOPOA::POA_impl::InvocationRecord::make_dyn_req (POA_impl * poa)
   CORBA::ServerRequest_ptr dynsvr;
 
   assert (CORBA::is_nil (svr));
-  dynsvr = new CORBA::ServerRequest (req, por->get_ref(), id(), poa, pr);
+  dynsvr = new CORBA::ServerRequest (req, por->get_ref(), orbid, poa, pr);
   svr = dynsvr;
   assert (!CORBA::is_nil (svr));
   return dynsvr;
