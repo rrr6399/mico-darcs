@@ -4256,7 +4256,8 @@ MICOPOA::POA_impl::cancel (CORBA::ORBMsgId id)
   vector<InvocationRecord *>::iterator it = InvocationQueue.begin ();
 
   while (it != InvocationQueue.end()) {
-    if (CORBA::ORB::get_msgid((*it)->id()) == CORBA::ORB::get_msgid(id) ) {
+    CORBA::ORBInvokeRec_var rec = (*it)->id();
+    if (rec->id() == CORBA::ORB::get_msgid(id) ) {
       delete *it;
       InvocationQueue.erase (it);
       return;
