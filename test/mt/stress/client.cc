@@ -38,6 +38,10 @@ public:
 	    for (int i=0; i<num; i++) {
 		bench->perform_oneway_with_context(ctx2);
 	    }
+	} else if (method == "non_existent") {
+	    for (int i=0; i<num; i++) {
+		bench->_non_existent();
+	    }
 	} else {
 	    assert(0);
 	}
@@ -160,6 +164,15 @@ try {
 		//::sleep (delay);
 	    }
 	}
+    }
+    else if (method == "non_existent") {
+	for (int j=0; j<100; j++) {
+	    cout << "\r" << "progress: " << j << "%" << flush;
+	    for (int i=0; i<tnum; i++) {
+                bench->_non_existent();
+		//::sleep (delay);
+	    }
+        }
     }
     else if (method == "long_seq") {
 	CORBA::ULong len = atoi(argv[6]);
