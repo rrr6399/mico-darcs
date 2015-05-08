@@ -292,7 +292,7 @@ interface InitiatingContext {
   }
   environmental_attributes = {
     PrinAttribute("SL3:TransportMechanism","TLS")
-    PrinAttribute("SL3:TLSCipherSuite","AES256-SHA")
+    PrinAttribute("SL3:TLSCipherSuite","AES256-GCM-SHA384")
     PrinAttribute("SL3:ChannelIdentifier","TCPIPv4:127.0.0.1:6589-127.0.0.1:2345")
   }
   parent_credentials = MICO_TLS:0
@@ -392,7 +392,7 @@ interface InitiatingContext {
   }
   environmental_attributes = {
     PrinAttribute("SL3:TransportMechanism","TLS")
-    PrinAttribute("SL3:TLSCipherSuite","AES256-SHA")
+    PrinAttribute("SL3:TLSCipherSuite","AES256-GCM-SHA384")
     PrinAttribute("SL3:ChannelIdentifier","TCPIPv4:127.0.0.1:12445-127.0.0.1:2345")
   }
   parent_credentials = MICO_TLS:1
@@ -492,7 +492,7 @@ interface AcceptingContext {
   }
   environmental_attributes = {
     PrinAttribute("SL3:TransportMechanism","TLS")
-    PrinAttribute("SL3:TLSCipherSuite","AES256-SHA")
+    PrinAttribute("SL3:TLSCipherSuite","AES256-GCM-SHA384")
     PrinAttribute("SL3:ChannelIdentifier","TCPIPv4:127.0.0.1:6589-127.0.0.1:2345")
   }
   parent_credentials = MICO_TLS:0
@@ -596,7 +596,7 @@ interface AcceptingContext {
   }
   environmental_attributes = {
     PrinAttribute("SL3:TransportMechanism","TLS")
-    PrinAttribute("SL3:TLSCipherSuite","AES256-SHA")
+    PrinAttribute("SL3:TLSCipherSuite","AES256-GCM-SHA384")
     PrinAttribute("SL3:ChannelIdentifier","TCPIPv4:127.0.0.1:12445-127.0.0.1:2345")
   }
   parent_credentials = MICO_TLS:0
