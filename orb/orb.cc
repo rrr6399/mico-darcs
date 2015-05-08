@@ -1932,8 +1932,13 @@ CORBA::ORB::shutdown (Boolean wait)
 void
 CORBA::ORB::destroy ()
 {
-    if (!_is_stopped)
+    if (!_is_stopped) {
         shutdown (TRUE);
+    }
+    else if (!_is_running) {
+        // client side w/o orb->run();
+        shutdown(TRUE);
+    }
 
     if (MICO::Logger::IsLogged (MICO::Logger::Info)) {
        MICO::Logger::Stream (MICO::Logger::Info)
