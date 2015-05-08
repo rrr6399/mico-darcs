@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2014 by The Mico Team
+ *  Copyright (c) 1997-2015 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -1041,6 +1041,9 @@ public:
     { return iiopserver_instance_; }
 private:
     static IIOPServer* iiopserver_instance_;
+
+    CORBA::Boolean shutdown_in_progress_;
+    MICOMT::Mutex shutdown_in_progress_lock_;
 };
 
 }
