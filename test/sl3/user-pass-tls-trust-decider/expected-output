@@ -327,7 +327,7 @@ interface TargetCredentials {
   }
   environmental_attributes = {
     PrinAttribute("SL3:TransportMechanism","TLS")
-    PrinAttribute("SL3:TLSCipherSuite","AES256-SHA")
+    PrinAttribute("SL3:TLSCipherSuite","AES256-GCM-SHA384")
   }
   parent_credentials = MICO_SL3CSI:0
   client_authentication = true
@@ -499,7 +499,7 @@ interface ClientCredentials {
   }
   environmental_attributes = {
     PrinAttribute("SL3:TransportMechanism","TLS")
-    PrinAttribute("SL3:TLSCipherSuite","AES256-SHA")
+    PrinAttribute("SL3:TLSCipherSuite","AES256-GCM-SHA384")
   }
   parent_credentials = MICO_SL3CSI:0
   client_authentication = true
