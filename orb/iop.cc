@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2014 by The Mico Team
+ *  Copyright (c) 1997-2015 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -2513,6 +2513,12 @@ MICO::GIOPConn::terminate ()
     //          it does NOT cancel the thread
     if (_M_use_writer_thread)
       _writer->init_shutdown();
+    if (_M_use_reader_thread) {
+        if (!this->is_this_reader_thread()) {
+            _reader->terminate();
+            _reader->wait();
+        }
+    }
 
     _transp->close();
 
@@ -2552,7 +2558,11 @@ MICO::GIOPConn::~GIOPConn ()
     CORBA::release (_codec);
 #ifdef HAVE_THREADS
     if (_M_use_reader_thread) {
-        delete _reader;
+        if (!this->is_this_reader_thread()) {
+            _reader->terminate();
+            _reader->wait();
+            delete _reader;
+        }
     }
     if (this->side() == CLIENT_SIDE && !MICO::MTManager::reactive_client()) {
         // we're using our own dispatcher
@@ -3091,6 +3101,7 @@ MICO::GIOPConn::deref (CORBA::Boolean all)
 	_refcnt = 0;
     else
 	--_refcnt;
+    assert(_refcnt >= 0);
     check_idle ();
     return (_refcnt <= 0);
 }
@@ -3119,6 +3130,7 @@ MICO::GIOPConn::deref (CORBA::Boolean all)
 	    << ", activerefs: " << _activerefs 
 	    << endl;
     }
+    assert(_refcnt >= 0);
     return (_refcnt == 0);
 }
 
@@ -5292,6 +5304,7 @@ MICO::IIOPServer::~IIOPServer ()
 #endif // HAVE_THREADS
     assert(iiopserver_instance_ != NULL);
     iiopserver_instance_ = NULL;
+    shutdown_in_progress_ = FALSE;
 }
 
 CORBA::Boolean
@@ -5626,6 +5639,19 @@ MICO::IIOPServer::deref_conn (GIOPConn *conn, CORBA::Boolean all )
 void
 MICO::IIOPServer::kill_conn (GIOPConn *conn, CORBA::Boolean redo)
 {
+    if (shutdown_in_progress_) {
+        // shutdown takes care about all connections. Here we're just
+        // invoked by the reader thread and should exit this
+        // immediately
+        return;
+    }
+    MICOMT::AutoLock lock(shutdown_in_progress_lock_);
+    // we holds the lock all the time in order to prevent shutdown from
+    // run
+    // double checking necessary
+    if (shutdown_in_progress_) {
+        return;
+    }   
 #ifdef HAVE_THREADS
     if (conn->state() != MICOMT::StateRefCnt::Active
         && conn->state() != MICOMT::StateRefCnt::InitShutdown) {
@@ -6343,6 +6369,10 @@ void
 MICO::IIOPServer::shutdown (CORBA::Boolean wait_for_completion)
 {
     {
+        MICOMT::AutoLock l(shutdown_in_progress_lock_);
+        shutdown_in_progress_ = TRUE;
+    }
+    {
 	MICOMT::AutoLock lock(_tservers);
 	for (CORBA::ULong i = 0; i < _tservers.size(); i++) {
 	    _tservers[i]->close();
@@ -6356,15 +6386,22 @@ MICO::IIOPServer::shutdown (CORBA::Boolean wait_for_completion)
      * pointers to the entries in the 'conns' list, so do not delete them
      */
 
+    ListConn tmp_conns;
+
     _conns.lock();
 
     for (ListConn::iterator i0 = _conns.begin(); i0 != _conns.end(); ++i0) {
-	conn_closed (*i0);
-	deref_conn(*i0, TRUE);
+	tmp_conns.push_back(*i0);
     }
     _conns.erase (_conns.begin(), _conns.end());
 
     _conns.unlock();
+
+    for (ListConn::iterator i0 = tmp_conns.begin(); i0 != tmp_conns.end(); ++i0) {
+	conn_closed (*i0);
+        kill_conn(*i0, TRUE);
+	//deref_conn(*i0, TRUE);
+    }
 
 
 #ifdef USE_IOP_CACHE
