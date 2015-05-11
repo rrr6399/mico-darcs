@@ -1231,8 +1231,6 @@ MICO::GIOPCodec::get_target (GIOPInContext &in, CORBA::Object_ptr obj)
 	    check (dc->get_short (kind));
 	    obj->_ior()->addressing_disposition (kind);
 	    if (kind == GIOP::KeyAddr) {
-		obj->_ior()->add_profile (new GIOPSimpleProf);
-
 		CORBA::ULong objkeylen;
 		CORBA::Octet *objkey;
 
@@ -1242,7 +1240,7 @@ MICO::GIOPCodec::get_target (GIOPInContext &in, CORBA::Object_ptr obj)
 		dc->buffer()->rseek_rel (objkeylen);
 		check (dc->seq_end ());
 
-		obj->_ior()->objectkey (objkey, objkeylen);
+		obj->_ior()->objectkey_nc (objkey, objkeylen);
 	    } else if (kind == GIOP::ProfileAddr) {
 		CORBA::IORProfile *prof = CORBA::IORProfile::decode (*dc);
 		check (prof);
