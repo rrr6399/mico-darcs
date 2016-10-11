@@ -2178,13 +2178,15 @@ SSLMTRUN=""
 if test X"$ac_cv_lib_ssl_open" = Xyes -a X"$ac_cv_lib_crypto_open" = Xyes -a X"$ac_cv_header_openssl_ssl_h" = Xyes -a X"$use_threads" = Xyes; then
   AC_MSG_CHECKING(for thread-safe openssl)
   AC_TRY_RUN([
-int
-main()
-{
 #define OPENSSL_THREAD_DEFINES
 #undef THREADS
 #undef OPENSSL_THREADS
+extern "C" {
 #include <openssl/opensslconf.h>
+}
+int
+main()
+{
 #if !defined(THREADS) && !defined(OPENSSL_THREADS)
 //error You are trying to build multi-threaded MICO with single-threaded OpenSSL!
 return 1;
