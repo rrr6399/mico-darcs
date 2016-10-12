@@ -1,6 +1,6 @@
 #
 #  MICO --- an Open Source CORBA implementation
-#  Copyright (c) 1997-2014 by The Mico Team
+#  Copyright (c) 1997-2016 by The Mico Team
 #
 #  This library is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Library General Public
@@ -705,16 +705,20 @@ if test X"$GXX" = Xyes; then
       ;;
   esac
 
-  # kcg: GCC 4.1.x requires -fno-strict-aliasing
+  # kcg: GCC 4.1.x and higher requires -fno-strict-aliasing
   GCC_STRICT_ALIASING="no"
-  case $gccversion in
+  gccver=`$CXX -v 2>&1|grep "gcc version"|cut -d ' ' -f 3-3`
+  case $gccver in
     # we need to avoid 4.0.x but still support 4.4.0
     *4.0.0*|*4.0.1*|*4.0.2*|*4.0.3*|*4.0.4*)
       ;;
-    *4.*)
+    *4.*.*|*5.*.*|*6.*.*)
       GCC_STRICT_ALIASING="yes"
       ;;
     *)
+      echo "WARNING: Your GNU C++ compiler is unknown so we do not know"
+      echo "WARNING: if to switch on or off strict aliasing rules!"
+      echo "WARNING: Your resulting MICO build may not function correctly!"
       ;;
   esac
   if test X"$GCC_STRICT_ALIASING" = Xyes; then
