@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2006 by The Mico Team
+ *  Copyright (c) 1997-20016 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -35,6 +35,7 @@ class IRObject_impl :
 protected:
   CORBA::DefinitionKind _dk;
   CORBA::Boolean _already_destructed;
+  MICOMT::Mutex _already_destructed_lock;
 
  public:
   static PortableServer::POA_var _ifrpoa;

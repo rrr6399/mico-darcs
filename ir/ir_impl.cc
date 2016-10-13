@@ -91,11 +91,14 @@ void
 IRObject_impl::destroy ()
 {
   if (!_already_destructed) {
-    _already_destructed = 1;
-    deactivate ();
-    PortableServer::POA_var poa = _default_POA();
-    PortableServer::ObjectId_var oid = poa->servant_to_id (this);
-    poa->deactivate_object (oid.in());
+    MICOMT::AutoLock l(_already_destructed_lock);
+    if (!_already_destructed) {
+      _already_destructed = 1;
+      deactivate ();
+      PortableServer::POA_var poa = _default_POA();
+      PortableServer::ObjectId_var oid = poa->servant_to_id (this);
+      poa->deactivate_object (oid.in());
+    }
   }
 }
 
