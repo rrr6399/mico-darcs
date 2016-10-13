@@ -1,7 +1,7 @@
 /* -*- mode: c++; c-basic-offset: 4; -*-
  *
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2011 by The Mico Team
+ *  Copyright (c) 1997-2016 by The Mico Team
  * 
  *  os-thread wrapper
  *  Copyright (C) 1999 Andreas Schultz                                 
@@ -205,7 +205,7 @@ namespace MICOMT {
 	AutoRDLock(RWLock& l)
 	    : _l(l)
 	{
-	    l.rdlock();
+	    _l.rdlock();
 	};
 
 	/*!
@@ -238,7 +238,7 @@ namespace MICOMT {
 	AutoWRLock(RWLock& l)
 	    : _l(l)
 	{
-	    l.wrlock();
+	    _l.wrlock();
 	};
 
 	/*!
