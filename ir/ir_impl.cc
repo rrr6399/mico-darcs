@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2010 by The Mico Team
+ *  Copyright (c) 1997-2016 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -1293,7 +1293,8 @@ Container_impl::deactivate ()
   /*
    * Upon deactivation, destroy all contents
    */
-
+  NameMap tmpmap_for_deactivate;
+  {
   MICOMT::AutoWRLock lock(_names);
   NameMap::iterator it = _names.begin();
 
@@ -1302,10 +1303,22 @@ Container_impl::deactivate ()
       _names.erase (it);
     }
     else {
-      (*it).value->destroy ();
+      tmpmap_for_deactivate.push_back((*it));
+      _names.erase(it);
     }
     // iterator invalidated
     it = _names.begin();
+  }
+  }
+  // let's do actual destroy after releasing RW lock on _names
+  // we need to do this in this way to avoid double locking on RW lock
+  // which leads to undefined behavior as per POSIX spec. On Linux it
+  // causes crash on second unlock in such case in _xend() function of
+  // POSIX thread library
+  for (NameMap::iterator it2 = tmpmap_for_deactivate.begin();
+       it2 != tmpmap_for_deactivate.end();
+       it2++) {
+    (*it2).value->destroy();
   }
 }
 
