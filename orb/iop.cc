@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2015 by The Mico Team
+ *  Copyright (c) 1997-2016 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -5370,6 +5370,14 @@ MICO::IIOPServer::listen (CORBA::Address *addr, CORBA::Address *fwproxyaddr, con
 	MICO::Logger::Stream (MICO::Logger::GIOP)
 	    << "binding to " << prof->addr()->stringify() << endl;
     }
+    // hack to fix race condition on resolve_ip call on ORB's IOR
+    // template IIOP profile InetAddress object. If we
+    // resolve_ip/resolve_host now (what valid() does), we avoid the
+    // call later while comparing addresses
+    const InetAddress* inaddr = dynamic_cast<const InetAddress*>(prof->addr());
+    if (inaddr != NULL)
+        inaddr->valid();
+
     _orb->ior_template()->add_profile (prof);
 
     _tservers.push_back(tserv);
