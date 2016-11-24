@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2014 by The Mico Team
+ *  Copyright (c) 1997-2016 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -216,6 +216,7 @@ extern CORBA::ULong mico_string_hash (const char *s, CORBA::ULong max);
 extern void mico_print_stack_trace();
 extern void mico_print_stack_trace(std::ostream&);
 extern void mico_print_stack_trace(const char*);
+extern void mico_print_stack_trace(std::string&);
 #endif // HAVE_ANSI_CPLUSPLUS_HEADERS && HAVE_BACKTRACE && HAVE_BACKTRACE_SYMBOLS
 
 #ifndef HAVE_STRERROR_PROTO
