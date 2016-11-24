@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2013 by The Mico Team
+ *  Copyright (c) 1997-2016 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -1114,7 +1114,12 @@ MICOSSL::SSLTransport::read (void *_b, CORBA::Long len)
 	    // we have received close notify alert from the peer so we will
 	    // reply to it by calling SSL_shutdown
 	    long ret = SSL_shutdown(_ssl);
-	    assert(ret == 1);
+	    if (ret == 0)
+	      ret = SSL_shutdown(_ssl);
+	    //assert(ret == 1);
+	    if (MICO::Logger::IsLogged(MICO::Logger::Warning))
+	      MICO::Logger::Stream(MICO::Logger::Warning)
+		<< "ssl.cc: SSL_shutdown returns: " << ret << endl;
 	}
     }
 #ifdef HAVE_THREADS
