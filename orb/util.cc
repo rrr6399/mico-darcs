@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2014 by The Mico Team
+ *  Copyright (c) 1997-2016 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -1377,4 +1377,11 @@ mico_print_stack_trace(const char* s)
     free (strings);
 }
 
+void
+mico_print_stack_trace(string& out)
+{
+    std::stringstream strstream;
+    mico_print_stack_trace(strstream);
+    out = strstream.str();
+}
 #endif // HAVE_BACKTRACE && HAVE_BACKTRACE_SYMBOLS
