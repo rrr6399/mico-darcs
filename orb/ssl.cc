@@ -1097,6 +1097,7 @@ CORBA::Long
 MICOSSL::SSLTransport::read (void *_b, CORBA::Long len)
 {
 #ifdef HAVE_THREADS
+    int i = -1;
     // We can't lock while using blocking transport (blocking is used only
     // by thread per connection concurrency model) because it block on read
     // and it can lead to deadlock ie. reader will be faster then writer,
@@ -1104,8 +1105,9 @@ MICOSSL::SSLTransport::read (void *_b, CORBA::Long len)
     // since writter doesn't write it's request
     if (!this->isblocking())
 	_ssl_mutex.lock();
+    try {
 #endif // HAVE_THREADS
-    int i = SSL_read (_ssl, (char *)_b, len);
+    i = SSL_read (_ssl, (char *)_b, len);
     if (i < 0)
 	_err = _transp->errormsg();
     if (i == 0) {
@@ -1123,6 +1125,18 @@ MICOSSL::SSLTransport::read (void *_b, CORBA::Long len)
 	}
     }
 #ifdef HAVE_THREADS
+    }
+    catch (...) {
+        // this is necessary since read is a cancellation point and if
+        // it's called by the reader thread which is terminated then
+        // on some OSes (E.g. Linux) we get a cancellation exception
+        // here thrown from read. We need to unlock mutex and then
+        // rethrow the exception.
+        if (!this->isblocking()) {
+            _ssl_mutex.unlock();
+        }
+        throw;
+    }
     // see comment above
     if (!this->isblocking())
 	_ssl_mutex.unlock();
