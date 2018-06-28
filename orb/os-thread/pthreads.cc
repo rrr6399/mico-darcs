@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2015 by The Mico Team
+ *  Copyright (c) 1997-2018 by The Mico Team
  * 
  *  OSThread: An abstract Thread class for MICO
  *  Copyright (C) 1999 Andy Kersting & Andreas Schultz
@@ -47,9 +47,12 @@ using namespace std;
 #ifdef USE_SHARED_MUTEX_ATTRIBUTE
 pthread_mutexattr_t
 MICOMT::Mutex::S_normal_mutex_attr_;
-
+bool
+MICOMT::Mutex::S_normal_mutex_attr_initialized_ = false;
 pthread_mutexattr_t
 MICOMT::Mutex::S_recursive_mutex_attr_;
+bool
+MICOMT::Mutex::S_recursive_mutex_attr_initialized_ = false;
 #endif // USE_SHARED_MUTEX_ATTRIBUTE
 
 static pthread_mutex_t __debug_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -108,6 +111,19 @@ void MICOMT::_init ()
 #endif // MTDEBUG
 #ifdef PTW32_STATIC_LIB
     pthread_win32_process_attach_np();
+#endif
+#ifdef USE_SHARED_MUTEX_ATTRIBUTE
+    // init normal attr
+    int res = pthread_mutexattr_init(&MICOMT::Mutex::S_normal_mutex_attr_);
+    assert(!res);
+    MICOMT::Mutex::S_normal_mutex_attr_initialized_ = true;
+    // init recursive attr
+    res = pthread_mutexattr_init(&MICOMT::Mutex::S_recursive_mutex_attr_);
+    assert(!res);
+    res = pthread_mutexattr_settype(&MICOMT::Mutex::S_recursive_mutex_attr_,
+                                    PTHREAD_MUTEX_RECURSIVE);
+    assert (!res);
+    MICOMT::Mutex::S_recursive_mutex_attr_initialized_ = true;
 #endif
 }
 
@@ -475,14 +491,13 @@ MICOMT::Mutex::Mutex(MICO_Boolean locked, Attribute attr)
 #endif
     if (attr == Normal) {
 #ifdef USE_SHARED_MUTEX_ATTRIBUTE
-        result = pthread_mutex_init(&_mutex, &S_normal_mutex_attr_);
-        if (result == EINVAL) {
-            // perhaps mutex attribute is not initialized yet?
-            int res2 = pthread_mutexattr_init(&MICOMT::Mutex::S_normal_mutex_attr_);
-            assert(!res2);
+        if (S_normal_mutex_attr_initialized_) {
             result = pthread_mutex_init(&_mutex, &S_normal_mutex_attr_);
+            assert(!result);
         }
-#else // USE_SHARED_MUTEX_ATTRIBUTE
+        else {
+            // slow path, perhaps mutex attribute is not initialized yet?
+#endif // USE_SHARED_MUTEX_ATTRIBUTE
         // it seems that linux/win32 and others do not like our clever hack of using
         // static mutex attr at all! This is a pity, since this is a
         // speedup trick. So on Linux we go slow way...
@@ -492,25 +507,23 @@ MICOMT::Mutex::Mutex(MICO_Boolean locked, Attribute attr)
         result = pthread_mutex_init(&_mutex, &mattr);
         assert(!result);
         result = pthread_mutexattr_destroy(&mattr);
-#endif // USE_SHARED_MUTEX_ATTRIBUTE
         assert(!result);
+#ifdef USE_SHARED_MUTEX_ATTRIBUTE
+        }
+#endif // USE_SHARED_MUTEX_ATTRIBUTE
     }
     else if (attr == Recursive) {
 #ifdef SOLARIS_MUTEX
 	    _rec = 1;
 #else // SOLARIS_MUTEX
 #ifdef USE_SHARED_MUTEX_ATTRIBUTE
-            result = pthread_mutex_init(&_mutex, &S_recursive_mutex_attr_);
-            if (result == EINVAL) {
-                // perhaps mutex attribute is not initialized yet?
-                int res2 = pthread_mutexattr_init(&MICOMT::Mutex::S_recursive_mutex_attr_);
-                assert(!res2);
-                res2 = pthread_mutexattr_settype(&MICOMT::Mutex::S_recursive_mutex_attr_,
-                                                 PTHREAD_MUTEX_RECURSIVE);
-                assert (!res2);
+            if (S_recursive_mutex_attr_initialized_) {
                 result = pthread_mutex_init(&_mutex, &S_recursive_mutex_attr_);
+                assert (!result);
             }
-#else // USE_SHARED_MUTEX_ATTRIBUTE
+            else {
+                // slow path, perhaps mutex attribute is not initialized yet?
+#endif // USE_SHARED_MUTEX_ATTRIBUTE
         // it seems that linux/win32 and others do not like our clever hack of using
         // static mutex attr at all! This is a pity, since this is a
         // speedup trick. So on Linux we go slow way...
@@ -522,8 +535,10 @@ MICOMT::Mutex::Mutex(MICO_Boolean locked, Attribute attr)
         result = pthread_mutex_init(&_mutex, &mattr);
         assert(!result);
         result = pthread_mutexattr_destroy(&mattr);
+        assert (!result);
+#ifdef USE_SHARED_MUTEX_ATTRIBUTE
+            }
 #endif // USE_SHARED_MUTEX_ATTRIBUTE
-	    assert (!result);
 #endif // SOLARIS_MUTEX
     }
     else {
