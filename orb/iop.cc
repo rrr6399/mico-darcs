@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2016 by The Mico Team
+ *  Copyright (c) 1997-2018 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -5437,9 +5437,10 @@ MICO::IIOPServer::pull_invoke_reqid (MsgId msgid, GIOPConn *conn)
 #ifndef HAVE_THREADS
     for (MapIdConn::iterator i = _orbids.begin(); i != _orbids.end(); ++i) {
 	rec = (*i).second;
-	if (rec->reqid() == msgid && rec->conn() == conn && rec->active() )
+	if (rec->reqid() == msgid && rec->conn() == conn && rec->active() ) {
 	    rec->deactivate();
 	    return rec;
+        }
     }
 #else // HAVE_THREADS
     MICOMT::AutoLock l(_orbids_mutex);
@@ -5449,9 +5450,10 @@ MICO::IIOPServer::pull_invoke_reqid (MsgId msgid, GIOPConn *conn)
              j != (*i).second->map_.end();
              j++) {
             rec = (*j).second;
-            if (rec->reqid() == msgid && rec->conn() == conn && rec->active() )
+            if (rec->reqid() == msgid && rec->conn() == conn && rec->active() ) {
                 rec->deactivate();
-	    return rec;
+                return rec;
+            }
         }
     }
 #endif // HAVE_THREADS
