@@ -1,6 +1,6 @@
 #
 #  MICO --- an Open Source CORBA implementation
-#  Copyright (c) 1997-2016 by The Mico Team
+#  Copyright (c) 1997-2018 by The Mico Team
 #
 #  This library is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Library General Public
@@ -433,6 +433,7 @@ if test X"$use_pthreads" = Xyes; then
     )
     AC_CHECK_HEADERS(semaphore.h)
     AC_DEFINE(HAVE_PTHREADS)
+    AC_DEFINE(USE_SHARED_MUTEX_ATTRIBUTE)
     SHLIBS="-lpthread"
     platform_supports_threads=yes
     use_threads=yes
@@ -444,6 +445,7 @@ if test X"$use_pthreads" = Xyes; then
       )
       AC_CHECK_HEADERS(semaphore.h)
       AC_DEFINE(HAVE_PTHREADS)
+      AC_DEFINE(USE_SHARED_MUTEX_ATTRIBUTE)
       #SHLIBS="-lpthread"
       LDFLAGS="-pthread $LDFLAGS"
       platform_supports_threads=yes
@@ -531,6 +533,7 @@ if test X"$platform_supports_threads" = Xno; then
       )
       AC_CHECK_HEADERS(semaphore.h)
       AC_DEFINE(HAVE_PTHREADS)
+      AC_DEFINE(USE_SHARED_MUTEX_ATTRIBUTE)
       case "${GXX}:${target}" in
       yes:*solaris*|yes:*sunos*)
         CXXFLAGS="-pthreads ${CXXFLAGS}"
@@ -552,6 +555,7 @@ if test X"$platform_supports_threads" = Xno; then
         )
         AC_CHECK_HEADERS(semaphore.h)
         AC_DEFINE(HAVE_PTHREADS)
+        AC_DEFINE(USE_SHARED_MUTEX_ATTRIBUTE)
         LDFLAGS="-pthread $LDFLAGS"
       else
         AC_CHECK_LIB(thread, open, use_solaris_threads=yes, use_solaris_threads=no)
