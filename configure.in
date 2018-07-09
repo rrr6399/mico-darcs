@@ -711,20 +711,36 @@ if test X"$GXX" = Xyes; then
 
   # kcg: GCC 4.1.x and higher requires -fno-strict-aliasing
   GCC_STRICT_ALIASING="no"
-  gccver=`$CXX -v 2>&1|grep "gcc version"|cut -d ' ' -f 3-3`
-  case $gccver in
-    # we need to avoid 4.0.x but still support 4.4.0
-    *4.0.0*|*4.0.1*|*4.0.2*|*4.0.3*|*4.0.4*)
-      ;;
-    *4.*.*|*5.*.*|*6.*.*)
-      GCC_STRICT_ALIASING="yes"
-      ;;
-    *)
-      echo "WARNING: Your GNU C++ compiler is unknown so we do not know"
-      echo "WARNING: if to switch on or off strict aliasing rules!"
-      echo "WARNING: Your resulting MICO build may not function correctly!"
-      ;;
-  esac
+  GXX_IS_REAL_GCC=no
+  gccver=`$CXX -v 2>&1|grep "gcc version"`
+  if test -n "$gccver"; then
+    GXX_IS_REAL_GCC=yes
+  fi
+  if test X"$GXX_IS_REAL_GCC" = Xyes; then
+    gccver=`$CXX -v 2>&1|grep "gcc version"|cut -d ' ' -f 3-3`
+    case $gccver in
+      # we need to avoid 4.0.x but still support 4.4.0
+      *4.0.0*|*4.0.1*|*4.0.2*|*4.0.3*|*4.0.4*)
+        ;;
+      *4.*.*|*5.*.*|*6.*.*)
+        GCC_STRICT_ALIASING="yes"
+        ;;
+      *)
+        echo "WARNING: Your GNU C++ compiler is unknown so we do not know"
+        echo "WARNING: if to switch on or off strict aliasing rules!"
+        echo "WARNING: Your resulting MICO build may not function correctly!"
+        ;;
+    esac
+  fi
+  gccver=`$CXX -v 2>&1|grep "clang"`
+  if test -n "$gccver"; then
+    # switch off strict aliasing on all clang.
+    GCC_STRICT_ALIASING="yes"
+    # clang hates our C11 un-compatible narrowing in uni_fromuni.cc and others
+    # hence enforce good old C++ 98 mode
+    CXXFLAGS="$CXXFLAGS -std=c++98"
+  fi
+  
   if test X"$GCC_STRICT_ALIASING" = Xyes; then
     CXXFLAGS="$CXXFLAGS -fno-strict-aliasing"
   fi
