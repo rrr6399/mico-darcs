@@ -55,6 +55,7 @@ main (int argc, char *argv[])
   }
 
   bank->shutdown (); // explicit server shutdown
+  sleep(2);
 
   /*
    * Deposit and withdraw some money
@@ -62,12 +63,15 @@ main (int argc, char *argv[])
 
   account->deposit (700);
   bank->shutdown ();
+  sleep(2);
 
   account->withdraw (450);
   bank->shutdown ();
+  sleep(2);
 
   cout << "Balance is " << account->balance() << endl;
   bank->shutdown ();
+  sleep(2);
 
   orb->shutdown(TRUE);
   //orb->destroy();
