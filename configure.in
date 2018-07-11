@@ -1384,7 +1384,7 @@ CURSES_LIBS="$LIBS $SHLIBS"
 AC_HEADER_STDC
 AC_CHECK_HEADERS(fcntl.h unistd.h sys/select.h strings.h float.h ieeefp.h)
 AC_CHECK_HEADERS(sys/un.h netinet/in.h arpa/inet.h netdb.h dlfcn.h dl.h)
-AC_CHECK_HEADERS(netinet/tcp.h stdlib.h sys/time.h sunmath.h sys/stat.h)
+AC_CHECK_HEADERS(netinet/tcp.h stdlib.h sys/time.h sys/timeb.h sunmath.h sys/stat.h)
 AC_CHECK_HEADERS(poll.h)
 
 AC_CHECK_HEADERS(exception exception.h terminate.h openssl/ssl.h pgsql/libpq-fe.h)
