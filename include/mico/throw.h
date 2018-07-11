@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2006 by The Mico Team
+ *  Copyright (c) 1997-2018 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -91,7 +91,7 @@ mico_throw (const CORBA::Exception &ex)
 #endif
 }
 
-static void
+static inline void
 mico_sii_throw (CORBA::StaticRequest *r, ...)
 {
 #if !(defined(_WIN32) && defined(_MSC_VER))
