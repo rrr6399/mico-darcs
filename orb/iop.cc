@@ -5561,9 +5561,9 @@ MICO::IIOPServer::del_invoke_orbid (IIOPServerInvokeRec *rec)
              i++) {
             MICOMT::AutoLock l2(*(*i).second);
             MapIdConn::iterator j = (*i).second->map_.find(rec->orbmsgid());
-            if (j != map->map_.end()) {
+            if (j != (*i).second->map_.end()) {
                 delete (*j).second;
-                map->map_.erase(j);
+                (*i).second->map_.erase(j);
             }
         }
     }
