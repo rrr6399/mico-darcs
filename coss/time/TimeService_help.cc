@@ -32,7 +32,9 @@
 #include <coss/CosNaming.h>
 #include <mico/util.h>
 #include <time.h>
+#ifdef HAVE_SYS_TIMEB_H
 #include <sys/timeb.h>
+#endif
 
 //
 //Helper functions, mainly wrappers around the time function
