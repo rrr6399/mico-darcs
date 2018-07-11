@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2015 by The Mico Team
+ *  Copyright (c) 1997-2018 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -949,9 +949,7 @@ private:
     CORBA::UShort _iiop_ver;
     CORBA::ULong _max_message_size;
 
-#ifndef HAVE_THREADS
-    CORBA::Object_ptr target_obj_;
-#else // HAVE_THREADS
+#ifdef HAVE_THREADS
     MICOMT::Thread::ThreadKey target_obj_key_;
 #endif // HAVE_THREADS
     IIOPServerInvokeRec *create_invoke();
