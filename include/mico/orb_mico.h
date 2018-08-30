@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2013 by The Mico Team
+ *  Copyright (c) 1997-2018 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -68,6 +68,7 @@ private:
     // So server side needs to deal with this on its own
     ORBRequest *_req;
     ORBCallback *_cb;
+    Boolean _cb_async_callback;
     ORB_ptr _orb;
     OctetSeq _objtag;
     Address *_addr;
