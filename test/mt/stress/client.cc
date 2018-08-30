@@ -16,6 +16,37 @@ CORBA::Context_var ctx, ctx2;
 
 #ifdef HAVE_THREADS
 
+class Notifier : public CORBA::RequestCallback {
+private:
+    MICOMT::Locked<std::list<CORBA::Request_var> > requests;
+public:
+    void add_request (CORBA::Request_ptr r) {
+        MICOMT::AutoLock l(requests);
+        cerr << "add_request: " << requests.size() << endl;
+        requests.push_back(CORBA::Request::_duplicate(r));
+    }
+    void callback (CORBA::Request_ptr r, CORBA::RequestCallback::Event ev) {
+        cerr << "callback." << endl;
+        assert (ev == CORBA::RequestCallback::RequestDone);
+        MICOMT::AutoLock lock(requests);
+        list<CORBA::Request_var>::iterator j = requests.begin();
+        for (; j != requests.end(); ++j) {
+            CORBA::Request_ptr req = (*j).in();
+            if (r == req) {
+                MICO_CATCHANY (req->get_response ());
+                if (req->env()->exception()) {
+                    cerr << "eventd: push failed with: "
+		     << req->env()->exception() << endl;
+                }
+                cerr << "erasing req: " << (void*)req << " from queue size: " << requests.size() << endl;
+                requests.erase (j);
+                break;
+            }
+        }
+    }
+
+};
+
 class Invoker
     : virtual public MICOMT::Thread
 {
@@ -187,6 +218,21 @@ try {
 		//::sleep (delay);
 	    }
 	}
+    }
+    else if (method == "send_deferred") {
+        Notifier* notif = new Notifier();
+	for (int j=0; j<100; j++) {
+	    cout << "\r" << "progress: " << j << "%" << flush;
+	    for (int i=0; i<tnum; i++) {
+                CORBA::Request_var req = bench->_request("perform");
+                notif->add_request(req);
+                req->send_deferred(notif);
+                req->poll_response();
+            }
+        }
+        while (orb->work_pending()) {
+            orb->perform_work();
+        }
     } else {
 	assert(0);
     }
