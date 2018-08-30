@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2015 by The Mico Team
+ *  Copyright (c) 1997-2018 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -172,6 +172,7 @@ CORBA::ORBInvokeRec::ORBInvokeRec (MsgId id)
     _adapter = 0;
     _req = 0;
     _cb = 0;
+    _cb_async_callback = FALSE;
     _req_hint = 0;
     _inv_hint = 0;
     _active = TRUE;
@@ -204,6 +205,12 @@ CORBA::ORBInvokeRec::init_invoke (ORB_ptr orb,
     _addr = 0;
     _adapter = oa;
     _cb = callback;
+    _cb_async_callback = FALSE;
+    if (_cb != NULL) {
+        if (dynamic_cast<ORBAsyncCallback*>(_cb) != NULL) {
+            _cb_async_callback = TRUE;
+        }
+    }
     _active = TRUE;
 #ifdef USE_MESSAGING
     relative_roundtrip_timeout_ = o->relative_roundtrip_timeout();
@@ -265,6 +272,12 @@ CORBA::ORBInvokeRec::init_bind (ORB_ptr orb, const char *repo,
     _addr = a;
     _adapter = oa;
     _cb = callback;
+    _cb_async_callback = FALSE;
+    if (_cb != NULL) {
+        if (dynamic_cast<ORBAsyncCallback*>(_cb) != NULL) {
+            _cb_async_callback = TRUE;
+        }
+    }
     _objtag = tag;
     _active = TRUE;
 }
@@ -285,6 +298,12 @@ CORBA::ORBInvokeRec::init_locate (ORB_ptr orb, Object_ptr o,
     _addr = 0;
     _adapter = oa;
     _cb = callback;
+    _cb_async_callback = FALSE;
+    if (_cb != NULL) {
+        if (dynamic_cast<ORBAsyncCallback*>(_cb) != NULL) {
+            _cb_async_callback = TRUE;
+        }
+    }
     _active = TRUE;
 }
 
@@ -300,9 +319,10 @@ CORBA::ORBInvokeRec::~ORBInvokeRec ()
     // CORBA::release (_req);
     CORBA::release (_sri);
 #ifdef HAVE_THREADS
-    CORBA::ORBAsyncCallback* tmp_cb = dynamic_cast<CORBA::ORBAsyncCallback*>(_cb);
-    if (tmp_cb != NULL) {
-	delete _cb;
+    if (_cb_async_callback) {
+        delete _cb;
+        _cb = 0;
+        _cb_async_callback = FALSE;
     }
 #endif
 }
@@ -327,6 +347,7 @@ CORBA::ORBInvokeRec::free ()
     _principal = 0;
     _req = 0;
     _cb = 0;
+    _cb_async_callback = FALSE;
     _active = FALSE;
     _sri = 0;
 }
