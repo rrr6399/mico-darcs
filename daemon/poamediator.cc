@@ -1,7 +1,7 @@
 /*
  *  MICO --- an Open Source CORBA implementation
  *  Copyright (C) 1998 Frank Pilhofer
- *  Copyright (c) 1999-2010 by The Mico Team
+ *  Copyright (c) 1999-2018 by The Mico Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -62,6 +62,7 @@ using namespace std;
  */
 
 POAMediatorImpl::SvInf::SvInf ()
+    : lock(FALSE, MICOMT::Mutex::Recursive)
 {
   pstate = Inactive;
   proc = NULL;
@@ -74,7 +75,7 @@ POAMediatorImpl::SvInf::SvInf ()
  */
 
 POAMediatorImpl::POAMediatorImpl (CORBA::ORB_ptr _orb, CORBA::Boolean _forward)
-  : invqueue (this, _orb), _M_global_lock (FALSE, MICOMT::Mutex::Recursive)
+    : svmap_lock_(FALSE, MICOMT::Mutex::Recursive), invqueue (this, _orb), lock_ (FALSE, MICOMT::Mutex::Recursive)
 {
   orb = _orb;
   forward = _forward;
@@ -88,13 +89,16 @@ POAMediatorImpl::POAMediatorImpl (CORBA::ORB_ptr _orb, CORBA::Boolean _forward)
 
 POAMediatorImpl::~POAMediatorImpl ()
 {
-  MICOMT::AutoLock __lock(_M_global_lock);
+  MICOMT::AutoLock l(lock_);
 
   orb->unregister_oa (this);
+
+  MICOMT::AutoLock l2(svmap_lock_);
 
   MapSvInf::iterator it;
 
   for (it = svmap.begin(); it != svmap.end(); it++) {
+    MICOMT::AutoLock lx((*it).second.lock);
     if ((*it).second.proc) {
       delete (*it).second.proc;
     }
@@ -108,8 +112,6 @@ POAMediatorImpl::~POAMediatorImpl ()
 char *
 POAMediatorImpl::create_impl (const char * svid, const char * ior)
 {
-  MICOMT::AutoLock __lock(_M_global_lock);
-
   CORBA::ImplRepository::ImplDefSeq_var ids =
     imr->find_by_name (svid);
 
@@ -120,6 +122,9 @@ POAMediatorImpl::create_impl (const char * svid, const char * ior)
 		   svid, "");
   }
 
+  MICOMT::AutoLock l(svmap_lock_);
+  MICOMT::AutoLock l2(svmap[svid].lock);
+
   svmap[svid].ior = CORBA::IOR (ior);
   return CORBA::string_dup (myior.c_str());
 }
@@ -127,8 +132,8 @@ POAMediatorImpl::create_impl (const char * svid, const char * ior)
 void
 POAMediatorImpl::activate_impl (const char * svid)
 {
-  MICOMT::AutoLock __lock(_M_global_lock);
-
+  MICOMT::AutoLock l(svmap_lock_);
+  MICOMT::AutoLock l2(svmap[svid].lock);
   if (svmap[svid].pstate == Stopped ||
       svmap[svid].pstate == Holding) {
     return;
@@ -146,10 +151,11 @@ POAMediatorImpl::activate_impl (const char * svid)
 void
 POAMediatorImpl::deactivate_impl (const char * svid)
 {
-  MICOMT::AutoLock __lock(_M_global_lock);
+  MICOMT::AutoLock l(svmap_lock_);
 
   SvInf &inf = svmap[svid];
-
+  MICOMT::AutoLock l2(inf.lock);
+  
   assert (inf.pstate == Stopped || inf.proc);
 
   switch (inf.pstate) {
@@ -183,10 +189,12 @@ POAMediatorImpl::deactivate_impl (const char * svid)
 CORBA::Boolean
 POAMediatorImpl::force_activation (CORBA::ImplementationDef_ptr impl)
 {
-  MICOMT::AutoLock __lock(_M_global_lock);
-
   CORBA::String_var svid = impl->name ();
+
+  MICOMT::AutoLock l(svmap_lock_);
   SvInf &inf = svmap[svid.in()];
+
+  MICOMT::AutoLock l2(inf.lock);
 
   switch (inf.pstate) {
   case Inactive:
@@ -223,10 +231,12 @@ POAMediatorImpl::force_activation (CORBA::ImplementationDef_ptr impl)
 CORBA::Boolean
 POAMediatorImpl::hold (CORBA::ImplementationDef_ptr impl)
 {
-  MICOMT::AutoLock __lock(_M_global_lock);
-
   CORBA::String_var svid = impl->name ();
+
+  MICOMT::AutoLock l(svmap_lock_);
   SvInf &inf = svmap[svid.in()];
+
+  MICOMT::AutoLock l2(inf.lock);
 
   switch (inf.pstate) {
   case Inactive:
@@ -254,56 +264,73 @@ POAMediatorImpl::hold (CORBA::ImplementationDef_ptr impl)
 CORBA::Boolean
 POAMediatorImpl::stop (CORBA::ImplementationDef_ptr impl)
 {
-  MICOMT::AutoLock __lock(_M_global_lock);
-
   CORBA::String_var svid = impl->name ();
-  SvInf &inf = svmap[svid.in()];
+  {
+    MICOMT::AutoLock l(svmap_lock_);
+    SvInf &inf = svmap[svid.in()];
 
-  switch (inf.pstate) {
-  case Inactive:
-  case Failed:
-  case Stopped:
+    MICOMT::AutoLock l2(inf.lock);
+
+    switch (inf.pstate) {
+    case Inactive:
+    case Failed:
+    case Stopped:
+      inf.pstate = Stopped;
+      return 1;
+
+    case Started:
+    case Active:
+    case Holding:
+      assert (inf.proc);
+      break;
+
+    default:
+      assert (0);
+    }
+
+    /*
+     * Signal the server to exit
+     */
     inf.pstate = Stopped;
-    return 1;
-
-  case Started:
-  case Active:
-  case Holding:
-    assert (inf.proc);
-    break;
-
-  default:
-    assert (0);
+    inf.proc->terminate ();
   }
 
   /*
-   * Signal the server to exit and wait for confirmation
+   * Wait for server exit confirmation
    */
-
-  inf.pstate = Stopped;
-  inf.proc->terminate ();
-
   CORBA::Timeout t (orb->dispatcher(), 5000);
-
-  while (!t.done() && svmap[svid.in()].proc) {
+  CORBA::Boolean finish = FALSE;
+  while (!finish) {
+    if (t.done())
+      finish = TRUE;
+    {
+      MICOMT::AutoLock l(svmap_lock_);
+      MICOMT::AutoLock l2(svmap[svid.in()].lock);
+      if (svmap[svid.in()].proc == NULL) {
+        finish = TRUE;
+      }
+    }
     orb->perform_work ();
   }
 
-  if (svmap[svid.in()].proc) {
-    cerr << "*** server cannot be stopped: " << svid << endl;
-    return 0;
+  {
+    MICOMT::AutoLock l(svmap_lock_);
+    MICOMT::AutoLock l2(svmap[svid.in()].lock);
+    if (svmap[svid.in()].proc) {
+      cerr << "*** server cannot be stopped: " << svid << endl;
+      return 0;
+    }
   }
-
   return 1;
 }
 
 CORBA::Boolean
 POAMediatorImpl::_cxx_continue (CORBA::ImplementationDef_ptr impl)
 {
-  MICOMT::AutoLock __lock(_M_global_lock);
-
   CORBA::String_var svid = impl->name ();
+  MICOMT::AutoLock l(svmap_lock_);
   SvInf &inf = svmap[svid.in()];
+  MICOMT::AutoLock l2(inf.lock);
 
   switch (inf.pstate) {
   case Inactive:
@@ -332,9 +359,12 @@ POAMediatorImpl::_cxx_continue (CORBA::ImplementationDef_ptr impl)
 CORBA::Boolean
 POAMediatorImpl::create_server (const char * svid)
 {
-  MICOMT::AutoLock __lock(_M_global_lock);
+  svmap_lock_.lock();
+  // hopefully this will never throw so manual unlocking below is ok
+  SvInf& inf = svmap[svid];
+  svmap_lock_.unlock();
 
-  SvInf &inf = svmap[svid];
+  MICOMT::AutoLock l2(inf.lock);
 
   if (inf.pstate == Started || inf.pstate == Active) {
     return TRUE;
@@ -418,6 +448,7 @@ POAMediatorImpl::create_server (const char * svid)
 void
 POAMediatorImpl::set_own_ref(CORBA::Object_ptr obj)
 {
+    MICOMT::AutoLock l(lock_);
     my_ref_ = CORBA::Object::_duplicate(obj);
 }
 
@@ -434,8 +465,6 @@ POAMediatorImpl::get_oaid () const
 CORBA::Boolean
 POAMediatorImpl::has_object (CORBA::Object_ptr obj)
 {
-  MICOMT::AutoLock __lock(_M_global_lock);
-
   /*
    * Extract Objectkey from IOR. It starts with the POAImplName.
    * Take care of escaped slashes.
@@ -482,6 +511,7 @@ POAMediatorImpl::has_object (CORBA::Object_ptr obj)
    * an svmap entry so that the server will be restarted upon invoke().
    */
 
+  MICOMT::AutoLock l(svmap_lock_);
   MapSvInf::iterator it = svmap.find (svid);
 
   if (it == svmap.end()) {
@@ -490,6 +520,7 @@ POAMediatorImpl::has_object (CORBA::Object_ptr obj)
     if (ims->length() == 0) {
       return FALSE;
     }
+    MICOMT::AutoLock l2(svmap[svid].lock);
     svmap[svid].pstate = Inactive;
   }
 
@@ -517,8 +548,6 @@ POAMediatorImpl::invoke (CORBA::ORBMsgId id, CORBA::Object_ptr obj,
 			 CORBA::Principal_ptr pr,
 			 CORBA::Boolean response_exp)
 {
-  MICOMT::AutoLock __lock(_M_global_lock);
-
   /*
    * Extract Objectkey from IOR. It starts with the POAImplName.
    */
@@ -554,7 +583,7 @@ POAMediatorImpl::invoke (CORBA::ORBMsgId id, CORBA::Object_ptr obj,
   /*
    * Look up ServerId in Map
    */
-
+  MICOMT::AutoLock l(svmap_lock_);
   MapSvInf::iterator it = svmap.find (svid);
 
   if (it == svmap.end()) {
@@ -568,10 +597,11 @@ POAMediatorImpl::invoke (CORBA::ORBMsgId id, CORBA::Object_ptr obj,
     return TRUE;
   }
 
+  MICOMT::AutoLock l2((*it).second.lock);
+
   /*
    * If the Server is stopped, queue the request
    */
-
   if ((*it).second.pstate == Stopped ||
       (*it).second.pstate == Holding) {
     invqueue.add (new MICO::ReqQueueRec (id, req, obj, pr, response_exp));
@@ -631,6 +661,7 @@ POAMediatorImpl::invoke (CORBA::ORBMsgId id, CORBA::Object_ptr obj,
   CORBA::ORBMsgId orbid = orb->new_orbid (orb->new_msgid());
 
   if (response_exp) {
+    MICOMT::AutoLock lr(requests_lock_);
     requests[orbid] = id;
   }
 
@@ -643,8 +674,6 @@ POAMediatorImpl::bind (CORBA::ORBMsgId id, const char *repoid,
 		       const CORBA::ORB::ObjectTag &tag,
 		       CORBA::Address *addr)
 {
-  MICOMT::AutoLock __lock(_M_global_lock);
-
   if (addr && !addr->is_local()) {
     return FALSE;
   }
@@ -665,6 +694,8 @@ POAMediatorImpl::bind (CORBA::ORBMsgId id, const char *repoid,
   CORBA::Boolean queue = FALSE;
   CORBA::ULong count = 0;
 
+  MICOMT::AutoLock l(svmap_lock_);
+
   for (CORBA::ULong i=0; i<ims->length(); i++) {
     if (ims[i]->mode() != CORBA::ImplementationDef::ActivatePOA) {
       continue;
@@ -673,6 +704,8 @@ POAMediatorImpl::bind (CORBA::ORBMsgId id, const char *repoid,
     count++;
 
     SvInf &inf = svmap[ims[i]->name()];
+
+    MICOMT::AutoLock l2(inf.lock);
 
     if (inf.pstate != Active && inf.pstate != Stopped &&
 	inf.pstate != Holding) {
@@ -712,10 +745,12 @@ POAMediatorImpl::bind (CORBA::ORBMsgId id, const char *repoid,
 
   vector<CORBA::ORBMsgId> msgids;
   for (it = svmap.begin(); it != svmap.end(); it++) {
+    MICOMT::AutoLock l2((*it).second.lock);
     if ((*it).second.pstate != Active) {
       continue;
     }
     msgids.push_back (orb->new_orbid (orb->new_msgid()));
+    MICOMT::AutoLock l3(requests_lock_);
     requests[msgids.back()] = id;
   }
 
@@ -724,6 +759,7 @@ POAMediatorImpl::bind (CORBA::ORBMsgId id, const char *repoid,
    */
 
   for (it = svmap.begin(); it != svmap.end(); it++) {
+    MICOMT::AutoLock l2((*it).second.lock);
     if ((*it).second.pstate != Active) {
       continue;
     }
@@ -757,8 +793,7 @@ POAMediatorImpl::skeleton (CORBA::Object_ptr)
 void
 POAMediatorImpl::cancel (CORBA::ORBMsgId id)
 {
-  MICOMT::AutoLock __lock(_M_global_lock);
-
+  MICOMT::AutoLock l(requests_lock_);
   int again = 1;
   while (again) {
     again = 0;
@@ -777,18 +812,19 @@ POAMediatorImpl::cancel (CORBA::ORBMsgId id)
 void
 POAMediatorImpl::shutdown_server ()
 {
-  MICOMT::AutoLock __lock(_M_global_lock);
+  {
+    MICOMT::AutoLock l(svmap_lock_);
+    /*
+     * Signal servers
+     */
 
-  /*
-   * Signal servers
-   */
-
-  for (MapSvInf::iterator it = svmap.begin(); it != svmap.end(); it++) {
-    if ((*it).second.proc != 0) {
-      (*it).second.proc->terminate ();
+    for (MapSvInf::iterator it = svmap.begin(); it != svmap.end(); it++) {
+      MICOMT::AutoLock l2((*it).second.lock);
+      if ((*it).second.proc != 0) {
+        (*it).second.proc->terminate ();
+      }
     }
   }
-
   /*
    * Wait for callbacks to arrive
    */
@@ -799,10 +835,14 @@ POAMediatorImpl::shutdown_server ()
 
   do {
     waiting = FALSE;
+    {
+      MICOMT::AutoLock l(svmap_lock_);
 
-    for (MapSvInf::iterator it1 = svmap.begin(); it1 != svmap.end(); it1++) {
-      if ((*it1).second.proc != 0) {
-	waiting = TRUE;
+      for (MapSvInf::iterator it1 = svmap.begin(); it1 != svmap.end(); it1++) {
+        MICOMT::AutoLock l2((*it1).second.lock);
+        if ((*it1).second.proc != 0) {
+          waiting = TRUE;
+        }
       }
     }
 
@@ -813,7 +853,9 @@ POAMediatorImpl::shutdown_server ()
   }
   while (waiting && (t2.tv_sec - t1.tv_sec < 60));
 
+  MICOMT::AutoLock l(svmap_lock_);
   for (MapSvInf::iterator it2 = svmap.begin(); it2 != svmap.end(); it2++) {
+    MICOMT::AutoLock l2((*it2).second.lock);
     if ((*it2).second.proc != 0) {
       cerr << "*** server cannot be stopped: " << (*it2).first << endl;
     }
@@ -823,7 +865,6 @@ POAMediatorImpl::shutdown_server ()
 void
 POAMediatorImpl::shutdown (CORBA::Boolean wait_for_completion)
 {
-  MICOMT::AutoLock __lock(_M_global_lock);
   invqueue.fail();
   orb->answer_shutdown (this);
 }
@@ -868,7 +909,7 @@ void
 POAMediatorImpl::notify (CORBA::ORB_ptr porb, CORBA::ORBMsgId id,
 			 CORBA::ORBCallback::Event ev)
 {
-  MICOMT::AutoLock __lock(_M_global_lock);
+  MICOMT::AutoLock l(requests_lock_);
 
   switch (ev) {
   case CORBA::ORBCallback::Invoke:
@@ -937,19 +978,22 @@ void
 POAMediatorImpl::callback (MICO::Process * proc,
 			   MICO::ProcessCallback::Event ev)
 {
-  MICOMT::AutoLock __lock(_M_global_lock);
+  MICOMT::AutoLock l(svmap_lock_);
   /*
    * Find appropriate server
    */
 
   MapSvInf::iterator it;
   for (it = svmap.begin(); it != svmap.end(); it++) {
+    MICOMT::AutoLock l2((*it).second.lock);
     if ((*it).second.proc == proc) {
       break;
     }
   }
 
   assert (it != svmap.end());
+
+  MICOMT::AutoLock l2((*it).second.lock);
 
   /*
    * What's happened?

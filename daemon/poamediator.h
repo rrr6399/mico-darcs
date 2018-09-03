@@ -2,7 +2,7 @@
 /*
  *  MICO --- an Open Source CORBA implementation
  *  Copyright (C) 1998 Frank Pilhofer
- *  Copyright (c) 1999-2010 by The Mico Team
+ *  Copyright (c) 1999-2018 by The Mico Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -52,13 +52,17 @@ private:
     CORBA::IOR ior;
     MICO::UnixProcess * proc;
     CORBA::Long failed;
+    MICOMT::Mutex lock;
   };
 
   typedef std::map<std::string, SvInf, std::less<std::string> > MapSvInf;
   typedef std::map<CORBA::ORBMsgId, CORBA::ORBMsgId, std::less<CORBA::ORBMsgId> > MapIdId;
 
   MapSvInf svmap;
+  MICOMT::Mutex svmap_lock_;
   MapIdId requests;
+  MICOMT::Mutex requests_lock_;
+
   CORBA::ORB_var orb;
   std::string myior;
   CORBA::Boolean forward;
@@ -66,7 +70,7 @@ private:
   CORBA::ImplRepository_var imr;
   MICO::RequestQueue invqueue;
 
-  MICOMT::Mutex _M_global_lock;
+  MICOMT::Mutex lock_;
   CORBA::Object_var my_ref_;
 public:
   POAMediatorImpl (CORBA::ORB_ptr, CORBA::Boolean forward = FALSE);
