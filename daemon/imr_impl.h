@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2001 by The Mico Team
+ *  Copyright (c) 1997-2018 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -30,6 +30,8 @@ class ImplementationDef_impl : public POA_CORBA::ImplementationDef {
     ObjectInfoList _objs;
     CORBA::String_var _name;
     CORBA::String_var _command;
+
+    MICOMT::RWLock _lock;
 
     void put_str (std::string &, const std::string &);
     std::string get_str (std::string &);
@@ -61,6 +63,7 @@ class ImplRepository_impl : public POA_CORBA::ImplRepository {
     typedef std::list<CORBA::ImplementationDef_ptr> ListImplDef;
     typedef CORBA::ImplRepository::ImplDefSeq ImplDefSeq;
     ListImplDef defs;
+    MICOMT::RWLock defs_lock;
 public:
     ImplRepository_impl ();
     ~ImplRepository_impl ();
