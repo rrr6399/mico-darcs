@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2006 by The Mico Team
+ *  Copyright (c) 1997-2018 by The Mico Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -162,24 +162,7 @@ main (int argc, char *argv[])
 {
     CORBA::Boolean forward_opt = TRUE;
 
-    //
-    // Make sure that we'll run with at most 1 thread
-    // in thread pool - so in fact in single-threaded
-    // mode
-    //
-    char** t_argv = new char*[argc+1+2+1];
-
-    for (int i=0; i<argc; ++i) {
-	t_argv[i] = argv[i];
-    }
-    t_argv[argc++] = CORBA::string_dup("-ORBThreadPool");
-
-    t_argv[argc++] = CORBA::string_dup("-ORBRequestLimit");
-    t_argv[argc++] = CORBA::string_dup("1");
-
-    t_argv[argc] = 0;
-
-    orb = CORBA::ORB_init (argc, t_argv, "mico-local-orb");
+    orb = CORBA::ORB_init (argc, argv, "mico-local-orb");
     CORBA::Object_var obj = orb->resolve_initial_references("RootPOA");
     PortableServer::POA_var poa = PortableServer::POA::_narrow(obj);
     PortableServer::POAManager_var mgr = poa->the_POAManager();
@@ -196,8 +179,8 @@ main (int argc, char *argv[])
     opts["--ior"]     = "arg-expected";
 
     MICOGetOpt opt_parser (opts);
-    if (!opt_parser.parse (argc, t_argv))
-	usage (t_argv[0]);
+    if (!opt_parser.parse (argc, argv))
+	usage (argv[0]);
 
     string reffile;
 
@@ -215,13 +198,13 @@ main (int argc, char *argv[])
 	} else if (arg == "--ior") {
 	    reffile = val;
 	} else if (arg == "--help") {
-	    usage (t_argv[0]);
+	    usage (argv[0]);
 	} else {
-	    usage (t_argv[0]);
+	    usage (argv[0]);
 	}
     }
     if (argc != 1) {
-	usage (t_argv[0]);
+	usage (argv[0]);
     }
 
     /*
