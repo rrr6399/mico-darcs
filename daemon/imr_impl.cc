@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2010 by The Mico Team
+ *  Copyright (c) 1997-2018 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -157,48 +157,56 @@ ImplementationDef_impl::get_str (string &s)
 void
 ImplementationDef_impl::mode (ActivationMode mode)
 {
+    MICOMT::AutoWRLock l(_lock);
     _mode = mode;
 }
 
 CORBA::ImplementationDef::ActivationMode
 ImplementationDef_impl::mode ()
 {
+    MICOMT::AutoRDLock l(_lock);
     return _mode;
 }
 
 void
 ImplementationDef_impl::objs (const ObjectInfoList &objs)
 {
+    MICOMT::AutoWRLock l(_lock);
     _objs = objs;
 }
 
 CORBA::ImplementationDef::ObjectInfoList *
 ImplementationDef_impl::objs ()
 {
+    MICOMT::AutoRDLock l(_lock);
     return new ObjectInfoList (_objs);
 }
 
 char *
 ImplementationDef_impl::name ()
 {
+    MICOMT::AutoRDLock l(_lock);
     return CORBA::string_dup (_name);
 }
 
 void
 ImplementationDef_impl::command (const char *command)
 {
+    MICOMT::AutoWRLock l(_lock);
     _command = command;
 }
 
 char *
 ImplementationDef_impl::command ()
 {
+    MICOMT::AutoRDLock l(_lock);
     return CORBA::string_dup (_command);
 }
 
 char *
 ImplementationDef_impl::tostring ()
 {
+    MICOMT::AutoRDLock l(_lock);
     string s;
     put_str (s, (const char *)_name);
 
@@ -246,7 +254,10 @@ ImplRepository_impl::create (ActivationMode mode, const ObjectInfoList &objs,
 {
     ImplementationDef_impl* serv = new ImplementationDef_impl(mode, objs, name, command);
     CORBA::ImplementationDef_var def = serv->_this();
-    defs.push_back (def);
+    {
+        MICOMT::AutoWRLock l(defs_lock);
+        defs.push_back (def);
+    }
     return CORBA::ImplementationDef::_duplicate (def);
 }
 
@@ -255,13 +266,17 @@ ImplRepository_impl::restore (const char *asstring)
 {
     ImplementationDef_impl* serv = new ImplementationDef_impl(asstring);
     CORBA::ImplementationDef_var def = serv->_this();
-    defs.push_back (def);
+    {
+        MICOMT::AutoWRLock l(defs_lock);
+        defs.push_back (def);
+    }
     return CORBA::ImplementationDef::_duplicate (def);
 }
 
 void
 ImplRepository_impl::destroy (CORBA::ImplementationDef_ptr def)
 {
+    MICOMT::AutoWRLock l(defs_lock);
     for (ListImplDef::iterator i = defs.begin(); i != defs.end(); ++i) {
 	if ((*i)->_is_equivalent (def)) {
 	    CORBA::release (*i);
@@ -275,6 +290,8 @@ CORBA::ImplRepository::ImplDefSeq *
 ImplRepository_impl::find_by_name (const char *name)
 {
     ImplDefSeq *res = new ImplDefSeq;
+
+    MICOMT::AutoRDLock l(defs_lock);
 
     for (ListImplDef::iterator i = defs.begin(); i != defs.end(); ++i) {
 	CORBA::String_var defname = (*i)->name();
@@ -291,6 +308,8 @@ CORBA::ImplRepository::ImplDefSeq *
 ImplRepository_impl::find_by_repoid (const char *repoid)
 {
     ImplDefSeq *res = new ImplDefSeq;
+
+    MICOMT::AutoRDLock l(defs_lock);
 
     for (ListImplDef::iterator i = defs.begin(); i != defs.end(); ++i) {
 	CORBA::ImplementationDef::ObjectInfoList_var objs
@@ -313,6 +332,8 @@ ImplRepository_impl::find_by_repoid_tag (const char *repoid,
 {
     ImplDefSeq *res = new ImplDefSeq;
 
+    MICOMT::AutoRDLock l(defs_lock);
+
     for (ListImplDef::iterator i = defs.begin(); i != defs.end(); ++i) {
 	CORBA::ImplementationDef::ObjectInfoList_var objs
 	    = (*i)->objs();
@@ -333,6 +354,9 @@ CORBA::ImplRepository::ImplDefSeq *
 ImplRepository_impl::find_all ()
 {
     ImplDefSeq *res = new ImplDefSeq;
+
+    MICOMT::AutoRDLock l(defs_lock);
+
     mico_vec_size_type defs_size = defs.size();
     assert(defs_size < UINT_MAX);
     res->length ((CORBA::ULong)defs_size);
