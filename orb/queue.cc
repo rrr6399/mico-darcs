@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2013 by The Mico Team
+ *  Copyright (c) 1997-2018 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -160,6 +160,7 @@ MICO::RequestQueue::~RequestQueue ()
 void
 MICO::RequestQueue::add (ReqQueueRec *r)
 {
+    MICOMT::AutoLock l(_invokes_lock);
     assert(_invokes.size() < INT_MAX);
     _invokes.push_back (r);
 }
@@ -167,6 +168,8 @@ MICO::RequestQueue::add (ReqQueueRec *r)
 void
 MICO::RequestQueue::exec_now ()
 {
+    MICOMT::AutoLock l(_invokes_lock);
+    MICOMT::AutoLock l2(_lock);
     // reissue pending invokes ...
     set<CORBA::ORBMsgId_var, less<CORBA::ORBMsgId_var> > seen;
     while (_invokes.size() > 0) {
@@ -189,6 +192,7 @@ MICO::RequestQueue::exec_now ()
 void
 MICO::RequestQueue::exec_later ()
 {
+    MICOMT::AutoLock l(_invokes_lock);
     // schedule reexecution of pending requests ...
     if (_invokes.size() > 0) {
 	_orb->dispatcher()->remove (this, CORBA::Dispatcher::Timer);
@@ -205,6 +209,7 @@ MICO::RequestQueue::exec_stop ()
 void
 MICO::RequestQueue::fail ()
 {
+    MICOMT::AutoLock l(_invokes_lock);
     // make pending invokes fail ...
     // The int cast is needed for Win64/VC++ 10.0
     int sz = (int)_invokes.size();
@@ -220,6 +225,7 @@ MICO::RequestQueue::fail ()
 void
 MICO::RequestQueue::clear ()
 {
+    MICOMT::AutoLock l(_invokes_lock);
     for (InvokeList::iterator i = _invokes.begin(); i != _invokes.end(); ++i)
 	delete *i;
     _invokes.erase (_invokes.begin(), _invokes.end());
