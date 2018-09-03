@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2013 by The Mico Team
+ *  Copyright (c) 1997-2018 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -111,8 +111,10 @@ private:
     typedef std::list<ReqQueueRec *> InvokeList;
     CORBA::ORBMsgId_var _current_id;
     InvokeList _invokes;
+    MICOMT::Mutex _invokes_lock;
     CORBA::ObjectAdapter *_oa;
     CORBA::ORB_ptr _orb;
+    MICOMT::Mutex _lock;
 public:
     RequestQueue (CORBA::ObjectAdapter *, CORBA::ORB_ptr);
     ~RequestQueue ();
