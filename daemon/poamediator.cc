@@ -75,7 +75,7 @@ POAMediatorImpl::SvInf::SvInf ()
  */
 
 POAMediatorImpl::POAMediatorImpl (CORBA::ORB_ptr _orb, CORBA::Boolean _forward)
-    : svmap_lock_(FALSE, MICOMT::Mutex::Recursive), invqueue (this, _orb), lock_ (FALSE, MICOMT::Mutex::Recursive)
+    : svmap_lock_(FALSE, MICOMT::Mutex::Recursive), requests_lock_(FALSE, MICOMT::Mutex::Recursive), invqueue (this, _orb), lock_ (FALSE, MICOMT::Mutex::Recursive)
 {
   orb = _orb;
   forward = _forward;
