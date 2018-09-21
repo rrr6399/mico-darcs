@@ -212,7 +212,22 @@ main (int argc, char *argv[])
      */
 
     ImplRepository_impl* imr_serv = new ImplRepository_impl;
-    CORBA::Object_var imr = imr_serv->_this();
+    CORBA::Object_var imr = CORBA::Object::_nil();
+    if (thedb.length() == 0) {
+        imr = imr_serv->_this();
+    }
+    else {
+        // using DB hence also providing persistent IOR when the same port is used
+        CORBA::PolicyList pl2;
+        pl2.length(2);
+        pl2[0] = poa->create_lifespan_policy (PortableServer::PERSISTENT);
+        pl2[1] = poa->create_id_assignment_policy (PortableServer::USER_ID);
+        PortableServer::POA_var imrpoa = poa->create_POA ("ImplementationRepository", mgr, pl2);
+        PortableServer::ObjectId_var oid =
+            PortableServer::string_to_ObjectId ("ImplementationRepository");
+        imrpoa->activate_object_with_id (*oid, imr_serv);
+        imr = imrpoa->id_to_reference(oid.in());
+    }
     orb->set_initial_reference ("ImplementationRepository", imr);
     POAMediatorImpl* poa_med = new POAMediatorImpl(orb, forward_opt);
     pmd = poa_med->_this();
