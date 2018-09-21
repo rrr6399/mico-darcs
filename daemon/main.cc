@@ -162,7 +162,25 @@ main (int argc, char *argv[])
 {
     CORBA::Boolean forward_opt = TRUE;
 
-    orb = CORBA::ORB_init (argc, argv, "mico-local-orb");
+    // pass -POAImplName ImplementationRepository just to be sure
+    // it is used when --db is in use.
+    // The usage is purely ascetical just to get nice corbaloc:
+    //    corbaloc::<host>:<port>/ImplementationRepository
+    // instead of
+    //    corbaloc::<host>:<port>/Default/ImplementationRepository/ImplementationRepository
+    char** t_argv = new char*[argc+2+1];
+
+    for (int i=0; i<argc; ++i) {
+        t_argv[i] = argv[i];
+    }
+    t_argv[argc++] = CORBA::string_dup("-POAImplName");
+    t_argv[argc++] = CORBA::string_dup("ImplementationRepository");
+
+    t_argv[argc] = 0;
+
+
+
+    orb = CORBA::ORB_init (argc, t_argv, "mico-local-orb");
     CORBA::Object_var obj = orb->resolve_initial_references("RootPOA");
     PortableServer::POA_var poa = PortableServer::POA::_narrow(obj);
     PortableServer::POAManager_var mgr = poa->the_POAManager();
@@ -179,8 +197,8 @@ main (int argc, char *argv[])
     opts["--ior"]     = "arg-expected";
 
     MICOGetOpt opt_parser (opts);
-    if (!opt_parser.parse (argc, argv))
-	usage (argv[0]);
+    if (!opt_parser.parse (argc, t_argv))
+	usage (t_argv[0]);
 
     string reffile;
 
@@ -198,13 +216,13 @@ main (int argc, char *argv[])
 	} else if (arg == "--ior") {
 	    reffile = val;
 	} else if (arg == "--help") {
-	    usage (argv[0]);
+	    usage (t_argv[0]);
 	} else {
-	    usage (argv[0]);
+	    usage (t_argv[0]);
 	}
     }
     if (argc != 1) {
-	usage (argv[0]);
+	usage (t_argv[0]);
     }
 
     /*
