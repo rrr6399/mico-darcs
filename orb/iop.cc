@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2018 by The Mico Team
+ *  Copyright (c) 1997-2019 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -5249,6 +5249,7 @@ MICO::IIOPServer::IIOPServer (CORBA::ORB_ptr orb, CORBA::UShort iiop_ver,
 #ifdef HAVE_THREADS
     MICOMT::Thread::create_key(target_obj_key_, IIOPServer_cleanup_target_obj);
 #endif // HAVE_THREADS
+    shutdown_in_progress_ = FALSE;
 }
 
 MICO::IIOPServer::~IIOPServer ()
