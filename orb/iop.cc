@@ -3588,8 +3588,11 @@ MICO::IIOPProxy::make_conn (const CORBA::Address *addr,
 #ifdef USE_SL3
 		    CORBA::String_var conn_creds_id = conn->creds_id();
 		    if ((tcpip_creds_id != NULL && strcmp(conn_creds_id.in(), tcpip_creds_id) != 0)
-			|| (tls_creds_id != NULL && strcmp(conn_creds_id.in(), tls_creds_id) != 0))
+                        || (tls_creds_id != NULL && strcmp(conn_creds_id.in(), tls_creds_id) != 0)
+                        || (tcpip_creds_id == NULL && strcmp(conn_creds_id.in(), "") == 0)
+                        || (tls_creds_id == NULL && strcmp(conn_creds_id.in(), "") == 0)) {
 			continue;
+                    }
 #endif // USE_SL3
 #ifdef HAVE_THREADS
 		    // The connection was created and I have it in _conns map
@@ -3612,7 +3615,9 @@ MICO::IIOPProxy::make_conn (const CORBA::Address *addr,
 #ifdef USE_SL3
 	    CORBA::String_var conn_creds_id = conn->creds_id();
 	    if ((tcpip_creds_id != NULL && strcmp(conn_creds_id.in(), tcpip_creds_id) == 0)
-		|| (tls_creds_id != NULL && strcmp(conn_creds_id.in(), tls_creds_id) == 0)) {
+                || (tls_creds_id != NULL && strcmp(conn_creds_id.in(), tls_creds_id) == 0)
+                || (tcpip_creds_id == NULL && strcmp(conn_creds_id.in(), "") == 0)
+                || (tls_creds_id == NULL && strcmp(conn_creds_id.in(), "") == 0)) {
 		// kcg: this is really ugly code.
 #endif // USE_SL3
 #ifdef HAVE_THREADS
