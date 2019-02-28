@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2010 by The Mico Team
+ *  Copyright (c) 1997-2019 by The Mico Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -395,7 +395,7 @@ IDLParser::collectImport (CORBA::Container_ptr con, ParseNode *node)
   node = node->getBranch (1);
 
   assert (node);
-  assert (node->getType() == string_literals ||
+  assert (node->getType() == t_string_literals ||
 	  node->getType() == scoped_name);
 
   CORBA::String_var to_be_imported = CORBA::string_dup (node->getIdent ());
@@ -427,7 +427,7 @@ IDLParser::collectImport (CORBA::Container_ptr con, ParseNode *node)
 
   CORBA::Contained_var icont = CORBA::Contained::_nil ();
 
-  if (node->getType() == string_literals) {
+  if (node->getType() == t_string_literals) {
     if (CORBA::is_nil (myrepo)) {
       cerr << IDLError (36, node, to_be_imported.in()) << endl;
       exit (1);
@@ -1823,7 +1823,7 @@ void
 IDLParser::collectContextExpr( ParseNode *node, CORBA::ContextIdSeq &ctx )
 {
   while( node != NULL ) {
-    assert( node->getType() == string_literals );
+    assert( node->getType() == t_string_literals );
     int i = ctx.length();
     ctx.length( i + 1 );
     ctx[ i ] = (const char *) node->getIdent();

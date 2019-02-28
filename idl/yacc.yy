@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2001 by The Mico Team
+ *  Copyright (c) 1997-2019 by The Mico Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -255,7 +255,7 @@ void yyerror( char *s )
 %type <node>   case
 %type <node>   case_label
 %type <node>   element_spec
-%type <node>   string_literals
+%type <node>   T_string_literals
 %type <_str>   T_string_literal
 %type <_wstr>  T_wstring_literal
 %type <node>   value
@@ -1781,21 +1781,21 @@ raises_expr
 
 /*94*/
 context_expr
-	: T_CONTEXT T_LEFT_PARANTHESIS string_literals T_RIGHT_PARANTHESIS
+	: T_CONTEXT T_LEFT_PARANTHESIS T_string_literals T_RIGHT_PARANTHESIS
           {
 	    $$ = $3;
 	  }
 	;
 
-string_literals
+T_string_literals
 	: T_string_literal
           {
-	    $$ = new ParseNode( string_literals );
+	    $$ = new ParseNode( t_string_literals );
 	    $$->setIdent( $1 );
 	  }
-	| T_string_literal T_COMMA string_literals
+	| T_string_literal T_COMMA T_string_literals
           {
-	    $$ = new ParseNode( string_literals, $3 );
+	    $$ = new ParseNode( t_string_literals, $3 );
 	    $$->setIdent( $1 );
 	  }
 	;
@@ -1917,7 +1917,7 @@ imported_scope
 	: scoped_name
 	| T_string_literal
 	  {
-	    $$ = new ParseNode (string_literals);
+	    $$ = new ParseNode (t_string_literals);
 	    $$->setIdent ($1);
 	  }
 	;
