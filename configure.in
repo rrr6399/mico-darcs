@@ -1,6 +1,6 @@
 #
 #  MICO --- an Open Source CORBA implementation
-#  Copyright (c) 1997-2018 by The Mico Team
+#  Copyright (c) 1997-2019 by The Mico Team
 #
 #  This library is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Library General Public
@@ -722,7 +722,7 @@ if test X"$GXX" = Xyes; then
       # we need to avoid 4.0.x but still support 4.4.0
       *4.0.0*|*4.0.1*|*4.0.2*|*4.0.3*|*4.0.4*)
         ;;
-      *4.*.*|*5.*.*|*6.*.*)
+      *4.*.*|*5.*.*|*6.*.*|*7.*.*|*8.*.*)
         GCC_STRICT_ALIASING="yes"
         ;;
       *)
