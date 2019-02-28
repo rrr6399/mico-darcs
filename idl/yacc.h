@@ -1,12 +1,13 @@
-/* A Bison parser, made from yacc.yy, by GNU bison 1.75.  */
+/* A Bison parser, made by GNU Bison 3.0.4.  */
 
-/* Skeleton parser for Yacc-like parsing with Bison,
-   Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002 Free Software Foundation, Inc.
+/* Bison interface for Yacc-like parsers in C
 
-   This program is free software; you can redistribute it and/or modify
+   Copyright (C) 1984, 1989-1990, 2000-2015 Free Software Foundation, Inc.
+
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,126 +15,139 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place - Suite 330,
-   Boston, MA 02111-1307, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
-/* As a special exception, when this file is copied by Bison into a
-   Bison output file, you may use that output file without restriction.
-   This special exception was added by the Free Software Foundation
-   in version 1.24 of Bison.  */
+/* As a special exception, you may create a larger work that contains
+   part or all of the Bison parser skeleton and distribute that work
+   under terms of your choice, so long as that work isn't itself a
+   parser generator using the skeleton or a modified version thereof
+   as a parser skeleton.  Alternatively, if you modify or redistribute
+   the parser skeleton itself, you may (at your option) remove this
+   special exception, which will cause the skeleton and the resulting
+   Bison output files to be licensed under the GNU General Public
+   License without this special exception.
 
-#ifndef BISON_YACC_H
-# define BISON_YACC_H
+   This special exception was added by the Free Software Foundation in
+   version 2.2 of Bison.  */
 
-/* Tokens.  */
+#ifndef YY_YY_YACC_H_INCLUDED
+# define YY_YY_YACC_H_INCLUDED
+/* Debug traces.  */
+#ifndef YYDEBUG
+# define YYDEBUG 1
+#endif
+#if YYDEBUG
+extern int yydebug;
+#endif
+
+/* Token type.  */
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
-   /* Put the tokens into the symbol table, so that GDB and other debuggers
-      know about them.  */
-   enum yytokentype {
-     T_AMPERSAND = 258,
-     T_ANY = 259,
-     T_ASTERISK = 260,
-     T_ATTRIBUTE = 261,
-     T_BOOLEAN = 262,
-     T_CASE = 263,
-     T_CHAR = 264,
-     T_CHARACTER_LITERAL = 265,
-     T_WCHARACTER_LITERAL = 266,
-     T_CIRCUMFLEX = 267,
-     T_COLON = 268,
-     T_COMMA = 269,
-     T_CONST = 270,
-     T_CONTEXT = 271,
-     T_DEFAULT = 272,
-     T_DOUBLE = 273,
-     T_ENUM = 274,
-     T_EQUAL = 275,
-     T_EXCEPTION = 276,
-     T_FALSE = 277,
-     T_FIXED = 278,
-     T_FIXED_PT_LITERAL = 279,
-     T_FLOAT = 280,
-     T_FLOATING_PT_LITERAL = 281,
-     T_GREATER_THAN_SIGN = 282,
-     T_IDENTIFIER = 283,
-     T_IN = 284,
-     T_INOUT = 285,
-     T_INTEGER_LITERAL = 286,
-     T_INTERFACE = 287,
-     T_LEFT_CURLY_BRACKET = 288,
-     T_LEFT_PARANTHESIS = 289,
-     T_LEFT_SQUARE_BRACKET = 290,
-     T_LESS_THAN_SIGN = 291,
-     T_LONG = 292,
-     T_MINUS_SIGN = 293,
-     T_MODULE = 294,
-     T_OCTET = 295,
-     T_ONEWAY = 296,
-     T_OUT = 297,
-     T_PERCENT_SIGN = 298,
-     T_PLUS_SIGN = 299,
-     T_RAISES = 300,
-     T_READONLY = 301,
-     T_RIGHT_CURLY_BRACKET = 302,
-     T_RIGHT_PARANTHESIS = 303,
-     T_RIGHT_SQUARE_BRACKET = 304,
-     T_SCOPE = 305,
-     T_SEMICOLON = 306,
-     T_SEQUENCE = 307,
-     T_SHIFTLEFT = 308,
-     T_SHIFTRIGHT = 309,
-     T_SHORT = 310,
-     T_SOLIDUS = 311,
-     T_STRING = 312,
-     T_STRING_LITERAL = 313,
-     T_WSTRING_LITERAL = 314,
-     T_PRAGMA = 315,
-     T_INCLUDE = 316,
-     T_STRUCT = 317,
-     T_SWITCH = 318,
-     T_TILDE = 319,
-     T_TRUE = 320,
-     T_OBJECT = 321,
-     T_TYPEDEF = 322,
-     T_UNION = 323,
-     T_UNSIGNED = 324,
-     T_VERTICAL_LINE = 325,
-     T_VOID = 326,
-     T_WCHAR = 327,
-     T_WSTRING = 328,
-     T_UNKNOWN = 329,
-     T_ABSTRACT = 330,
-     T_VALUETYPE = 331,
-     T_TRUNCATABLE = 332,
-     T_SUPPORTS = 333,
-     T_CUSTOM = 334,
-     T_PUBLIC = 335,
-     T_PRIVATE = 336,
-     T_FACTORY = 337,
-     T_NATIVE = 338,
-     T_VALUEBASE = 339,
-     T_IMPORT = 340,
-     T_TYPEID = 341,
-     T_TYPEPREFIX = 342,
-     T_GETRAISES = 343,
-     T_SETRAISES = 344,
-     T_LOCAL = 345,
-     T_COMPONENT = 346,
-     T_PROVIDES = 347,
-     T_USES = 348,
-     T_MULTIPLE = 349,
-     T_EMITS = 350,
-     T_PUBLISHES = 351,
-     T_CONSUMES = 352,
-     T_HOME = 353,
-     T_MANAGES = 354,
-     T_PRIMARYKEY = 355,
-     T_FINDER = 356,
-     T_EVENTTYPE = 357
-   };
+  enum yytokentype
+  {
+    T_AMPERSAND = 258,
+    T_ANY = 259,
+    T_ASTERISK = 260,
+    T_ATTRIBUTE = 261,
+    T_BOOLEAN = 262,
+    T_CASE = 263,
+    T_CHAR = 264,
+    T_CHARACTER_LITERAL = 265,
+    T_WCHARACTER_LITERAL = 266,
+    T_CIRCUMFLEX = 267,
+    T_COLON = 268,
+    T_COMMA = 269,
+    T_CONST = 270,
+    T_CONTEXT = 271,
+    T_DEFAULT = 272,
+    T_DOUBLE = 273,
+    T_ENUM = 274,
+    T_EQUAL = 275,
+    T_EXCEPTION = 276,
+    T_FALSE = 277,
+    T_FIXED = 278,
+    T_FIXED_PT_LITERAL = 279,
+    T_FLOAT = 280,
+    T_FLOATING_PT_LITERAL = 281,
+    T_GREATER_THAN_SIGN = 282,
+    T_IDENTIFIER = 283,
+    T_IN = 284,
+    T_INOUT = 285,
+    T_INTEGER_LITERAL = 286,
+    T_INTERFACE = 287,
+    T_LEFT_CURLY_BRACKET = 288,
+    T_LEFT_PARANTHESIS = 289,
+    T_LEFT_SQUARE_BRACKET = 290,
+    T_LESS_THAN_SIGN = 291,
+    T_LONG = 292,
+    T_MINUS_SIGN = 293,
+    T_MODULE = 294,
+    T_OCTET = 295,
+    T_ONEWAY = 296,
+    T_OUT = 297,
+    T_PERCENT_SIGN = 298,
+    T_PLUS_SIGN = 299,
+    T_RAISES = 300,
+    T_READONLY = 301,
+    T_RIGHT_CURLY_BRACKET = 302,
+    T_RIGHT_PARANTHESIS = 303,
+    T_RIGHT_SQUARE_BRACKET = 304,
+    T_SCOPE = 305,
+    T_SEMICOLON = 306,
+    T_SEQUENCE = 307,
+    T_SHIFTLEFT = 308,
+    T_SHIFTRIGHT = 309,
+    T_SHORT = 310,
+    T_SOLIDUS = 311,
+    T_STRING = 312,
+    T_STRING_LITERAL = 313,
+    T_WSTRING_LITERAL = 314,
+    T_PRAGMA = 315,
+    T_INCLUDE = 316,
+    T_STRUCT = 317,
+    T_SWITCH = 318,
+    T_TILDE = 319,
+    T_TRUE = 320,
+    T_OBJECT = 321,
+    T_TYPEDEF = 322,
+    T_UNION = 323,
+    T_UNSIGNED = 324,
+    T_VERTICAL_LINE = 325,
+    T_VOID = 326,
+    T_WCHAR = 327,
+    T_WSTRING = 328,
+    T_UNKNOWN = 329,
+    T_ABSTRACT = 330,
+    T_VALUETYPE = 331,
+    T_TRUNCATABLE = 332,
+    T_SUPPORTS = 333,
+    T_CUSTOM = 334,
+    T_PUBLIC = 335,
+    T_PRIVATE = 336,
+    T_FACTORY = 337,
+    T_NATIVE = 338,
+    T_VALUEBASE = 339,
+    T_IMPORT = 340,
+    T_TYPEID = 341,
+    T_TYPEPREFIX = 342,
+    T_GETRAISES = 343,
+    T_SETRAISES = 344,
+    T_LOCAL = 345,
+    T_COMPONENT = 346,
+    T_PROVIDES = 347,
+    T_USES = 348,
+    T_MULTIPLE = 349,
+    T_EMITS = 350,
+    T_PUBLISHES = 351,
+    T_CONSUMES = 352,
+    T_HOME = 353,
+    T_MANAGES = 354,
+    T_PRIMARYKEY = 355,
+    T_FINDER = 356,
+    T_EVENTTYPE = 357
+  };
 #endif
+/* Tokens.  */
 #define T_AMPERSAND 258
 #define T_ANY 259
 #define T_ASTERISK 260
@@ -235,12 +249,13 @@
 #define T_FINDER 356
 #define T_EVENTTYPE 357
 
+/* Value type.  */
+#if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 
+union YYSTYPE
+{
+#line 56 "yacc.yy" /* yacc.c:1909  */
 
-
-#ifndef YYSTYPE
-#line 56 "yacc.yy"
-typedef union {
   char              *ident;
   ParseNode         *node;
   CORBA::ULongLong  _int;
@@ -250,14 +265,18 @@ typedef union {
   CORBA::WChar      _wchar;
   CORBA::LongDouble _float;
   CORBA::LongDouble _fixed;
-} yystype;
-/* Line 1281 of /home/karel/usr/local/bison-1.75/share/bison/yacc.c.  */
-#line 256 "yacc.h"
-# define YYSTYPE yystype
+
+#line 270 "yacc.h" /* yacc.c:1909  */
+};
+
+typedef union YYSTYPE YYSTYPE;
+# define YYSTYPE_IS_TRIVIAL 1
+# define YYSTYPE_IS_DECLARED 1
 #endif
+
 
 extern YYSTYPE yylval;
 
+int yyparse (void);
 
-#endif /* not BISON_YACC_H */
-
+#endif /* !YY_YY_YACC_H_INCLUDED  */
