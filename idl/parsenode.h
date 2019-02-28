@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2010 by The Mico Team
+ *  Copyright (c) 1997-2019 by The Mico Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -121,7 +121,7 @@ typedef enum
   t_default,
   element_spec,
   enum_case_label,
-  string_literals,
+  t_string_literals,
   t_pragma,
   t_include,
   t_long_double,

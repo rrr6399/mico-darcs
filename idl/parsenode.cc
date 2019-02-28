@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2010 by The Mico Team
+ *  Copyright (c) 1997-2019 by The Mico Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -124,7 +124,7 @@ static ParseNodeDoc parseNodeDoc[] = {
   { "t_default", 0 },
   { "element_spec", 0 },
   { "enum_case_label", 1 },
-  { "string_literals", 1 },
+  { "t_string_literals", 1 },
   { "t_pragma", 1 },
   { "t_include", 1 },
   { "t_long_double", 0 },
