@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2018 by The Mico Team
+ *  Copyright (c) 1997-2019 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -168,23 +168,33 @@ MICO::RequestQueue::add (ReqQueueRec *r)
 void
 MICO::RequestQueue::exec_now ()
 {
-    MICOMT::AutoLock l(_invokes_lock);
-    MICOMT::AutoLock l2(_lock);
-    // reissue pending invokes ...
-    set<CORBA::ORBMsgId_var, less<CORBA::ORBMsgId_var> > seen;
-    while (_invokes.size() > 0) {
-	ReqQueueRec *inv = _invokes.front();
-        _current_id = inv->id();
-	if (seen.count (_current_id))
-	    break;
-	seen.insert (_current_id);
-        _invokes.pop_front();
+    CORBA::Boolean again = TRUE;
+    while (again) {
+        set<CORBA::ORBMsgId_var, less<CORBA::ORBMsgId_var> > seen;
+        ReqQueueRec *inv = NULL;
+        {
+            MICOMT::AutoLock l(_invokes_lock);
+            MICOMT::AutoLock l2(_lock);
+            // reissue pending invokes ...
+            again = FALSE;
+            while (_invokes.size() > 0) {
+                again = TRUE;
+                inv = _invokes.front();
+                _current_id = CORBA::ORBInvokeRec::_duplicate(inv->id());
+                if (seen.count (_current_id))
+                    break;
+                seen.insert (CORBA::ORBInvokeRec::_duplicate(_current_id));
+                _invokes.pop_front();
+            }
+        }
         /*
          * if invoke cannot be executed yet mediator will install
          * new ReqQueueRec ...
          */
-	inv->exec (_oa, _orb);
-	delete inv;
+        if (inv != NULL) {
+            inv->exec (_oa, _orb);
+            delete inv;
+        }
     }
     _current_id = CORBA::ORBInvokeRec::_nil();
 }
