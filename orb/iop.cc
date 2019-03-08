@@ -5132,6 +5132,9 @@ MICO::IIOPServerInvokeRec::IIOPServerInvokeRec ()
     _obj = 0;
     _pr = 0;
     _orbid = CORBA::ORBInvokeRec::_nil();
+    _orbmsgid = -1;
+    _reqid = -1;
+    _active = FALSE;
 }
 
 
@@ -5156,6 +5159,8 @@ MICO::IIOPServerInvokeRec::free ()
     _obj = 0;
     _pr = 0;
     _orbid = CORBA::ORBInvokeRec::_nil();
+    _orbmsgid = -1;
+    _reqid = -1;
     _active = FALSE;
 }
 
