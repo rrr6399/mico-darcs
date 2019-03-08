@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2018 by The Mico Team
+ *  Copyright (c) 1997-2019 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -2752,15 +2752,17 @@ CORBA::ORB::invoke_async (Object_ptr obj,
         this->initialize_threading();
     }
 
-    stack<CORBA::ORBInvokeRec_var>* invs = static_cast<stack<CORBA::ORBInvokeRec_var>*>
-	(MICOMT::Thread::get_specific(_current_rec_key));
-    if (invs == NULL) {
-	invs = new stack<CORBA::ORBInvokeRec_var>;
-	invs->push(ORBInvokeRec::_duplicate(rec));
-	MICOMT::Thread::set_specific(_current_rec_key, invs);
-    }
-    else {
-	invs->push(ORBInvokeRec::_duplicate(rec));
+    if (use_current_inv_stack_) {
+        stack<CORBA::ORBInvokeRec_var>* invs = static_cast<stack<CORBA::ORBInvokeRec_var>*>
+            (MICOMT::Thread::get_specific(_current_rec_key));
+        if (invs == NULL) {
+            invs = new stack<CORBA::ORBInvokeRec_var>;
+            invs->push(ORBInvokeRec::_duplicate(rec));
+            MICOMT::Thread::set_specific(_current_rec_key, invs);
+        }
+        else {
+            invs->push(ORBInvokeRec::_duplicate(rec));
+        }
     }
 
 #endif // HAVE_THREADS
@@ -2817,10 +2819,12 @@ CORBA::ORB::invoke_async (Object_ptr obj,
 	        _currentid.pop();
             }
 #else // HAVE_THREADS
-            stack<CORBA::ORBInvokeRec_var>* invs = static_cast<stack<CORBA::ORBInvokeRec_var>*>
-	        (MICOMT::Thread::get_specific(_current_rec_key));
-            if (invs != NULL && !invs->empty()) {
-	        invs->pop();
+            if (use_current_inv_stack_) {
+                stack<CORBA::ORBInvokeRec_var>* invs = static_cast<stack<CORBA::ORBInvokeRec_var>*>
+                    (MICOMT::Thread::get_specific(_current_rec_key));
+                if (invs != NULL && !invs->empty()) {
+                    invs->pop();
+                }
             }
 #endif // HAVE_THREADS
 #ifdef USE_SL3
@@ -3008,11 +3012,13 @@ CORBA::ORB::cancel (MsgId id)
 	    _currentid.pop();
 	}
 #else // HAVE_THREADS
-	stack<CORBA::ORBInvokeRec_var>* invs = static_cast<stack<CORBA::ORBInvokeRec_var>*>
-	    (MICOMT::Thread::get_specific(_current_rec_key));
-	if (invs != NULL && !invs->empty()) {
-	    invs->pop();
-	}
+        if (use_current_inv_stack_) {
+            stack<CORBA::ORBInvokeRec_var>* invs = static_cast<stack<CORBA::ORBInvokeRec_var>*>
+                (MICOMT::Thread::get_specific(_current_rec_key));
+            if (invs != NULL && !invs->empty()) {
+                invs->pop();
+            }
+        }
 #endif // HAVE_THREADS
     }
 }
@@ -3168,10 +3174,12 @@ CORBA::ORB::get_invoke_reply (ORBMsgId id, Object_out obj, ORBRequest *&r,
 	_currentid.pop();
     }
 #else // HAVE_THREADS
-    stack<CORBA::ORBInvokeRec_var>* invs = static_cast<stack<CORBA::ORBInvokeRec_var>*>
-	(MICOMT::Thread::get_specific(_current_rec_key));
-    if (invs != NULL && !invs->empty()) {
-	invs->pop();
+    if (use_current_inv_stack_) {
+        stack<CORBA::ORBInvokeRec_var>* invs = static_cast<stack<CORBA::ORBInvokeRec_var>*>
+            (MICOMT::Thread::get_specific(_current_rec_key));
+        if (invs != NULL && !invs->empty()) {
+            invs->pop();
+        }
     }
 #endif // HAVE_THREADS
     return state;
@@ -3612,6 +3620,7 @@ CORBA::ORB_init (int &argc, char **argv, const char *_id)
     Boolean thread_pool = FALSE;
     Boolean thread_per_connection = TRUE;
     ClientConcurrencyModel client_concurrency_model = THREADED;
+    Boolean use_current_inv_stack = TRUE;
 #endif // HAVE_THREADS
 #ifdef MTDEBUG
     __mtdebug_init ();
@@ -3698,6 +3707,7 @@ CORBA::ORB_init (int &argc, char **argv, const char *_id)
     opts["-ORBClientReactive"] = "";
     opts["-ORBClientThreaded"] = "";
     opts["-ORBClientThreadedBlocking"] = "";
+    opts["-ORBNoCurrentInvStack"] = "";
 #ifdef HAVE_POLL_H
     opts["-ORBUsePoll"]       = "";
 #endif // HAVE_POLL_H
@@ -3813,6 +3823,8 @@ CORBA::ORB_init (int &argc, char **argv, const char *_id)
             client_concurrency_model = THREADED;
         } else if (arg == "-ORBClientThreadedBlocking") {
             client_concurrency_model = BLOCKING_THREADED;
+        } else if (arg == "-ORBNoCurrentInvStack") {
+            use_current_inv_stack = FALSE;
         }
 #endif // HAVE_THREADS
 #ifdef USE_CSIV2
@@ -4000,6 +4012,7 @@ CORBA::ORB_init (int &argc, char **argv, const char *_id)
     }
     MICO::MTManager::client_concurrency_model(client_concurrency_model);
     MICO::MTManager::thread_setup (conn_limit, request_limit);
+    orb_instance->set_use_current_inv_stack(use_current_inv_stack);
 #endif
 
     // interceptors

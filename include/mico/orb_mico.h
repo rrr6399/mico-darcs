@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2018 by The Mico Team
+ *  Copyright (c) 1997-2019 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -285,6 +285,7 @@ private:
     std::stack<MsgId> _currentid;
 #else // HAVE_THREADS
     MICOMT::Thread::ThreadKey _current_rec_key;
+    CORBA::Boolean use_current_inv_stack_;
     MICOMT::Mutex run_lock_;
     MICOMT::Thread::ThreadID main_thread_id_;
     MICOMT::Mutex shutdown_lock_;
@@ -347,6 +348,8 @@ public:
     void
     set_main_thread_id(MICOMT::Thread::ThreadID id)
     { main_thread_id_ = id; }
+    void set_use_current_inv_stack(CORBA::Boolean value)
+    { use_current_inv_stack_ = value; }
 #endif // HAVE_THREADS
     typedef IfaceSequenceTmpl<Request_var,Request_ptr> RequestSeq;
     typedef TSeqVar<RequestSeq> RequestSeq_var;
