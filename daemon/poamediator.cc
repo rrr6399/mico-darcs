@@ -703,7 +703,8 @@ POAMediatorImpl::bind (CORBA::ORBMsgId id, const char *repoid,
 
     count++;
 
-    SvInf &inf = svmap[ims[i]->name()];
+    CORBA::String_var sname = ims[i]->name();
+    SvInf &inf = svmap[sname.in()];
 
     MICOMT::AutoLock l2(inf.lock);
 
