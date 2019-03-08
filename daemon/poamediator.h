@@ -2,7 +2,7 @@
 /*
  *  MICO --- an Open Source CORBA implementation
  *  Copyright (C) 1998 Frank Pilhofer
- *  Copyright (c) 1999-2018 by The Mico Team
+ *  Copyright (c) 1999-2019 by The Mico Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -55,8 +55,13 @@ private:
     MICOMT::Mutex lock;
   };
 
+  template <class T> struct ORBMsgIdComparator : std::binary_function<T, T, bool> {
+      bool operator() (const T& x, const T& y) const
+      { return x->id() < y->id(); }
+  };
+
   typedef std::map<std::string, SvInf, std::less<std::string> > MapSvInf;
-  typedef std::map<CORBA::ORBMsgId, CORBA::ORBMsgId, std::less<CORBA::ORBMsgId> > MapIdId;
+  typedef std::map<CORBA::ORBMsgId_var, CORBA::ORBMsgId_var, ORBMsgIdComparator<CORBA::ORBMsgId_var> > MapIdId;
 
   MapSvInf svmap;
   MICOMT::Mutex svmap_lock_;
