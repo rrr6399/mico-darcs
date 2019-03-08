@@ -1,7 +1,7 @@
 /*
  *  MICO --- an Open Source CORBA implementation
  *  Copyright (C) 1998 Frank Pilhofer
- *  Copyright (c) 1999-2018 by The Mico Team
+ *  Copyright (c) 1999-2019 by The Mico Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -657,12 +657,12 @@ POAMediatorImpl::invoke (CORBA::ORBMsgId id, CORBA::Object_ptr obj,
   /*
    * do the invocation (on the remote object)
    */
-
-  CORBA::ORBMsgId orbid = orb->new_orbid (orb->new_msgid());
+  CORBA::ORBMsgId_var orbid = orb->new_orbid (orb->new_msgid());
 
   if (response_exp) {
     MICOMT::AutoLock lr(requests_lock_);
-    requests[orbid] = id;
+    assert(requests.count(orbid) == 0);
+    requests[orbid] = CORBA::ORBInvokeRec::_duplicate(id);
   }
 
   orb->invoke_async (remote_ref, req, pr, response_exp, this, orbid);
@@ -743,15 +743,17 @@ POAMediatorImpl::bind (CORBA::ORBMsgId id, const char *repoid,
    * not.
    */
 
-  vector<CORBA::ORBMsgId> msgids;
+  vector<CORBA::ORBMsgId_var> msgids;
   for (it = svmap.begin(); it != svmap.end(); it++) {
     MICOMT::AutoLock l2((*it).second.lock);
     if ((*it).second.pstate != Active) {
       continue;
     }
     msgids.push_back (orb->new_orbid (orb->new_msgid()));
-    MICOMT::AutoLock l3(requests_lock_);
-    requests[msgids.back()] = id;
+    {
+        MICOMT::AutoLock l3(requests_lock_);
+        requests[msgids.back()] = CORBA::ORBInvokeRec::_duplicate(id);
+    }
   }
 
   /*
@@ -937,7 +939,7 @@ POAMediatorImpl::notify (CORBA::ORB_ptr porb, CORBA::ORBMsgId id,
       MapIdId::iterator i = requests.find (id);
       assert (i != requests.end());
 
-      CORBA::ORBMsgId id2 = (*i).second;
+      CORBA::ORBInvokeRec_var id2 = CORBA::ORBInvokeRec::_duplicate((*i).second);
       requests.erase (i);
 
       if (stat == CORBA::LocateHere) {
