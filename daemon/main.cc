@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2018 by The Mico Team
+ *  Copyright (c) 1997-2019 by The Mico Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -168,14 +168,19 @@ main (int argc, char *argv[])
     //    corbaloc::<host>:<port>/ImplementationRepository
     // instead of
     //    corbaloc::<host>:<port>/Default/ImplementationRepository/ImplementationRepository
-    char** t_argv = new char*[argc+2+1];
+    char** t_argv = new char*[argc+2+1+1];
 
     for (int i=0; i<argc; ++i) {
         t_argv[i] = argv[i];
     }
     t_argv[argc++] = CORBA::string_dup("-POAImplName");
     t_argv[argc++] = CORBA::string_dup("ImplementationRepository");
-
+    // we can't use current invocation stack on micod. micod acts as a
+    // proxy or may and this causes troubles (memory leaks) with
+    // current implementation of the current invocation stack. Besides
+    // this, current invocation stack is not needed on micod so far
+    // unless someone needs it, it's better to be disabled.
+    t_argv[argc++] = CORBA::string_dup("-ORBNoCurrentInvStack");
     t_argv[argc] = 0;
 
 
