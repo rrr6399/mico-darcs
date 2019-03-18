@@ -169,22 +169,24 @@ void
 MICO::RequestQueue::exec_now ()
 {
     CORBA::Boolean again = TRUE;
+    set<CORBA::ORBMsgId_var, ORBMsgIdComparator<CORBA::ORBMsgId_var> > seen;
     while (again) {
-        set<CORBA::ORBMsgId_var, less<CORBA::ORBMsgId_var> > seen;
         ReqQueueRec *inv = NULL;
         {
             MICOMT::AutoLock l(_invokes_lock);
             MICOMT::AutoLock l2(_lock);
-            // reissue pending invokes ...
             again = FALSE;
-            while (_invokes.size() > 0) {
+            //while (_invokes.size() > 0) {
+            if (_invokes.size() > 0) {
                 again = TRUE;
+                // reissue pending invokes ...
                 inv = _invokes.front();
                 _current_id = CORBA::ORBInvokeRec::_duplicate(inv->id());
-                if (seen.count (_current_id))
-                    break;
-                seen.insert (CORBA::ORBInvokeRec::_duplicate(_current_id));
                 _invokes.pop_front();
+                if (seen.count (_current_id)) {
+                    continue;
+                }
+                seen.insert (CORBA::ORBInvokeRec::_duplicate(_current_id));
             }
         }
         /*
@@ -193,6 +195,7 @@ MICO::RequestQueue::exec_now ()
          */
         if (inv != NULL) {
             inv->exec (_oa, _orb);
+            _current_id = CORBA::ORBInvokeRec::_nil();
             delete inv;
         }
     }
