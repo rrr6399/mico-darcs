@@ -108,6 +108,10 @@ class RequestQueue : public CORBA::DispatcherCallback {
 public:
     typedef CORBA::ULong MsgId;
 private:
+    template <class T> struct ORBMsgIdComparator : std::binary_function<T, T, bool> {
+        bool operator() (const T& x, const T& y) const
+        { return x->id() < y->id(); }
+    };
     typedef std::list<ReqQueueRec *> InvokeList;
     CORBA::ORBMsgId_var _current_id;
     InvokeList _invokes;
