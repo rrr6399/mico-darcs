@@ -98,10 +98,10 @@ try {
     method = argv[2];
     cout << "binding: " << s << endl;
     if (s == "bind") {
-	cerr << "binding..." << endl;
+	cout << "binding..." << endl;
 	CORBA::Object_ptr obj = orb->bind ("IDL:bench:1.0");
 	bench = bench::_narrow (obj);
-	cerr << "binded." << endl;
+	cout << "binded." << endl;
     }
     else if (s == "ior") {
 	string ior;
@@ -242,6 +242,7 @@ try {
     bench->shutdown();
     orb->shutdown(TRUE);
     orb->destroy();
+    cout << "client: finished." << endl;
 }
 catch (const CORBA::Exception& ex) {
     ex._print(cerr);

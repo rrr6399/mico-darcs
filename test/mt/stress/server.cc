@@ -51,23 +51,31 @@ main (int argc, char* argv[])
     CORBA::Object_ptr obj = orb->resolve_initial_references ("RootPOA");
     PortableServer::POA_ptr poa = PortableServer::POA::_narrow (obj);
     CORBA::release (obj);
+    PortableServer::POAManager_ptr manager = poa->the_POAManager ();
+
+    CORBA::PolicyList pl2;
+    pl2.length(2);
+    pl2[0] = poa->create_lifespan_policy (PortableServer::PERSISTENT);
+    pl2[1] = poa->create_id_assignment_policy (PortableServer::USER_ID);
+    PortableServer::POA_var benchpoa = poa->create_POA ("bench", manager, pl2);
 
     bench_impl* servant = new bench_impl;
+    PortableServer::ObjectId_var oid =
+        PortableServer::string_to_ObjectId ("bench");
+    benchpoa->activate_object_with_id (*oid, servant);
 
-    poa->activate_object (servant);
-    CORBA::Object_ptr ref = poa->servant_to_reference (servant);
-  
+    CORBA::Object_ptr ref = benchpoa->servant_to_reference (servant);  
     CORBA::String_var ior = orb->object_to_string (ref);
     cout << ior << endl;
 
     CORBA::release (ref);
 
-    PortableServer::POAManager_ptr manager = poa->the_POAManager ();
     manager->activate ();
 
     orb->run ();
 
     CORBA::release (manager);
+    CORBA::release (benchpoa);
     CORBA::release (poa);
     CORBA::release (orb);
 
