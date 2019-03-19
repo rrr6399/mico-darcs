@@ -1,0 +1,9 @@
+#!/bin/sh
+ADDR=inet:localhost:7788
+#micod --dont-forward --ior ref -ORBIIOPAddr $ADDR &
+micod --ior ref -ORBIIOPAddr $ADDR &
+sleep 2
+imr -ORBImplRepoIOR file://`pwd`/ref create bench poa `pwd`/server IDL:bench:1.0
+imr -ORBImplRepoIOR file://`pwd`/ref activate bench
+echo "Waiting..."
+wait

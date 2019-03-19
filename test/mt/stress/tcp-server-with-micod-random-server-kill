@@ -1,0 +1,18 @@
+#!/bin/sh
+ADDR=inet:localhost:7788
+micod --ior ref -ORBIIOPAddr $ADDR &
+sleep 2
+imr -ORBImplRepoIOR file://`pwd`/ref create bench poa `pwd`/server IDL:bench:1.0
+imr -ORBImplRepoIOR file://`pwd`/ref activate bench
+
+sleep 1
+for ((i=0; i<1000; i++))
+do
+  echo "$i. cycle..."
+  TM=$(( ( RANDOM % 10 ) + 5 ))
+  echo "Sleeping for $TM seconds."
+  sleep $TM
+  echo "Killing all servers."
+  killall server
+done
+
