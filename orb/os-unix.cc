@@ -69,6 +69,7 @@ MICO_LongDouble OSMath::_long_notanumber = 0;
 /**************************** UnixProcess *****************************/
 
 
+#ifndef HAVE_THREADS
 namespace MICO {
   MICO::UnixProcess::ListProcess UnixProcess::_procs;
 }
@@ -104,19 +105,26 @@ MICO::UnixProcess::signal_handler (int sig)
     }
     ::signal (SIGCHLD, signal_handler);
 }
+#endif // HAVE_THREADS
 
 MICO::UnixProcess::UnixProcess (const char *cmd, MICO::ProcessCallback *cb)
+#ifdef HAVE_THREADS
+    : MICOMT::Thread(MICOMT::Thread::NotDetached)
+#endif
 {
     _exit_status = -1;
     _pid = 0;
     _detached = FALSE;
     _cb = cb;
+#ifndef HAVE_THREADS
     _procs.push_back (this);
+#endif // HAVE_THREADS
     _args = cmd;
 }
 
 MICO::UnixProcess::~UnixProcess ()
 {
+#ifndef HAVE_THREADS
     for (ListProcess::iterator pos = _procs.begin(); pos != _procs.end(); ++pos) {
 	if (*pos == this) {
 	    _procs.erase (pos);
@@ -125,13 +133,18 @@ MICO::UnixProcess::~UnixProcess ()
 	    return;
 	}
     }
-    assert (0);
+#endif // HAVE_THREADS
+    if (!_detached && !exited())
+        terminate ();
+    return;
 }
 
 CORBA::Boolean
 MICO::UnixProcess::run ()
 {
+#ifndef HAVE_THREADS
     ::signal (SIGCHLD, signal_handler);
+#endif // HAVE_THREADS
     string command;
 #ifndef __CYGWIN32__
     // with Cygwin32 using "exec" doesnt work for some strange reason
@@ -153,8 +166,42 @@ MICO::UnixProcess::run ()
 	::execl ("/bin/sh", "/bin/sh", "-c", cmd, NULL);
 	exit (1);
     }
+#ifdef HAVE_THREADS
+    if (_pid > 0 && _cb != NULL) {
+        // thread will wait for child exit and then signals it
+        this->start();
+    }
+#endif // HAVE_THREADS
     return _pid > 0;
 }
+
+#ifdef HAVE_THREADS
+void
+MICO::UnixProcess::_run(void* arg)
+{
+    int status;
+    while (42) {
+        int pid = waitpid(_pid, &status, 0);
+        if (pid < 0 && errno == EINTR)
+            continue;
+	if (pid <= 0)
+	    break;
+        if (WIFEXITED ((status))) {
+            _exit_status = WEXITSTATUS ((status));
+        }
+        else if (WIFSIGNALED ((status))) {
+            _exit_status = WTERMSIG ((status));
+        }
+        else {
+            _exit_status = 1000;
+        }
+        if (_cb) {
+            _cb->callback(this, MICO::ProcessCallback::Exited);
+        }
+        break;
+    }
+}
+#endif // HAVE_THREADS
 
 CORBA::Boolean
 MICO::UnixProcess::exited ()
@@ -187,6 +234,7 @@ MICO::UnixProcess::operator CORBA::Boolean ()
     return _pid > 0;
 }
 
+#ifndef HAVE_THREADS
 void
 MICO::UnixProcess::callback (CORBA::Dispatcher *disp,
 			     CORBA::DispatcherCallback::Event ev)
@@ -194,7 +242,7 @@ MICO::UnixProcess::callback (CORBA::Dispatcher *disp,
     if (ev == CORBA::Dispatcher::Timer && _cb)
 	_cb->callback (this, MICO::ProcessCallback::Exited);
 }
-
+#endif // HAVE_THREADS
 
 /*************************** UnixSharedLib ****************************/
 

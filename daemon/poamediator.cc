@@ -439,6 +439,13 @@ POAMediatorImpl::create_server (const char * svid)
   command += " -POARemoteIOR ";
   command += s;
 
+  if (inf.proc != NULL && inf.proc->finished()) {
+    // GCing still allocated previous UnixProcess object which happen
+    // on multi-threaded build due to inabiliaty to delete still
+    // running thread object in the process callback method
+    delete inf.proc;
+    inf.proc = 0;
+  }
   inf.pstate = Started;
   inf.proc = new MICO::UnixProcess (command.c_str(), this);
 
@@ -989,6 +996,23 @@ POAMediatorImpl::callback (MICO::Process * proc,
 			   MICO::ProcessCallback::Event ev)
 {
   MICOMT::AutoLock l(svmap_lock_);
+
+#ifdef HAVE_THREADS
+  // in case of using thread instead of signal handler
+  // we cannot delete UnixProcess/Thread object as this
+  // is still running when it calls this method so we do not delete
+  // it, sometimes we need to do some garbage collecting of finished
+  // Processes/Threads. And the time is now.
+  MapSvInf::iterator gcit;
+  for (gcit = svmap.begin(); gcit != svmap.end(); gcit++) {
+    MICOMT::AutoLock l2((*gcit).second.lock);
+    if ((*gcit).second.proc->finished()) {
+        delete (*gcit).second.proc;
+        (*gcit).second.proc = 0;
+    }
+  }
+#endif // HAVE_THREADS
+
   /*
    * Find appropriate server
    */
@@ -1013,8 +1037,11 @@ POAMediatorImpl::callback (MICO::Process * proc,
   case MICO::ProcessCallback::Exited:
     if ((*it).second.pstate == Active) {
       (*it).second.pstate = Inactive;
+#ifndef HAVE_THREADS
+      // can't delete still running thread object!
       delete (*it).second.proc;
       (*it).second.proc = 0;
+#endif // HAVE_THREADS
     }
     else if ((*it).second.pstate == Started) {
       OSMisc::TimeVal ct = OSMisc::gettime();
@@ -1030,12 +1057,18 @@ POAMediatorImpl::callback (MICO::Process * proc,
       invqueue.exec_later();
     }
     else if ((*it).second.pstate == Stopped) {
+#ifndef HAVE_THREADS
+      // can't delete still running thread object!
       delete (*it).second.proc;
       (*it).second.proc = 0;
+#endif // HAVE_THREADS
     }
     else if ((*it).second.pstate == Holding) {
+#ifndef HAVE_THREADS
+      // can't delete still running thread object!
       delete (*it).second.proc;
       (*it).second.proc = 0;
+#endif // HAVE_THREADS
       (*it).second.pstate = Stopped;
     }
     else {

@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2001 by The Mico Team
+ *  Copyright (c) 1997-2019 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -30,7 +30,13 @@
 
 namespace MICO {
 
-class UnixProcess : public MICO::Process, public CORBA::DispatcherCallback {
+class UnixProcess : public MICO::Process
+#ifndef HAVE_THREADS
+                  , public CORBA::DispatcherCallback
+#else // HAVE_THREADS
+                  , public MICOMT::Thread
+#endif // HAVE_THREADS
+{
 
     CORBA::Long _exit_status;
     CORBA::Boolean _detached;
@@ -60,9 +66,12 @@ class UnixProcess : public MICO::Process, public CORBA::DispatcherCallback {
     CORBA::Long _pid;
 #endif
     typedef std::list<UnixProcess *> ListProcess;
+#ifndef HAVE_THREADS
     static ListProcess _procs;
-
     static void signal_handler (int sig);
+#else // HAVE_THREADS
+    void _run(void*);
+#endif // HAVE_THREADS
 public:
 #if defined (_WIN32) || defined (_POCKET_PC)
     static void _init();
@@ -77,9 +86,10 @@ public:
     virtual void terminate ();
     virtual void detach ();
     virtual operator CORBA::Boolean ();
-
+#ifndef HAVE_THREADS
     virtual void callback (CORBA::Dispatcher *,
 			   CORBA::DispatcherCallback::Event);
+#endif // HAVE_THREADS
 };
 
 }
