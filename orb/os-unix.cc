@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2001 by The Mico Team
+ *  Copyright (c) 1997-2019 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -132,16 +132,25 @@ CORBA::Boolean
 MICO::UnixProcess::run ()
 {
     ::signal (SIGCHLD, signal_handler);
-
+    string command;
+#ifndef __CYGWIN32__
+    // with Cygwin32 using "exec" doesnt work for some strange reason
+    command = "exec ";
+#endif
+    command += _args;
+    const char* cmd = command.c_str();
+    // keep code between fork/exec as short as possible! Especially
+    // without any libraries calls which may results in malloc calls
+    // which may results in locking which may results in
+    // dead-locks. Remember fork forks all the memory including
+    // possible locks mutexes but does not fork threads which would
+    // potentially unlock locked mutexes hence keeping the code
+    // between fork/exec as short/clean as possible prevent hard to
+    // debug dead-lock with symptoms on waiting on mutex(es) somewhere
+    // in malloc code.
     _pid = ::fork ();
     if (_pid == 0) {
-	string command;
-#ifndef __CYGWIN32__
-	// with Cygwin32 using "exec" doesnt work for some strange reason
-	command = "exec ";
-#endif
-	command += _args;
-	::execl ("/bin/sh", "/bin/sh", "-c", command.c_str(), NULL);
+	::execl ("/bin/sh", "/bin/sh", "-c", cmd, NULL);
 	exit (1);
     }
     return _pid > 0;
