@@ -2519,13 +2519,19 @@ MICO::GIOPConn::terminate ()
 
     _disp->remove (this, CORBA::Dispatcher::Timer);
 
-    //REMEMBER: terminate tells the thread to exit
-    //          it does NOT cancel the thread
+    //REMEMBER: GIOPConn::terminate tells the thread to exit
+    //          it does NOT cancel the thread since canceling
+    //          thread requires another thread joining the canceled one
+    //          and this is not possible in one thread, E.g.
+    //          calling _reader->terminate() followed by _reader->wait()
+    //          results in race-condition and sometimes we get thread finish
+    //          before the wait/join gets a chance to reach it and the famous
+    //          "terminate called without an active exception" message is thrown
+    //          to the console together with app hard crash/assert
     if (_M_use_writer_thread)
       _writer->init_shutdown();
     if (_M_use_reader_thread) {
         if (!this->is_this_reader_thread()) {
-            _reader->terminate();
             _reader->wait();
         }
     }
@@ -2569,7 +2575,8 @@ MICO::GIOPConn::~GIOPConn ()
 #ifdef HAVE_THREADS
     if (_M_use_reader_thread) {
         if (!this->is_this_reader_thread()) {
-            _reader->terminate();
+            // we don't call _read->terminate() here, see comment in
+            // GIOPConn::terminate about it.
             _reader->wait();
             delete _reader;
         }
