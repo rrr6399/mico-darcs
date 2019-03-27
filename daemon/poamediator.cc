@@ -1014,7 +1014,8 @@ POAMediatorImpl::callback (MICO::Process * proc,
   MapSvInf::iterator gcit;
   for (gcit = svmap.begin(); gcit != svmap.end(); gcit++) {
     MICOMT::AutoLock l2((*gcit).second.lock);
-    if ((*gcit).second.proc->finished()) {
+    if ((*gcit).second.proc != NULL
+        && (*gcit).second.proc->finished()) {
         delete (*gcit).second.proc;
         (*gcit).second.proc = 0;
     }
