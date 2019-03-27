@@ -953,7 +953,7 @@ POAMediatorImpl::notify (CORBA::ORB_ptr porb, CORBA::ORBMsgId id,
       CORBA::LocateStatus stat = porb->get_bind_reply (id, obj);
 
       MapIdId::iterator i = requests.find (id);
-      if (i == requests.end() && stat == CORBA::LocateUnknown) {
+      if (i == requests.end()) {
           // the invocation was already canceled/removed from requests
           // by some successful (returning LocateHere) bind call. No
           // need to do anythig here except perhaps cancel the invocation.
