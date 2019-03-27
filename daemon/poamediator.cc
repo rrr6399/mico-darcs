@@ -850,7 +850,11 @@ POAMediatorImpl::shutdown_server ()
 
       for (MapSvInf::iterator it1 = svmap.begin(); it1 != svmap.end(); it1++) {
         MICOMT::AutoLock l2((*it1).second.lock);
+#ifndef HAVE_THREADS
         if ((*it1).second.proc != 0) {
+#else // HAVE_THREADS
+        if ((*it1).second.proc != 0 && !((*it1).second.proc->finished())) {
+#endif // HAVE_THREADS
           waiting = TRUE;
         }
       }
@@ -866,7 +870,11 @@ POAMediatorImpl::shutdown_server ()
   MICOMT::AutoLock l(svmap_lock_);
   for (MapSvInf::iterator it2 = svmap.begin(); it2 != svmap.end(); it2++) {
     MICOMT::AutoLock l2((*it2).second.lock);
+#ifndef HAVE_THREADS
     if ((*it2).second.proc != 0) {
+#else // HAVE_THREADS
+    if ((*it2).second.proc != 0 && !((*it2).second.proc->finished())) {
+#endif // HAVE_THREADS
       cerr << "*** server cannot be stopped: " << (*it2).first << endl;
     }
   }
