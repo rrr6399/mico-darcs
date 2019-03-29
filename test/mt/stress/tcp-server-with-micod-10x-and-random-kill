@@ -1,0 +1,23 @@
+#!/bin/sh
+set -x
+ADDR=inet:localhost:7788
+#micod --dont-forward --ior ref -ORBIIOPAddr $ADDR &
+micod --ior ref -ORBIIOPAddr $ADDR &
+sleep 2
+for i in `seq 0 9`
+do
+  imr -ORBImplRepoIOR file://`pwd`/ref create bench_$i poa "`pwd`/server bench$i" IDL:bench:1.0#bench$i
+  imr -ORBImplRepoIOR file://`pwd`/ref activate bench_$i
+done
+sleep 1
+for ((i=0; i<1000000; i++))
+do
+  echo "$i. cycle..."
+  TM=$(( ( RANDOM % 5 ) + 5 ))
+  echo "Sleeping for $TM seconds."
+  sleep $TM
+  PP=$(( RANDOM % 10 ))
+  PID=`ps x -o pid,cmd|grep server|grep bench_$PP|awk '{print $1}'`
+  echo "Killing server for bench_$PP of pid: $PID"
+  kill $PID
+done
