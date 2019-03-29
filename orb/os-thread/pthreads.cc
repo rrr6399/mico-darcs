@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2018 by The Mico Team
+ *  Copyright (c) 1997-2019 by The Mico Team
  * 
  *  OSThread: An abstract Thread class for MICO
  *  Copyright (C) 1999 Andy Kersting & Andreas Schultz
@@ -248,14 +248,14 @@ MICOMT::Thread::_thr_startup(void *arg)
         // terminating thread. (e.g. using Thread::terminate which is using
         // pthread_cancel function)
 
-#ifdef _THR_CREATE_AND_BLOCK
-        _ready.unlock();
-#endif // _THR_CREATE_AND_BLOCK
-
         {
             MICOMT::AutoLock l(_finished_lock);
             _finished = true;
         }
+
+#ifdef _THR_CREATE_AND_BLOCK
+        _ready.unlock();
+#endif // _THR_CREATE_AND_BLOCK
 
         // this is Linux/Glibc and we're unwinding caused by pthread_cancel
         // we cannot call pthread_exit here
@@ -268,14 +268,13 @@ MICOMT::Thread::_thr_startup(void *arg)
              << endl;
         __mtdebug_unlock();
     }
-#ifdef _THR_CREATE_AND_BLOCK
-    _ready.unlock();
-#endif // _THR_CREATE_AND_BLOCK
-
     {
         MICOMT::AutoLock l(_finished_lock);
         _finished = true;
     }
+#ifdef _THR_CREATE_AND_BLOCK
+    _ready.unlock();
+#endif // _THR_CREATE_AND_BLOCK
     pthread_exit(NULL);
 }
 
