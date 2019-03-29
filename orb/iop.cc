@@ -5497,9 +5497,12 @@ MICO::IIOPServer::pull_invoke_orbid (CORBA::ORBMsgId id)
     }
 #endif
 
-    MICO::IIOPServerInvokeRec *rec;
+    MICO::IIOPServerInvokeRec *rec = NULL;
 
     rec = (MICO::IIOPServerInvokeRec *)_orb->get_request_hint( id );
+    if (!rec)
+        return NULL;
+
     if (rec && rec->active() ) {
 	rec->deactivate();
 	return rec;
@@ -5644,6 +5647,8 @@ MICO::IIOPServer::del_invoke_reqid (MsgId msgid, GIOPConn *conn)
 void
 MICO::IIOPServer::abort_invoke_orbid (IIOPServerInvokeRec *rec)
 {
+    CORBA::ORBMsgId_var m = rec->orbid();
+    _orb->set_request_hint( m, NULL );
     _orb->cancel ( rec->orbmsgid() );
     // del_invoke_orbid ( rec );
 }
