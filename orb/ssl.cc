@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2016 by The Mico Team
+ *  Copyright (c) 1997-2019 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -1465,7 +1465,6 @@ void
 MICOSSL::SSLProfile::encode (CORBA::DataEncoder &ec) const
 {
     CORBA::Boolean port_zeroed = FALSE;
-#ifdef USE_CSIV2
     // here we have the only one chance to 
     // tweak port in TAG_CSI_SEC_MECH_LIST
     // component
@@ -1476,6 +1475,7 @@ MICOSSL::SSLProfile::encode (CORBA::DataEncoder &ec) const
     MICO::InetAddress* iaddr = dynamic_cast<MICO::InetAddress*>
 	(t_a);
     assert(iaddr != NULL);
+#ifdef USE_CSIV2
     if (iaddr->port() != 0) {
 	// the first call of this method => we need to change CSIv2 component
 	// and set port in profile to 0
