@@ -97,9 +97,20 @@ try {
     string s = argv[1];
     method = argv[2];
     cout << "binding: " << s << endl;
-    if (s == "bind") {
+    if (s.find("bind") != string::npos) {
 	cout << "binding..." << endl;
-	CORBA::Object_ptr obj = orb->bind ("IDL:bench:1.0");
+        size_t pos = -1;
+	CORBA::Object_ptr obj = CORBA::Object::_nil();
+        if ((pos = s.find("#")) != string::npos) {
+            string tag;
+            tag = s.substr(pos + 1, s.size());
+            cout << "tag: `" + tag << "'" << endl;
+            CORBA::ORB::ObjectTag_var t = CORBA::ORB::string_to_tag(tag.c_str());
+            obj = orb->bind ("IDL:bench:1.0", t, "inet:localhost:7788");
+        }
+        else {
+            obj = orb->bind ("IDL:bench:1.0");
+        }
 	bench = bench::_narrow (obj);
 	cout << "binded." << endl;
     }

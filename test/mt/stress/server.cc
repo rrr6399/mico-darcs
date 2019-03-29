@@ -46,8 +46,12 @@ public:
 int
 main (int argc, char* argv[])
 {
+    string tag = "bench";
     //  cerr << "main thread: " << MICOMT::Thread::self() << endl;
     orb = CORBA::ORB_init (argc, argv, "mico-local-orb");
+    if (argc > 1) {
+        tag = argv[1];
+    }
     CORBA::Object_ptr obj = orb->resolve_initial_references ("RootPOA");
     PortableServer::POA_ptr poa = PortableServer::POA::_narrow (obj);
     CORBA::release (obj);
@@ -61,7 +65,7 @@ main (int argc, char* argv[])
 
     bench_impl* servant = new bench_impl;
     PortableServer::ObjectId_var oid =
-        PortableServer::string_to_ObjectId ("bench");
+        PortableServer::string_to_ObjectId (tag.c_str());
     benchpoa->activate_object_with_id (*oid, servant);
 
     CORBA::Object_ptr ref = benchpoa->servant_to_reference (servant);  
