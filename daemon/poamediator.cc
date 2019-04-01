@@ -181,8 +181,11 @@ POAMediatorImpl::deactivate_impl (const char * svid)
 
   if (inf.proc) {
     inf.proc->detach ();
+#ifndef HAVE_THREADS
+    // can't delete still running thread object!
     delete inf.proc;
     inf.proc = 0;
+#endif // HAVE_THREADS
   }
 }
 
