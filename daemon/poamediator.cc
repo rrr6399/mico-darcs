@@ -213,7 +213,11 @@ POAMediatorImpl::force_activation (CORBA::ImplementationDef_ptr impl)
     return 1;
 
   case Stopped:
-    if (inf.proc) {
+    if (inf.proc
+#ifdef HAVE_THREADS
+        && !inf.proc->finished()
+#endif // HAVE_THREADS
+        ) {
       cerr << "*** server cannot be activated: " << svid << endl
 	   << "    in stopped state, still wating for server to exit" << endl;
       return 0;
@@ -309,7 +313,11 @@ POAMediatorImpl::stop (CORBA::ImplementationDef_ptr impl)
     {
       MICOMT::AutoLock l(svmap_lock_);
       MICOMT::AutoLock l2(svmap[svid.in()].lock);
-      if (svmap[svid.in()].proc == NULL) {
+      if (svmap[svid.in()].proc == NULL
+#ifdef HAVE_THREADS
+          || (svmap[svid.in()].proc != NULL && svmap[svid.in()].proc->finished())
+#endif // HAVE_THREADS
+          ) {
         finish = TRUE;
       }
     }
@@ -319,7 +327,11 @@ POAMediatorImpl::stop (CORBA::ImplementationDef_ptr impl)
   {
     MICOMT::AutoLock l(svmap_lock_);
     MICOMT::AutoLock l2(svmap[svid.in()].lock);
-    if (svmap[svid.in()].proc) {
+    if (svmap[svid.in()].proc
+#ifdef HAVE_THREADS
+        && !svmap[svid.in()].proc->finished()
+#endif // HAVE_THREADS
+        ) {
       cerr << "*** server cannot be stopped: " << svid << endl;
       return 0;
     }
