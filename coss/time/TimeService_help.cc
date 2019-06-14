@@ -66,7 +66,7 @@ TimeBase::TimeT getInaccuracy()
 
 TimeBase::TimeT getTimezone()
 {
-#if defined(HAVE_FTIME)
+#if defined(HAVE_FTIME) && false
    //obtain timezone
    timeb  timestruct;
    ftime(&timestruct);

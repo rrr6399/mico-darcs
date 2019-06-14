@@ -554,8 +554,9 @@ void
 MICO::MTManager::free()
 {
     assert(_S_mt_manager_shutdown_);
-    assert(_S_thread_pool_manager != NULL);
-    delete _S_thread_pool_manager;
+    if(_S_thread_pool_manager != NULL) {
+      delete _S_thread_pool_manager;
+    }
     _S_thread_pool_manager = NULL;
 }
 

@@ -179,13 +179,22 @@ int main (int argc, char *argv[])
     }
   }
 
-  CORBA::PolicyList_var policy_list = new CORBA::PolicyList(2); 
+  CORBA::PolicyList_var policy_list = new CORBA::PolicyList(2);
   policy_list->length(2);
   policy_list[(CORBA::ULong)0] = poa->create_lifespan_policy(PortableServer::TRANSIENT);
   policy_list[(CORBA::ULong)1] = poa->create_id_assignment_policy(PortableServer::SYSTEM_ID);
 
   PortableServer::POAManager_var poa_manager = poa->the_POAManager();
   PortableServer::POA_var factory_poa = poa->create_POA("EventChannelFactoryPOA", poa_manager, policy_list);
+
+//  TimeBase::TimeT tout = 20000000ULL;
+//  Any value;
+//  value <<= tout;
+//  PolicyList pl;
+//  pl.length(1);
+//  pl[0] = orb->create_policy(Messaging::RELATIVE_RT_TIMEOUT_POLICY_TYPE, value);
+//  hello->hello();
+//  obj = hello->_set_policy_overrides(pl, ADD_OVERRIDE);
 
   EventChannelFactory_impl* factory_impl =  new EventChannelFactory_impl (max_queue_size);
 

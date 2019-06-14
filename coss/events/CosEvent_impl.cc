@@ -34,6 +34,7 @@
 #include <fstream.h>
 #endif
 
+#include <ostream>
 
 using namespace std;
 
@@ -565,8 +566,17 @@ EventChannel_impl::_reg_push_supplier (
     CosEventChannelAdmin::ProxyPushSupplier_ptr push_supp)
 {
     MICOMT::AutoLock lock(_push_supp);
-    _push_supp.push_back (
-        CosEventChannelAdmin::ProxyPushSupplier::_duplicate (push_supp));
+    CosEventChannelAdmin::ProxyPushSupplier_ptr push_supp_copy =   CosEventChannelAdmin::ProxyPushSupplier::_duplicate(push_supp);
+
+    ::TimeBase::TimeT tout = 20000000ULL;
+    CORBA::Any value;
+    value <<= tout;
+    CORBA::PolicyList pl;
+    pl.length(1);
+    pl[0] = push_supp_copy->_orbnc()->create_policy(Messaging::RELATIVE_RT_TIMEOUT_POLICY_TYPE, value);
+    push_supp_copy->_set_policy_overrides(pl,CORBA::ADD_OVERRIDE);
+
+    _push_supp.push_back (push_supp_copy);
 }
 
 void
@@ -593,11 +603,26 @@ EventChannel_impl::notify (const CORBA::Any &any)
     MICOMT::AutoLock push_lock(_push_supp);
     MICOMT::AutoLock pull_lock(_pull_supp);
     list<CosEventChannelAdmin::ProxyPushSupplier_var>::iterator i;
-    for (i = _push_supp.begin(); i != _push_supp.end (); i++)
-        (*i)->notify (any);
+    //rrr std::cout << "Size of list = " << _push_supp.size()  << std::endl;
+    for (i = _push_supp.begin(); i != _push_supp.end (); i++)  {
+#ifdef HAVE_EXCEPTIONS
+      try {
+#endif
+        if((*i)->_non_existent()) {
+        	std::cout << "subscriber not responding" << std::endl;
+        } else {
+        	(*i)->notify (any);
+        }
+#ifdef HAVE_EXCEPTIONS
+      }  catch (CORBA::TIMEOUT& ex) {
+    	  std::cout << "ERROR: Timeout occurred for " << std::endl;
+      }
+#endif
+    }
     list<CosEventChannelAdmin::ProxyPullSupplier_var>::iterator j;
-    for (j = _pull_supp.begin(); j != _pull_supp.end (); j++)
+    for (j = _pull_supp.begin(); j != _pull_supp.end (); j++) {
         (*j)->notify (any);
+    }
 }
 
 void
