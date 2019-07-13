@@ -93,6 +93,16 @@ void ProxyPushSupplier_impl::connect_push_consumer (
     if (!CORBA::is_nil (consumer))
         mico_throw (CosEventChannelAdmin::AlreadyConnected ());
     consumer = CosEventComm::PushConsumer::_duplicate (push_consumer);
+
+    // set timeout on consumer callback client
+//    ::TimeBase::TimeT tout = 20000000ULL;
+//    CORBA::Any value;
+//    value <<= tout;
+//    CORBA::PolicyList pl;
+//    pl.length(1);
+//    pl[0] = consumer->_orbnc()->create_policy(Messaging::RELATIVE_RT_TIMEOUT_POLICY_TYPE, value);
+//    consumer->_set_policy_overrides(pl,CORBA::ADD_OVERRIDE);
+
     channel->listen (TRUE);
 }
 
@@ -110,8 +120,11 @@ void ProxyPushSupplier_impl::disconnect_push_supplier ()
     }
     int was_connected = !CORBA::is_nil (consumer);
     consumer = CosEventComm::PushConsumer::_nil();
-    if (was_connected)
-	channel->listen (FALSE);
+    if (was_connected) {
+    	channel->listen (FALSE);
+//    	channel->_add_stale_push_supplier(this->_this());
+    	//channel->_unreg_push_supplier(this->_this()); //rrr
+    }
 }
 
 void ProxyPushSupplier_impl::notify (const CORBA::Any &any)
@@ -132,17 +145,20 @@ ProxyPushSupplier_impl::callback (CORBA::Request_ptr req2,
                                   CORBA::RequestCallback::Event ev)
 {
     assert (ev == CORBA::RequestCallback::RequestDone);
-    MICOMT::AutoLock lock(requests);
+    /**
+     * This lock is blocking since the lock from notify is still active
+     */
+//rrr    MICOMT::AutoLock lock(requests);
     list<CORBA::Request_var>::iterator j = requests.begin();
     for (; j != requests.end(); ++j) {
         CORBA::Request_ptr req = (*j);
         if (req2 == req) {
             MICO_CATCHANY (req->get_response ());
             if (req->env()->exception()) {
-		cerr << "eventd: push failed with: "
-		     << req->env()->exception() << endl;
+            	cerr << "eventd: push failed with: "
+            			<< req->env()->exception() << endl;
                 disconnect_push_supplier();
-	    }
+	        }
             requests.erase (j);
             break;
         }
@@ -568,16 +584,17 @@ EventChannel_impl::_reg_push_supplier (
     MICOMT::AutoLock lock(_push_supp);
     CosEventChannelAdmin::ProxyPushSupplier_ptr push_supp_copy =   CosEventChannelAdmin::ProxyPushSupplier::_duplicate(push_supp);
 
-    ::TimeBase::TimeT tout = 20000000ULL;
-    CORBA::Any value;
-    value <<= tout;
-    CORBA::PolicyList pl;
-    pl.length(1);
-    pl[0] = push_supp_copy->_orbnc()->create_policy(Messaging::RELATIVE_RT_TIMEOUT_POLICY_TYPE, value);
-    push_supp_copy->_set_policy_overrides(pl,CORBA::ADD_OVERRIDE);
+//    ::TimeBase::TimeT tout = 20000000ULL;
+//    CORBA::Any value;
+//    value <<= tout;
+//    CORBA::PolicyList pl;
+//    pl.length(1);
+//    pl[0] = push_supp_copy->_orbnc()->create_policy(Messaging::RELATIVE_RT_TIMEOUT_POLICY_TYPE, value);
+//    push_supp_copy->_set_policy_overrides(pl,CORBA::ADD_OVERRIDE);
 
     _push_supp.push_back (push_supp_copy);
 }
+
 
 void
 EventChannel_impl::_reg_pull_consumer (
@@ -598,21 +615,25 @@ EventChannel_impl::_reg_pull_supplier (
 }
 
 void
+EventChannel_impl::_unreg_push_supplier (
+    CosEventChannelAdmin::ProxyPushSupplier_ptr push_supp)
+{
+    MICOMT::AutoLock lock(_push_supp);
+    _push_supp.remove (push_supp);
+}
+
+void
 EventChannel_impl::notify (const CORBA::Any &any)
 {
     MICOMT::AutoLock push_lock(_push_supp);
     MICOMT::AutoLock pull_lock(_pull_supp);
     list<CosEventChannelAdmin::ProxyPushSupplier_var>::iterator i;
-    //rrr std::cout << "Size of list = " << _push_supp.size()  << std::endl;
+    //std::cout << "Size of list = " << _push_supp.size()  << std::endl; // rrr
     for (i = _push_supp.begin(); i != _push_supp.end (); i++)  {
 #ifdef HAVE_EXCEPTIONS
       try {
 #endif
-        if((*i)->_non_existent()) {
-        	std::cout << "subscriber not responding" << std::endl;
-        } else {
-        	(*i)->notify (any);
-        }
+        (*i)->notify (any);
 #ifdef HAVE_EXCEPTIONS
       }  catch (CORBA::TIMEOUT& ex) {
     	  std::cout << "ERROR: Timeout occurred for " << std::endl;
@@ -622,6 +643,12 @@ EventChannel_impl::notify (const CORBA::Any &any)
     list<CosEventChannelAdmin::ProxyPullSupplier_var>::iterator j;
     for (j = _pull_supp.begin(); j != _pull_supp.end (); j++) {
         (*j)->notify (any);
+    }
+
+    for (i = _push_supp.begin(); i != _push_supp.end (); i++)  {
+//         CosEventChannelAdmin::ProxyPushSupplier_var junk = i;
+//        (*i)->disconnect_push_supplier();
+//        _push_supp.remove((*i));
     }
 }
 

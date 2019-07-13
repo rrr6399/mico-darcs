@@ -2532,6 +2532,7 @@ MICO::GIOPConn::terminate ()
       _writer->init_shutdown();
     if (_M_use_reader_thread) {
         if (!this->is_this_reader_thread()) {
+        	_reader->terminate(); // rrr put this back in since thread is hanging
             _reader->wait();
         }
     }

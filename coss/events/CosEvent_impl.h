@@ -181,6 +181,7 @@ public:
     void _reg_push_supplier (CosEventChannelAdmin::ProxyPushSupplier_ptr);
     void _reg_pull_consumer (CosEventChannelAdmin::ProxyPullConsumer_ptr);
     void _reg_pull_supplier (CosEventChannelAdmin::ProxyPullSupplier_ptr);
+    void _unreg_push_supplier (CosEventChannelAdmin::ProxyPushSupplier_ptr);
     void _disconnect ();
 
     void notify (const CORBA::Any &any);
@@ -197,6 +198,8 @@ private:
     MICOMT::Locked<std::list<CosEventChannelAdmin::ProxyPushConsumer_var> > _push_cons;
     MICOMT::Locked<std::list<CosEventChannelAdmin::ProxyPullSupplier_var> > _pull_supp;
     MICOMT::Locked<std::list<CosEventChannelAdmin::ProxyPullConsumer_var> > _pull_cons;
+
+    MICOMT::Locked<std::list<CosEventChannelAdmin::ProxyPushSupplier_var> > _push_supp_stale;
 
     CosEventChannelAdmin::SupplierAdmin_var supplier_admin;
     CosEventChannelAdmin::ConsumerAdmin_var consumer_admin;
