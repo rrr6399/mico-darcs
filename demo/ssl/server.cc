@@ -168,7 +168,7 @@ public:
 int
 main (int argc, char *argv[])
 {
-    PortableInterceptor::register_orb_initializer(new AccessCheckerInitializer());
+//    PortableInterceptor::register_orb_initializer(new AccessCheckerInitializer());
     the_orb = CORBA::ORB_init (argc, argv);
     CORBA::Object_var poaobj = the_orb->resolve_initial_references ("RootPOA");
     PortableServer::POA_var poa = PortableServer::POA::_narrow (poaobj);

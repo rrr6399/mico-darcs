@@ -1,4 +1,5 @@
 #!/bin/sh
+set -x
 
 # SSL addresses are usual MICO addresses prefixed by 'ssl:', e.g.
 #  ssl:inet:0.0:0
@@ -42,12 +43,14 @@ ADDR=ssl:inet:`uname -n`:12124
 
 
 ./server -ORBIIOPAddr $ADDR -ORBSSLcert s_cert.pem -ORBSSLkey s_key.pem \
-  -ORBSSLverify 0 &
+  -ORBSSLverify 0 -ORBDebug Security &
 server_pid=$!
+echo server_pid = $server_pid
 sleep 2
+exit
 
 trap "kill $server_pid" 0
 
 ./client `cat sec_hello.ior` -ORBSSLcert c_cert.pem -ORBSSLkey c_key.pem \
-  -ORBSSLverify 0
+  -ORBSSLverify 0 -ORBDebug Security
 

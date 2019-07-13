@@ -228,7 +228,7 @@ extern "C" int gethostname (char *, size_t);
 #endif
 
 #ifndef HAVE_FINITE_PROTO
-extern "C" int finite (double);
+//extern "C" int finite (double);
 #endif
 
 #ifndef HAVE_FTIME_PROTO

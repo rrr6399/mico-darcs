@@ -30,7 +30,7 @@ main (int argc, char *argv[])
 {
     CORBA::ORB_var orb = CORBA::ORB_init (argc, argv);
 
-    assert (argc == 2);
+//    assert (argc >= 2);
     CORBA::Object_var obj = orb->string_to_object (argv[1]);
     if (CORBA::is_nil (obj)) {
 	cout << "cannot bind to " << argv[1] << endl;
