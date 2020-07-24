@@ -1,6 +1,6 @@
 #
 #  MICO --- an Open Source CORBA implementation
-#  Copyright (c) 1997-2019 by The Mico Team
+#  Copyright (c) 1997-2020 by The Mico Team
 #
 #  This library is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Library General Public
@@ -722,8 +722,15 @@ if test X"$GXX" = Xyes; then
       # we need to avoid 4.0.x but still support 4.4.0
       *4.0.0*|*4.0.1*|*4.0.2*|*4.0.3*|*4.0.4*)
         ;;
-      *4.*.*|*5.*.*|*6.*.*|*7.*.*|*8.*.*)
+      *4.*.*|*5.*.*)
         GCC_STRICT_ALIASING="yes"
+        ;;
+      *6.*.*|*7.*.*|*8.*.*)
+        GCC_STRICT_ALIASING="yes"
+        # although -Wall switches -Wnarrowing, since GNU C++ 6.x it
+        # becomes error instead of simple warning like it was on GNU C++ 5.x
+        # Tested on Ubuntu's 5.5.0, 6.5.0, 7.5.0 and 8.4.0
+        CXXFLAGS="-Wno-narrowing $CXXFLAGS"
         ;;
       *)
         echo "WARNING: Your GNU C++ compiler is unknown so we do not know"
