@@ -1,6 +1,7 @@
 
 #include "bench.h"
 #include <CORBA.h>
+#include <coss/CosNaming.h>
 #include <iostream>
 #include <string>
 
@@ -119,6 +120,32 @@ try {
 	cin >> ior;
 	CORBA::Object_ptr obj = orb->string_to_object(ior.c_str());
 	bench = bench::_narrow (obj);
+    }
+    else if (s == "nsd") {
+        CORBA::Object_var nsobj =
+            orb->resolve_initial_references ("NameService");
+        CosNaming::NamingContext_var nc = 
+            CosNaming::NamingContext::_narrow (nsobj);
+        if (CORBA::is_nil (nc)) {
+            cerr << "oops, I cannot access the Naming Service!" << endl;
+            exit (1);
+        }
+
+        CosNaming::Name name;
+        name.length (1);
+        name[0].id = CORBA::string_dup ("server");
+        name[0].kind = CORBA::string_dup ("");
+  
+        CORBA::Object_var obj;
+        cout << "Looking up Server ... " << flush;
+        try {
+            obj = nc->resolve (name);
+        }
+        catch (...) {
+        }
+        cout << "done." << endl;
+
+        bench = bench::_narrow (obj);
     }
     else {
 	cerr << "unsupported binding method." << endl;
