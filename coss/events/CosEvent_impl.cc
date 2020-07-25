@@ -1,7 +1,7 @@
 /*
  *  Implementation of COSS Event Service for MICO
  *  Copyright (C) 1997 Kai-Uwe Sattler, Kay Roemer
- *  Copyright (c) 1998-2010 by The Mico Team
+ *  Copyright (c) 1998-2020 by The Mico Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -115,13 +115,16 @@ void ProxyPushSupplier_impl::disconnect_push_supplier ()
 
 void ProxyPushSupplier_impl::notify (const CORBA::Any &any)
 {
-    MICOMT::AutoLock lock(requests);
-    if (CORBA::is_nil (consumer) ||
-        requests.size() >= channel->max_queue_size())
-        return;
-
-    CORBA::Request_ptr req = consumer->_request ("push");
-    requests.push_back (req);
+    CORBA::Request_ptr req = CORBA::Request::_nil();
+    {
+        MICOMT::AutoLock lock(requests);
+        if (CORBA::is_nil (consumer) ||
+            requests.size() >= channel->max_queue_size())
+            return;
+        req = consumer->_request ("push");
+        requests.push_back (req);
+    }
+    assert(!CORBA::is_nil(req));
     req->add_in_arg ("data") <<= any;
     req->send_deferred (this);
 }
