@@ -2,6 +2,8 @@
 #include "bench.h"
 #include <CORBA.h>
 #include <coss/CosNaming.h>
+#include <coss/CosEventComm.h>
+#include <coss/CosEventChannelAdmin.h>
 #include <iostream>
 #include <string>
 
@@ -10,6 +12,7 @@ using namespace std;
 
 bench_ptr bench;
 int num;
+int events_received;
 int delay;
 int thread_number;
 string method = "";
@@ -82,6 +85,22 @@ public:
 
 #endif // HAVE_THREADS
 
+class Consumer_impl : virtual public POA_CosEventComm::PushConsumer {
+public:
+  Consumer_impl () {}
+
+  void push (const CORBA::Any& data);
+  void disconnect_push_consumer ();
+};
+
+void Consumer_impl::push (const CORBA::Any& data) {
+    events_received++;
+}
+
+void Consumer_impl::disconnect_push_consumer () {
+  cout << "Consumer: disconnected !" << endl;
+}
+
 int
 main (int argc, char* argv[])
 {
@@ -151,7 +170,7 @@ try {
 	cerr << "unsupported binding method." << endl;
 	exit(2);
     }
-    if (CORBA::is_nil(bench)) {
+    if (CORBA::is_nil(bench) && s != "nsd") {
 	cerr << "can't bind to the bench interface" << endl;
 	exit(1);
     }
@@ -271,13 +290,120 @@ try {
         while (orb->work_pending()) {
             orb->perform_work();
         }
+    }
+    else if (method == "send_event") {
+        CORBA::Object_var nsobj =
+            orb->resolve_initial_references ("NameService");
+        assert (! CORBA::is_nil (nsobj));
+  
+        CosNaming::NamingContext_var nc = 
+            CosNaming::NamingContext::_narrow (nsobj);
+        assert (! CORBA::is_nil (nc));
+
+        CosNaming::Name name;
+        name.length (1);
+        name[0].id = CORBA::string_dup ("MyEventChannel");
+        name[0].kind = CORBA::string_dup ("");
+
+        cerr << "looking for EventChannel" << endl;
+        CORBA::Object_var obj = nc->resolve (name);
+  
+        CosEventChannelAdmin::EventChannel_var event_channel;
+        CosEventChannelAdmin::SupplierAdmin_var supplier_admin;
+        CosEventChannelAdmin::ProxyPushConsumer_var proxy_consumer;
+
+        event_channel = CosEventChannelAdmin::EventChannel::_narrow (obj);
+        assert (! CORBA::is_nil (event_channel));
+        cerr << "EventChannel found !" << endl;
+
+        supplier_admin = event_channel->for_suppliers ();
+        assert (! CORBA::is_nil (supplier_admin));
+
+        proxy_consumer = supplier_admin->obtain_push_consumer ();
+        assert (! CORBA::is_nil (proxy_consumer));
+        cerr << "ProxyPushConsumer obtained !" << endl;
+
+        CORBA::Any any;
+	for (int j=0; j<100; j++) {
+	    cout << "\r" << "progress: " << j << "%" << flush;
+	    for (int i=0; i<tnum; i++) {
+                any <<= (CORBA::ULong)i;
+                proxy_consumer->push (any);
+            }
+        }
+    }
+    else if (method == "recv_event") {
+        events_received = 0;
+        CORBA::Object_var poa_obj = orb->resolve_initial_references("RootPOA");
+        PortableServer::POA_var poa = PortableServer::POA::_narrow(poa_obj);
+        assert(!CORBA::is_nil(poa));
+        PortableServer::POAManager_var mgr = poa->the_POAManager();
+
+        Consumer_impl* consumer_impl = new Consumer_impl ();
+        CosEventComm::PushConsumer_var consumer = consumer_impl->_this();
+
+        CORBA::Object_var nsobj =
+            orb->resolve_initial_references ("NameService");
+        assert (! CORBA::is_nil (nsobj));
+  
+        CosNaming::NamingContext_var nc = 
+            CosNaming::NamingContext::_narrow (nsobj);
+        assert (! CORBA::is_nil (nc));
+
+        CosNaming::Name name;
+        name.length (1);
+        name[0].id = CORBA::string_dup ("EventChannelFactory");
+        name[0].kind = CORBA::string_dup ("");
+        CORBA::Object_var obj = nc->resolve (name);
+  
+        SimpleEventChannelAdmin::EventChannelFactory_var ecf;
+        CosEventChannelAdmin::EventChannel_var event_channel;
+        CosEventChannelAdmin::ConsumerAdmin_var consumer_admin;
+        CosEventChannelAdmin::ProxyPushSupplier_var proxy_supplier;
+
+        ecf = SimpleEventChannelAdmin::EventChannelFactory::_narrow (obj);
+        assert (! CORBA::is_nil (ecf));
+
+        name[0].id = CORBA::string_dup ("MyEventChannel");
+        name[0].kind = CORBA::string_dup ("");
+
+        CORBA::Boolean channel_exist = FALSE;
+        try {
+            obj = nc->resolve (name);
+            event_channel = CosEventChannelAdmin::EventChannel::_narrow (obj);
+            assert (! CORBA::is_nil (event_channel));
+            channel_exist = TRUE;
+        }
+        catch (...) {
+        }
+        if (!channel_exist) {
+            event_channel = ecf->create_eventchannel ();
+            assert (! CORBA::is_nil (event_channel));
+
+            nc->bind (name, 
+                      CosEventChannelAdmin::EventChannel::_duplicate (event_channel));
+        }
+        consumer_admin = event_channel->for_consumers ();
+        assert (! CORBA::is_nil (consumer_admin));
+
+        proxy_supplier = consumer_admin->obtain_push_supplier ();
+        assert (! CORBA::is_nil (proxy_supplier));
+        cerr << "ProxyPushSupplier obtained !" << endl;
+
+        proxy_supplier->connect_push_consumer (CosEventComm::PushConsumer::_duplicate (consumer));
+ 
+        mgr->activate();
+        while (events_received < num) {
+            orb->perform_work();
+        }
     } else {
 	assert(0);
     }
 #ifdef USE_MEMTRACE
     MemTrace_Report(stderr);
 #endif
-    bench->shutdown();
+    if (!CORBA::is_nil(bench))
+        bench->shutdown();
     orb->shutdown(TRUE);
     orb->destroy();
     cout << "client: finished." << endl;

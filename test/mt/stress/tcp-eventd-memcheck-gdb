@@ -1,0 +1,10 @@
+#!/bin/sh
+rm -f nsd.ref
+nsd --ior nsd.ref &
+nsd_pid=$!
+
+trap "kill $nsd_pid" 0
+sleep 2
+
+valgrind --vgdb=yes --vgdb-error=0 --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --num-callers=80 --leak-resolution=high eventd -ORBInitRef NameService=`cat nsd.ref` -ORBDebug Info
+
