@@ -863,7 +863,7 @@ if test X"$GXX" = Xyes; then
     CONF_SOEXT="dylib"
     CONF_PICFLAGS=
     CONF_LDSOFLAGS=
-    CXXFLAGS="$CXXFLAGS -Wno-long-double"
+    CFLAGS="$CFLAGS -Wno-implicit-function-declaration"
     LDCONFIG="echo ldconfig not run on darwin"
     ;;
   esac
