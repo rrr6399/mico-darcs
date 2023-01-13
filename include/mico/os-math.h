@@ -1,7 +1,7 @@
 // -*- c++ -*-
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2005 by The Mico Team
+ *  Copyright (c) 1997-2023 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -334,14 +334,14 @@ public:
 
 #if defined(__APPLE__) && defined(__MACH__)
 // it _IS_ defined on 10.4, 10.5
-#ifndef isinf
+#if !defined(isinf) && !defined(HAVE_ISINF)
 #define isinf( x ) ( ( sizeof ( x ) == sizeof(double) ) ?           \
                    __isinfd ( x ) :                                 \
                    ( sizeof ( x ) == sizeof( float) ) ?             \
                    __isinff ( x ) :                                 \
                    __isinf  ( x ) )
 #endif
-#ifndef isnan
+#if !defined(isnan) && !defined(HAVE_ISNAN)
 #define isnan( x ) ( ( sizeof ( x ) == sizeof(double) ) ?           \
                    __isnand ( x ) :                                 \
                    ( sizeof ( x ) == sizeof( float) ) ?             \
