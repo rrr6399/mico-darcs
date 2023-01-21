@@ -4,15 +4,41 @@
 #include <coss/CosNaming.h>
 #include <fstream>
 
+#include <unistd.h>
 
 using namespace std;
+using namespace PortableServer;
 
 CORBA::ORB_ptr orb = NULL;
+
+class bench_impl;
+
+class Deactivator
+    : virtual public MICOMT::Thread
+{
+public:
+    Deactivator(bench_impl* s, PortableServer::POA_ptr p, PortableServer::ObjectId i)
+    {
+        servant_ = s;
+        poa_ = PortableServer::POA::_duplicate(p);
+        oid_ = new PortableServer::ObjectId(i);
+    }
+
+    virtual void _run(void*);
+private:
+    bench_impl* servant_;
+    POA_var poa_;
+    ObjectId_var oid_;
+};
 
 class bench_impl
     : public virtual POA_bench
 {
 public:
+    bench_impl()
+        : deactivator_(NULL), dthr_started_(FALSE), bmtx_(FALSE, MICOMT::Mutex::Normal), cycles_(0)
+    {}
+
     void
     perform()
     {}
@@ -29,6 +55,20 @@ public:
     perform_oneway_with_context(CORBA::Context_ptr ctx)
     {}
 
+    CORBA::ULongLong
+    perform_with_deactivate()
+    {
+        {
+            MICOMT::AutoLock lock(bmtx_);
+            if (!dthr_started_) {
+                deactivator_->start();
+                dthr_started_ = TRUE;
+            }
+        }
+        // intentionaly without lock
+        return cycles_;
+    }
+
     void shutdown()
     {
 #ifdef USE_MEMTRACE
@@ -42,7 +82,42 @@ public:
     {
 	return new bench::LongSeq(x);
     }
+
+    void set_deactivator(Deactivator* dthr)
+    { deactivator_ = dthr; }
+
+    void inc_cycles()
+    {
+        // intentionally without lock!
+        cycles_++;
+    }
+private:
+    Deactivator* deactivator_;
+    bool dthr_started_;
+    MICOMT::Mutex bmtx_;
+    volatile CORBA::ULongLong cycles_;
 };
+
+void
+Deactivator::_run(void*)
+{
+    cerr << "deactivating cycle started." << endl;
+    for(;;) {
+        usleep(100);
+        try {
+            poa_->deactivate_object(*oid_);
+            poa_->activate_object_with_id(*oid_, servant_);
+            servant_->inc_cycles();
+        }
+        catch (const CORBA::SystemException& ex) {
+            cerr << "caught: " << ex._repoid() << endl;
+        }
+        catch (...) {
+            cerr << "caught something really strange!" << endl;
+        }
+    }
+    cerr << "ERROR! Shouldn't be here! Deactivator thread finishes!" << endl;
+}
 
 int
 main (int argc, char* argv[])
@@ -68,6 +143,8 @@ main (int argc, char* argv[])
     PortableServer::ObjectId_var oid =
         PortableServer::string_to_ObjectId (tag.c_str());
     benchpoa->activate_object_with_id (*oid, servant);
+    Deactivator* deactivator = new Deactivator(servant, benchpoa, oid);
+    servant->set_deactivator(deactivator);
 
     CORBA::Object_ptr ref = benchpoa->servant_to_reference (servant);  
     CORBA::String_var ior = orb->object_to_string (ref);

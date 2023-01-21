@@ -8,6 +8,7 @@ interface bench {
     void perform_with_context() context("a*");
     void perform_oneway_with_context() context("a*");
 
+    unsigned long long perform_with_deactivate();
     // seq based operations
     LongSeq long_seq(in LongSeq x);
 
