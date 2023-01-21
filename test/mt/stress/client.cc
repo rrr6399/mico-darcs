@@ -17,6 +17,7 @@ int delay;
 int thread_number;
 string method = "";
 CORBA::Context_var ctx, ctx2;
+string ior;
 
 #ifdef HAVE_THREADS
 
@@ -104,6 +105,9 @@ void Consumer_impl::disconnect_push_consumer () {
 int
 main (int argc, char* argv[])
 {
+  int exnum = 0;
+  long succ = 0;
+  CORBA::ULongLong cycles = 0;
 try {
     CORBA::ORB_ptr orb = CORBA::ORB_init (argc, argv, "mico-local-orb");
   
@@ -135,7 +139,6 @@ try {
 	cout << "binded." << endl;
     }
     else if (s == "ior") {
-	string ior;
 	cin >> ior;
 	CORBA::Object_ptr obj = orb->string_to_object(ior.c_str());
 	bench = bench::_narrow (obj);
@@ -223,8 +226,8 @@ try {
     if (method == "perform") {
 	for (int j=0; j<100; j++) {
 	    cout << "\r" << "progress: " << j << "%" << flush;
-	    for (int i=0; i<tnum; i++) {
-		bench->perform();
+     	    for (int i=0; i<tnum; i++) {
+                bench->perform();
 		//::sleep (delay);
 	    }
 	}
@@ -249,6 +252,22 @@ try {
 	    cout << "\r" << "progress: " << j << "%" << flush;
 	    for (int i=0; i<tnum; i++) {
                 bench->perform_oneway_with_context(ctx2);
+		//::sleep (delay);
+	    }
+	}
+    }
+    if (method == "perform_with_deactivate") {
+	for (int j=0; j<100; j++) {
+	    cout << "\r" << "progress: " << j << "%" << flush;
+            cout << " (activation-deactivation cycles: " << cycles << "/exceptions: " << exnum << ")" << flush;
+	    for (int i=0; i<tnum; i++) {
+                try {
+		    cycles = bench->perform_with_deactivate();
+                } catch (const CORBA::OBJECT_NOT_EXIST&) {
+                    exnum++;
+                    CORBA::Object_ptr obj = orb->string_to_object(ior.c_str());
+                    bench = bench::_narrow (obj);
+                }
 		//::sleep (delay);
 	    }
 	}

@@ -1,7 +1,7 @@
 /*
  *  MICO --- an Open Source CORBA implementation
  *  Copyright (C) 1998 Frank Pilhofer
- *  Copyright (c) 1999-2015 by The Mico Team
+ *  Copyright (c) 1999-2023 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -2714,7 +2714,7 @@ MICOPOA::POA_impl::activate_object_with_id (const PortableServer::ObjectId & id,
       do {
 	// wait unlocks the ObjectActivationLock
 	delref->condition.wait();
-      } while (delref->signal != 0);
+      } while (delref->signal != 1);
       delref->cnt--;
       if (delref->cnt == 0)
 	delete delref;
