@@ -1,6 +1,7 @@
 /*
  *  MICO --- a free CORBA implementation
  *  Copyright (C) 1997-98 Kay Roemer & Arno Puder
+ *  Copyright (c) 1998-2020 by The Mico Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -150,8 +151,21 @@ int main (int argc, char *argv[])
   signal (SIGTERM, sighandler);
 #endif
 
+  char** t_argv = new char*[argc+2];
+
+  for (int i=0; i<argc; ++i) {
+      t_argv[i] = argv[i];
+  }
+  // we can't use current invocation stack on eventd. eventd acts as a
+  // proxy and this causes troubles (memory leaks) with
+  // current implementation of the current invocation stack. Besides
+  // this, current invocation stack is not needed on eventd so far
+  // unless someone needs it, it's better to be disabled.
+  t_argv[argc++] = CORBA::string_dup("-ORBNoCurrentInvStack");
+  t_argv[argc] = 0;
+
   // ORB initialization
-  CORBA::ORB_var orb = CORBA::ORB_init (argc, argv, "mico-local-orb");
+  CORBA::ORB_var orb = CORBA::ORB_init (argc, t_argv, "mico-local-orb");
   PortableServer::POA_var poa = PortableServer::POA::_narrow(orb->resolve_initial_references("RootPOA"));
 
   string regname = "EventChannelFactory";
@@ -162,8 +176,8 @@ int main (int argc, char *argv[])
   opts["--max-queue-size"] = "arg-expected";
 
   MICOGetOpt opt_parser (opts);
-  if (!opt_parser.parse (argc, argv))
-    usage (argv[0]);
+  if (!opt_parser.parse (argc, t_argv))
+    usage (t_argv[0]);
 
   for (MICOGetOpt::OptVec::const_iterator i = opt_parser.opts().begin();
        i != opt_parser.opts().end(); ++i) {
@@ -175,7 +189,7 @@ int main (int argc, char *argv[])
     } else if (arg == "--max-queue-size") {
       max_queue_size = atoi (val.c_str());
     } else {
-      usage( argv[ 0 ] );
+      usage( t_argv[ 0 ] );
     }
   }
 

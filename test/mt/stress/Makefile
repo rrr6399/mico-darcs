@@ -2,8 +2,8 @@
 include ../../../MakeVars
 
 CXXFLAGS := -I. -I../../../include $(CXXFLAGS) #$(EHFLAGS)
-LDFLAGS  := -L../../../orb $(LDFLAGS) 
-LDLIBS    = -lmico$(VERSION) $(CONFLIBS)
+LDFLAGS  := -L../../../libs $(LDFLAGS) 
+LDLIBS    = -lmicocoss$(VERSION) -lmico$(VERSION) $(CONFLIBS)
 
 all .NOTPARALLEL: .depend client server proxy
 

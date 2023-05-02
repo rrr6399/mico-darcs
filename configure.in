@@ -1,6 +1,6 @@
 #
 #  MICO --- an Open Source CORBA implementation
-#  Copyright (c) 1997-2019 by The Mico Team
+#  Copyright (c) 1997-2023 by The Mico Team
 #
 #  This library is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Library General Public
@@ -725,6 +725,13 @@ if test X"$GXX" = Xyes; then
       *4.*.*|*5.*.*|*6.*.*|*7.*.*|*8.*.*)
         GCC_STRICT_ALIASING="yes"
         ;;
+      *6.*.*|*7.*.*|*8.*.*|*9.*.*|*10.*.*|*11.*.*|*12.*.*)
+        GCC_STRICT_ALIASING="yes"
+        # although -Wall switches -Wnarrowing, since GNU C++ 6.x it
+        # becomes error instead of simple warning like it was on GNU C++ 5.x
+        # Tested on Ubuntu's 5.5.0, 6.5.0, 7.5.0 and 8.4.0
+        CXXFLAGS="-Wno-narrowing $CXXFLAGS"
+        ;;
       *)
         echo "WARNING: Your GNU C++ compiler is unknown so we do not know"
         echo "WARNING: if to switch on or off strict aliasing rules!"
@@ -856,7 +863,7 @@ if test X"$GXX" = Xyes; then
     CONF_SOEXT="dylib"
     CONF_PICFLAGS=
     CONF_LDSOFLAGS=
-    CXXFLAGS="$CXXFLAGS -Wno-long-double"
+    CFLAGS="$CFLAGS -Wno-implicit-function-declaration"
     LDCONFIG="echo ldconfig not run on darwin"
     ;;
   esac

@@ -1,6 +1,6 @@
 /*
  *  MICO --- an Open Source CORBA implementation
- *  Copyright (c) 1997-2019 by The Mico Team
+ *  Copyright (c) 1997-2023 by The Mico Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -67,11 +67,16 @@
 #ifdef HAVE_THREADS
 #  ifdef HAVE_OPENSSL_SSL_H
 // test if OpenSSL supports multi-threaded environment
+#if OPENSSL_VERSION_NUMBER < 0x30000000L
+// OpenSSL 3.0 allows us to include configure only once
+// hence we are not allowed to undefine here otherwise we would not get
+// symbols from opensslconf.h include again.
 #    define OPENSSL_THREAD_DEFINES
 #    undef THREADS
 #    undef OPENSSL_THREADS
+#endif
 #    include <openssl/opensslconf.h>
-#    if !defined(THREADS) && !defined(OPENSSL_THREADS)
+#    if !defined(OPENSSL_THREADS)
 #      error You are trying to build multi-threaded MICO with single-threaded OpenSSL!
 #    endif // THREADS
 #    define USE_OPENSSL_THREAD_FUNCTIONS
@@ -99,6 +104,55 @@ MICOSSL::SSLTransport::S_transp_creds_
 = TransportSecurity::OwnCredentials::_nil();
 #endif // USE_SL3
 
+#if OPENSSL_VERSION_NUMBER < 0x1010106f
+
+void BIO_set_data(BIO *a, void *ptr)
+{
+	a->ptr = ptr;
+}
+
+void* BIO_get_data(BIO *a)
+{
+	return a->ptr;
+}
+
+void BIO_set_init(BIO *a, int init)
+{
+	a->init = init;
+}
+
+int BIO_get_init(BIO *a)
+{
+	return a->init;
+}
+
+void BIO_set_shutdown(BIO *a, int shut)
+{
+	a->shutdown = shut;
+}
+
+int BIO_get_shutdown(BIO *a)
+{
+	return a->shutdown;
+}
+
+void BIO_set_num(BIO *a, int n)
+{
+	a->num = n;
+}
+
+void BIO_set_flags(BIO *a, int f)
+{
+	a->flags = f;
+}
+
+#else
+
+void BIO_set_num(BIO *a, int n)
+{
+}
+
+#endif
 /***************************** BIO methods ****************************/
 
 extern "C" {
@@ -109,10 +163,10 @@ extern "C" {
 static int
 mico_bio_new (BIO *b)
 {
-    b->init = 0;
-    b->num = 0;
-    b->ptr = 0;
-    b->flags = 0;
+    BIO_set_init(b, 0);
+    BIO_set_num(b, 0);
+    BIO_set_data(b, 0);
+    BIO_set_flags(b, 0);
     return 1;
 }
 
@@ -121,14 +175,14 @@ mico_bio_free (BIO *b)
 {
     if (!b)
 	return 0;
-    if (b->shutdown) {
-	if (b->init) {
-	    CORBA::Transport *t = (CORBA::Transport *)b->ptr;	
+    if (BIO_get_shutdown(b)) {
+	if (BIO_get_init(b)) {
+	    CORBA::Transport *t = (CORBA::Transport *)BIO_get_data(b);
 	    assert (t);
 	    t->close ();
 	}
-	b->init = 0;
-	b->flags = 0;
+	BIO_set_init(b, 0);
+	BIO_set_flags(b, 0);
     }
     return 1;
 }
@@ -138,7 +192,7 @@ mico_bio_read (BIO *b, char *out, int len)
 {
     int ret = 0;
     if (out) {
-	CORBA::Transport *t = (CORBA::Transport *)b->ptr;
+	CORBA::Transport *t = (CORBA::Transport *)BIO_get_data(b);
 	assert (t);
 	ret = t->read (out, len);
 	BIO_clear_retry_flags (b);
@@ -155,7 +209,7 @@ mico_bio_write (BIO *b, const char *in, int len)
 {
     int ret;
 
-    CORBA::Transport *t = (CORBA::Transport *)b->ptr;
+    CORBA::Transport *t = (CORBA::Transport *)BIO_get_data(b);
     assert (t);
 
     ret = t->write (in, len);
@@ -191,29 +245,29 @@ mico_bio_ctrl (BIO *b, int cmd, long num, void *ptr)
 	break;
 
     case BIO_CTRL_SET:
-	b->ptr = ptr;
-	b->num = 0;
-	b->shutdown = (int)num;
-	b->init = 1;
+	BIO_set_data(b, ptr);
+	BIO_set_num(b, 0);
+	BIO_set_shutdown(b, (int)num);
+	BIO_set_init(b, 1);
 	break;
 
     case BIO_CTRL_GET:
-	if (b->init) {
+	if (BIO_get_init(b)) {
 	    if (!ptr)
 		ret = 0;
 	    else
-		*(char **)ptr = (char *)b->ptr;
+		*(char **)ptr = (char *)BIO_get_data(b);
 	} else {
 	    ret = -1;
 	}
 	break;
 
     case BIO_CTRL_GET_CLOSE:
-	ret = b->shutdown;
+	ret = BIO_get_shutdown(b);
 	break;
 
     case BIO_CTRL_SET_CLOSE:
-	b->shutdown = (int)num;
+	BIO_set_shutdown(b, (int)num);
 	break;
 
     case BIO_CTRL_PENDING:
@@ -232,6 +286,7 @@ mico_bio_ctrl (BIO *b, int cmd, long num, void *ptr)
     return ret;
 }
 
+#if OPENSSL_VERSION_NUMBER < 0x1010106f
 
 static BIO_METHOD mico_bio_methods = {
     BIO_TYPE_MEM, "mico_bio",
@@ -248,6 +303,22 @@ static BIO_METHOD *BIO_mico ()
 {
     return &mico_bio_methods;
 }
+
+#else
+
+static BIO_METHOD *BIO_mico ()
+{
+    BIO_METHOD* rv = BIO_meth_new(BIO_get_new_index(), "mico_bio");
+    BIO_meth_set_write(rv, (int (*)(BIO*, const char*, int))mico_bio_write);
+    BIO_meth_set_read(rv, (int (*)(BIO*, char*, int))mico_bio_read);
+    BIO_meth_set_puts(rv, (int (*)(BIO*, const char*))mico_bio_puts);
+    BIO_meth_set_ctrl(rv, (long (*)(BIO*, int, long int, void*))mico_bio_ctrl);
+    BIO_meth_set_create(rv, (int (*)(BIO*))mico_bio_new);
+    BIO_meth_set_destroy(rv, (int (*)(BIO*))mico_bio_free);
+    return rv;
+}
+
+#endif
 
 //
 // OpenSSL locking primitives
