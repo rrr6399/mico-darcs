@@ -25,7 +25,7 @@ include $(DIR_PREFIX)../../MakeVars
 
 LD = $(CXX)
 
-CXXFLAGS := -I. -I$(DIR_PREFIX)../../include $(CXXFLAGS) $(EHFLAGS)
+CXXFLAGS := -I. -I$(DIR_PREFIX)../../include $(CXXFLAGS) $(EHFLAGS)  -O0 -g
 CFLAGS   := -I. -I$(DIR_PREFIX)../../include $(CFLAGS)
 LDLIBS   := $(LDMICO) $(CONFLIBS)
 LDFLAGS  := -L$(DIR_PREFIX)../../libs $(LDFLAGS)

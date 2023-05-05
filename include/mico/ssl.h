@@ -39,10 +39,10 @@
 #endif /* USE_CSL2  */
 
 #ifdef HAVE_OPENSSL_SSL_H
+#include <openssl/bio.h>
 #include <openssl/objects.h>
 #include <openssl/crypto.h>
 #include <openssl/buffer.h>
-#include <openssl/bio.h>
 #include <openssl/ssl.h>
 #include <openssl/x509.h>
 #else

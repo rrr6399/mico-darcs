@@ -1,0 +1,3 @@
+configure --enable-debug --prefix=$HOME/mdopt/icf/corba/Linux64-3 --without-x --enable-threads --enable-shared \
+	--with-ssl=$HOME/mdopt/icf/corba/Linux64-3
+#--with-ssl=/ots/sw/osstoolkit/15.4/sles11-x86_64

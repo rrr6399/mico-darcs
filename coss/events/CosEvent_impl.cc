@@ -125,6 +125,7 @@ void ProxyPushSupplier_impl::disconnect_push_supplier ()
 //    	channel->_add_stale_push_supplier(this->_this());
     	//channel->_unreg_push_supplier(this->_this()); //rrr
     }
+    channel->_unreg_push_supplier(this->_this()); //rrr
 }
 
 void ProxyPushSupplier_impl::notify (const CORBA::Any &any)
@@ -158,11 +159,12 @@ ProxyPushSupplier_impl::callback (CORBA::Request_ptr req2,
         if (req2 == req) {
             MICO_CATCHANY (req->get_response ());
             if (req->env()->exception()) {
-            	cerr << "eventd: push failed with: "
-            			<< req->env()->exception() << endl;
-                disconnect_push_supplier();
+                //cerr << "eventd: push failed with: " << req->env()->exception() << endl;
+//rrr                disconnect_push_supplier();
 	        }
             requests.erase (j);
+            //cerr << "eventd: request queue " << requests.size() << endl;
+            //cerr << "eventd: request queue length after processing " << requests.size() << endl;
             break;
         }
     }
@@ -389,8 +391,7 @@ ProxyPullConsumer_impl::callback (CORBA::Request_ptr req,
 
     MICO_CATCHANY (req->get_response ());
     if (req->env()->exception()) {
-	cerr << "eventd: pull failed with: "
-	     << req->env()->exception() << endl;
+	cerr << "eventd: pull failed with: " << req->env()->exception() << endl;
 	disconnect_pull_consumer();
 	return;
     }

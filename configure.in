@@ -755,6 +755,7 @@ if test X"$GXX" = Xyes; then
   if test X"$use_threads" = Xyes; then
     CXXFLAGS="$CXXFLAGS -D_REENTRANT"
   fi
+  CXXFLAGS="$CXXFLAGS -std=c++98"
 
   case $target in
   *aix*)

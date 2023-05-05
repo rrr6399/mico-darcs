@@ -9,7 +9,7 @@ do
   if [ $ret -eq 0 ] ; then
     VER=`$i --version 2>&1`
     case $VER in
-    *version*2.13*)
+    *version*2.69*)
       AUTOCONF=$i
       ;;
     esac

@@ -1,5 +1,4 @@
 #!/bin/sh
-set -x
 
 # SSL addresses are usual MICO addresses prefixed by 'ssl:', e.g.
 #  ssl:inet:0.0:0
@@ -40,18 +39,25 @@ ADDR=ssl:inet:`uname -n`:12124
 #   openssl req -days 1000 -new -x509 -key s_key.pem -out s_cert.pem
 # the client key and certificate are created analogous.
 # see the OpenSSL documentation for details.
-echo $CWD
-ulimit -c unlimited
-d="-ORBDebugLevel 10 -ORBDebug Security"
-d="-ORBDebugLevel 10 -ORBDebug All"
-v="-ORBGIOPVersion 1.0"
-ADDR=ssl:inet:0.0.0.0:0 
-./server $v $d -ORBIIOPAddr $ADDR -ORBSSLCAfile ca_cert.pem -ORBSSLCApath `pwd` -ORBSSLcert s_cert.pem -ORBSSLkey s_key.pem -ORBSSLverify 1 -ORBNoResolve &
-server_pid=$!
 
-sleep 1
+ADDR=ssl:inet:0.0.0.0:0 
+
+./server -ORBIIOPAddr $ADDR -ORBSSLcert s_cert.pem -ORBSSLkey s_key.pem \
+-ORBGIOPVersion 1.2   \
+-ORBCSIv2  -ORBCSSNoAuth  -ORBCSSNoAttr  -ORBTSSNoAuth -ORBTSSNoAttr \
+-ORBSSLCAfile ca_cert.pem -ORBSSLCApath /boeing/sw/mdopt-versions/mdopt-7.0-beta/icf/corba/mico/demo/ssl   \
+-ORBDebugLevel 10 -ORBDebug Security    \
+-ORBSSLverify 1 &
+server_pid=$!
+sleep 2
 
 trap "kill $server_pid" 0
 
-./client `cat sec_hello.ior` $v $d -ORBSSLCAfile ca_cert.pem  -ORBSSLCApath `pwd` -ORBSSLcert c_cert.pem -ORBSSLkey c_key.pem  -ORBSSLverify 1 -ORBNoResolve 
+./client `cat sec_hello.ior` -ORBSSLcert c_cert.pem -ORBSSLkey c_key.pem \
+-ORBGIOPVersion 1.2   \
+-ORBCSIv2  -ORBCSSNoAuth  -ORBCSSNoAttr  -ORBTSSNoAuth -ORBTSSNoAttr \
+-ORBDebugLevel 10 -ORBDebug Security    \
+-ORBSSLCAfile ca_cert.pem -ORBSSLCApath /boeing/sw/mdopt-versions/mdopt-7.0-beta/icf/corba/mico/demo/ssl   \
+-ORBSSLverify 1
 
+exit

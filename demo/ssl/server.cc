@@ -39,8 +39,10 @@ class SecureHello_impl : public virtual POA_SecureHello {
 public:
     void hello ()
     {
-        CORBA::Object_var o =
-            the_orb->resolve_initial_references ("PrincipalCurrent");
+
+cout << "*****Received a hello request**" << endl;
+
+        CORBA::Object_var o = the_orb->resolve_initial_references ("PrincipalCurrent");
         CORBA::PrincipalCurrent_var pc =
             CORBA::PrincipalCurrent::_narrow (o);
 	CORBA::Principal_var princ = pc->get_principal();
@@ -116,12 +118,15 @@ public:
 
 	CORBA::Any_var a = p->get_property ("ssl-x509-subject:CN");
 	const char *name;
+	a >>= name;
+
+	cout << "***subject = :|" << name <<  "|" << endl;
 
 	/*
 	 * try changing "Roemer" to some other name to verify that
 	 * the access check works ...
 	 */
-	if (!(a >>= name) || strcmp (name, "Roemer")) {
+	if (strcmp (name, "mdopt.sea.boeing.com")!=0) {
 	    // permission denied ...
             mico_throw(CORBA::NO_PERMISSION());
 	}
@@ -168,7 +173,7 @@ public:
 int
 main (int argc, char *argv[])
 {
-//    PortableInterceptor::register_orb_initializer(new AccessCheckerInitializer());
+    PortableInterceptor::register_orb_initializer(new AccessCheckerInitializer());
     the_orb = CORBA::ORB_init (argc, argv);
     CORBA::Object_var poaobj = the_orb->resolve_initial_references ("RootPOA");
     PortableServer::POA_var poa = PortableServer::POA::_narrow (poaobj);

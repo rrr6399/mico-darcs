@@ -1373,7 +1373,7 @@ CSIv2::TSS_impl::receive_request
 	    = info->get_request_service_context(IOP::SecurityAttributeService);
 	msg_with_sas_context = TRUE;
     } catch (CORBA::SystemException_catch& ex) {
-	// the server run under CSIv2 and receive msg without SAS context.
+	// rrr: the server run under CSIv2 and receive msg without SAS context.
 	if (MICO::Logger::IsLogged(MICO::Logger::Security))
 	    MICO::Logger::Stream(MICO::Logger::Security)
 		<< "TSS_impl: someone is trying to send me msg"
